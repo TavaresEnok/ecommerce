@@ -3,7 +3,7 @@
 // Contratos preservados: o servidor recalcula preço/frete, a cotação vence, uma chave de idempotência por intenção evita
 // pedido duplicado em recarga ou duplo clique, e só a API declara "Pago".
 import { type FormEvent, useEffect, useRef, useState } from 'react';
-import { Alert, Badge, EmptyState, Field, StatusBadge } from './ui/kit';
+import { Alert, Badge, CopyButton, EmptyState, Field, StatusBadge } from './ui/kit';
 import { Icon } from './ui/icons';
 import { DISPUTE_STATUS, FULFILLMENT_STATUS, ORDER_STATUS, PAYMENT_STATUS, SUPPORT_KIND, SUPPORT_STATUS, label } from './ui/status';
 import { formatDate, formatDateTime, formatTime, money } from './ui/format';
@@ -33,7 +33,7 @@ export function CartFlow({ slug }: { slug: string }) {
   const [cart, setCart] = useState<CartData | null>(null), [loadError, setLoadError] = useState(''), [busy, setBusy] = useState(false);
   const [step, setStep] = useState<Step>('delivery'), [kind, setKind] = useState('TABLE'), [address, setAddress] = useState<Address | null>(null), [quote, setQuote] = useState<Quote | null>(null);
   const [buyer, setBuyer] = useState({ name: '', email: '', method: 'PIX' }), [methods, setMethods] = useState<{ simulation: boolean; reason: string } | null | undefined>(undefined);
-  const [errors, setErrors] = useState<{ cart?: string; delivery?: string; cep?: string; confirm?: string }>({}), [info, setInfo] = useState(''), [editItems, setEditItems] = useState(false);
+  const [errors, setErrors] = useState<{ cart?: string; delivery?: string; cep?: string; confirm?: string; changed?: boolean }>({}), [info, setInfo] = useState(''), [editItems, setEditItems] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => { call(slug, 'cart').then(setCart).catch((e) => setLoadError(e.message)); call(slug, 'payment-methods').then(setMethods).catch(() => setMethods(null)); }, [slug]);
   useEffect(() => { heading.current?.focus(); }, [step]);
@@ -56,7 +56,7 @@ export function CartFlow({ slug }: { slug: string }) {
     catch (e) {
       const m = (e as Error).message;
       // Só o 409 de preço/frete/disponibilidade pede nova cotação; os demais (loja sem conta de pagamento, vendas pausadas) ficam na revisão.
-      if (e instanceof StoreError && e.status === 409 && /pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ delivery: `${m} Preço, disponibilidade ou frete mudaram: calcule a entrega de novo e revise o novo total antes de confirmar. Seus dados foram mantidos.` }); }
+      if (e instanceof StoreError && e.status === 409 && /pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ changed: true }); }
       else setErrors({ confirm: m });
       setBusy(false);
     }
@@ -91,6 +91,7 @@ export function CartFlow({ slug }: { slug: string }) {
           {step !== 'delivery' && quote && address ? <dl className="summary"><dt>Método</dt><dd>{quote.method}: {money(quote.price_cents)} · prazo {quote.days} {quote.days === 1 ? 'dia' : 'dias'}</dd><dt>Endereço</dt><dd>{address.street}, {address.number}{address.complement ? `, ${address.complement}` : ''} — {address.city}/{address.state} · CEP {address.cep}</dd></dl> :
           <form className="form" aria-label="Calcular frete" onSubmit={(e) => void quoteDelivery(e)}>
             {errors.delivery && <Alert tone="danger" role="alert" title="Não foi possível calcular a entrega">{errors.delivery}</Alert>}
+            {errors.changed && <Alert tone="warning" role="alert" title="Os valores mudaram antes da confirmação">A loja recalculou preço, disponibilidade ou frete. Nenhum pedido foi criado. Calcule a entrega de novo e revise o novo total antes de confirmar; seus dados foram mantidos.</Alert>}
             <fieldset><legend>Como receber</legend><div className="pay-options">
               {[['TABLE', 'Entrega no endereço', 'Valor e prazo pela tabela de CEP da loja.'], ['PICKUP', 'Retirada na loja', 'Sem frete; a loja avisa quando estiver pronto.'], ['CARRIER', 'Transportadora', 'Cotação integrada, quando a loja oferece.']].map(([k, l, h]) => <label className="pay-option" key={k}><input type="radio" name="kind-ui" checked={kind === k} onChange={() => setKind(k!)} /><span><strong>{l}</strong><br /><span className="small muted">{h}</span></span></label>)}
             </div></fieldset>
@@ -201,7 +202,7 @@ export function ContactPage({ slug }: { slug: string }) {
       <Field label="Mensagem">{(a) => <textarea className="textarea" name="message" required maxLength={2000} {...a} />}</Field>
       <div><button className="btn btn-primary" disabled={busy}>Enviar</button></div>
     </form>
-    {result && <Alert tone="success" role="status" title={`Protocolo ${result.id}`}><p>Registrado em {formatDateTime(result.created_at)}. Resposta até {formatDate(result.due_at)}.</p><p>Código de acompanhamento: <code>{result.token}</code>. Guarde-o; ele não é exibido de novo.</p></Alert>}
+    {result && <Alert tone="success" role="status" title={`Protocolo ${result.id}`}><p>Registrado em {formatDateTime(result.created_at)}. Resposta até {formatDate(result.due_at)}.</p><p>Código de acompanhamento: <code>{result.token}</code>. Guarde-o; ele não é exibido de novo.</p><div><CopyButton value={result.token} label="Copiar código" /></div></Alert>}
     <h2>Acompanhar protocolo</h2>
     <form className="form" aria-label="Acompanhar protocolo" onSubmit={(e) => { const b = fields(e); setError(''); void follow(b.id!, b.token!).catch((err) => setError(err.message)); }}>
       <div className="form-grid"><Field label="Protocolo">{(a) => <input className="input" name="id" required {...a} />}</Field><Field label="Código de acompanhamento">{(a) => <input className="input" name="token" required {...a} />}</Field></div>

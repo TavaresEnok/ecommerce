@@ -164,7 +164,7 @@ await step('A-R12-04', async () => {
   const [ctx, page] = await open(1440); await toReview(page, A.slug); await buyerData(page);
   await api(`tenants/${A.id}/catalogue/variants/${v.id}`, { method: 'PATCH', actor: owner, body: { price_cents: String(BigInt(v.price_cents) + 100n) } });
   try {
-    await page.getByRole('button', { name: /^Confirmar compra de/ }).click(); const alert = page.getByRole('alert').filter({ hasText: /mudaram/ }); await alert.waitFor();
+    await page.getByRole('button', { name: /^Confirmar compra de/ }).click(); const alert = page.getByRole('alert').filter({ hasText: /valores mudaram/ }); await alert.waitFor();
     const form = await page.getByRole('form', { name: 'Calcular frete' }).count(), kept = await page.getByRole('form', { name: 'Calcular frete' }).getByLabel('Rua', { exact: true }).inputValue();
     await shot(page, 'A-R12-04-1440');
     await page.getByRole('form', { name: 'Calcular frete' }).getByRole('button', { name: 'Calcular frete' }).click(); await page.getByRole('heading', { name: 'Seus dados' }).waitFor(); await sleep(500);

@@ -68,6 +68,7 @@ const scenarios = [
   { id: 'R02-produtos', route: 'R02', persona: 'owner', path: `/painel/${A.id}` },
   { id: 'R02-produto-editar', route: 'R02', persona: 'owner', path: `/painel/${A.id}?produto=${A.products.long}` },
   { id: 'R02-funcionario', route: 'R02', persona: 'employee', path: `/painel/${A.id}` },
+  { id: 'R02-funcionario-vitrine', route: 'R02', persona: 'employee', path: `/painel/${A.id}?aba=vitrine` },
   { id: 'R02-novo-erro', route: 'R02', persona: 'owner', path: `/painel/${A.id}?novo=1`, act: async (page) => { const f = page.getByRole('form', { name: 'Cadastrar produto' }); await f.getByLabel('Nome', { exact: true }).fill('Produto com SKU repetido TESTE'); await f.getByLabel('SKU').fill('aurora-CAFE-001'); await f.getByLabel('Preço').fill('19,9'); await f.getByRole('button', { name: 'Cadastrar produto' }).click(); await page.getByRole('alert').first().waitFor(); } },
   { id: 'R02-estoque', route: 'R02', persona: 'owner', path: `/painel/${A.id}?aba=estoque` },
   { id: 'R02-midia', route: 'R02', persona: 'owner', path: `/painel/${A.id}?aba=midia` },

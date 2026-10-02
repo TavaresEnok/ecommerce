@@ -121,7 +121,7 @@ export default function Storefront({data,path=[],preview=false,previewTenant,q='
   </>;
   return <div className="surface-store" data-store={route.slug} style={storeStyle(theme.color, theme.font) as CSSProperties}>
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
-    {preview && <div className="notice-bar store-notice"><div className="store-wrap cluster-tight"><Icon name="eye" size={16} /><strong>Preview privado do rascunho — não publicado.</strong>{previewTenant && <a href={`/painel/${previewTenant}?aba=vitrine`}>Voltar ao painel</a>}</div></div>}
+    {preview && <div className="notice-bar store-notice"><div className="store-wrap cluster-tight"><Icon name="eye" size={16} /><strong>Preview privado do rascunho — não publicado.</strong><span>Busca e carrinho ficam desativados.</span>{previewTenant && <a href={`/painel/${previewTenant}?aba=vitrine`}>Voltar ao painel</a>}</div></div>}
     {!preview && supplier?.synthetic && <div className="notice-bar store-notice"><div className="store-wrap">Loja sintética de TESTE: produtos, contatos e políticas fictícios; nenhuma venda real é feita.</div></div>}
     <header className="store-header"><div className="store-wrap">
       {home && !q ? <h1 className="store-name"><a href={base}>{theme.title}</a></h1> : <p className="store-name"><a href={base}>{theme.title}</a></p>}
@@ -129,12 +129,12 @@ export default function Storefront({data,path=[],preview=false,previewTenant,q='
         {menu.map((m) => { const p = m.path === '/' ? '' : m.path; return <li key={m.path}><a href={`${base}${p}`} aria-current={(p || '/') === here ? 'page' : undefined}>{m.label}</a></li>; })}
         {!menu.some((m) => m.path === '/atendimento') && <li><a href={`${base}/atendimento`} aria-current={here === '/atendimento' ? 'page' : undefined}>Atendimento</a></li>}
       </ul></nav>
-      <form className="store-search" action={base} role="search">
+      {!preview && <form className="store-search" action={base} role="search">
         <label className="sr-only" htmlFor="store-q">Buscar produto ou SKU</label>
         <input className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produto ou SKU" />
         <button className="btn btn-secondary" aria-label="Pesquisar"><Icon name="search" size={20} /></button>
-      </form>
-      <a className="store-cart btn btn-quiet" href={`${base}/carrinho`} aria-current={here === '/carrinho' ? 'page' : undefined}><Icon name="cart" size={20} />Carrinho</a>
+      </form>}
+      {!preview && <a className="store-cart btn btn-quiet" href={`${base}/carrinho`} aria-current={here === '/carrinho' ? 'page' : undefined}><Icon name="cart" size={20} />Carrinho</a>}
     </div></header>
     <main id="conteudo" className="store-wrap" tabIndex={-1}>{content}</main>
     {supplier && <footer className="store-footer"><div className="store-wrap cols">
