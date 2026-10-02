@@ -1,43 +1,146 @@
 'use client';
-import { FormEvent, useEffect, useState } from 'react';
-import { Checkout, ContactPage, OrderView } from './checkout';
+// Vitrine (R07–R14): catálogo, categoria, produto, página institucional e compra, com a cor e a fonte de títulos do tema
+// passando pelo algoritmo de marca (components/brand.ts). Nada da identidade da Plataforma aparece aqui.
+import { type CSSProperties, type FormEvent, type ReactNode, useEffect, useState } from 'react';
+import { CartFlow, ContactPage, OrderView } from './checkout';
+import { storeStyle } from './brand';
+import { money } from './ui/format';
+import { Icon } from './ui/icons';
+import { Alert, EmptyState, Field } from './ui/kit';
+export { money };
 export type Variant={id:string;sku:string;attributes:Record<string,string>;is_default:boolean;active:boolean;price_cents:string;available:number};
 export type Product={id:string;name:string;slug:string;description:string;status:string;variants:Variant[];media:{id:string}[]};
 export type Theme={title:string;description:string;hero:string;color:string;font:string;assets?:string[];pages:{slug:string;title:string;body:string}[];menu:{label:string;path:string}[];supplier?:{synthetic:boolean;name:string;document:string;address:string;email:string;phone:string;policies:string;delivery:string;risks:string}};
 export type StoreData={route:{slug:string;canonical:string};theme:Theme;products:Product[];categories:{slug:string;name:string}[];noindex:boolean};
-export const money=(value:string)=>{const cents=BigInt(value);return `R$ ${(cents/100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')},${(cents%100n).toString().padStart(2,'0')}`;};
-const fields=(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();return Object.fromEntries(new FormData(e.currentTarget));};
-async function api(slug:string,path:string,body?:unknown) {
-  const response=await fetch(`/api/public/stores/${slug}/cart${path}`,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:undefined,body:body?JSON.stringify(body):undefined,cache:'no-store'});
-  const data=await response.json();if(!response.ok)throw new Error(typeof data.error==='string'?data.error:data.error?.message||'Não foi possível concluir.');return data;
+
+const variantName = (v: Variant) => Object.values(v.attributes).join(' / ') || 'Padrão';
+const min = (values: string[]) => values.reduce((a, b) => (BigInt(b) < BigInt(a) ? b : a));
+function priceLabel(p: Product) {
+  const active = p.variants.filter((v) => v.active);
+  if (!active.length) return null;
+  const prices = active.map((v) => v.price_cents), low = min(prices);
+  return prices.some((c) => c !== low) ? `A partir de ${money(low)}` : money(low);
 }
-function Add({slug,product}:{slug:string;product:Product}) {
-  const variants=product.variants.filter(v=>v.active),[selected,setSelected]=useState(variants[0]?.id||''),[message,setMessage]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false);
-  const [ready,setReady]=useState(false);useEffect(()=>setReady(true),[]);
-  const variant=variants.find(v=>v.id===selected);
-  return <form aria-label={`Adicionar ${product.name}`} onSubmit={e=>{const b=fields(e);setBusy(true);setError('');void api(slug,'/items',{variant_id:selected,quantity:Number(b.quantity)}).then(()=>setMessage('Variação adicionada ao carrinho.')).catch(e=>setError(e.message)).finally(()=>setBusy(false));}}>
-    <label>Variação<select value={selected} onChange={e=>setSelected(e.target.value)}>{variants.map(v=><option key={v.id} value={v.id}>{Object.values(v.attributes).join(' / ')||'Padrão'} · {v.sku}</option>)}</select></label>
-    {variant&&<p><strong>{money(variant.price_cents)}</strong> · Disponível: {variant.available}</p>}
-    <label>Quantidade<input name="quantity" type="number" min="1" max={Math.min(99,variant?.available||1)} defaultValue="1" required/></label><button disabled={!ready||busy||!variant||variant.available<1}>Adicionar ao carrinho</button>{message&&<p role="status">{message} <a href={`/lojas/${slug}/carrinho`}>Ver carrinho</a></p>}{error&&<p role="alert" className="error">{error}</p>}
+
+function AddToCart({ slug, product }: { slug: string; product: Product }) {
+  const variants = product.variants.filter((v) => v.active);
+  const first = variants.find((v) => v.available > 0) ?? variants[0];
+  const [selected, setSelected] = useState(first?.id ?? ''), [added, setAdded] = useState(''), [error, setError] = useState(''), [qtyError, setQtyError] = useState(''), [busy, setBusy] = useState(false), [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
+  const variant = variants.find((v) => v.id === selected), soldOut = variants.every((v) => v.available < 1);
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const quantity = Number(new FormData(e.currentTarget).get('quantity'));
+    setBusy(true); setError(''); setQtyError(''); setAdded('');
+    try {
+      const response = await fetch(`/api/public/stores/${slug}/cart/items`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ variant_id: selected, quantity }), cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) { const m = typeof data.error === 'string' ? data.error : data.error?.message || (response.status === 429 ? 'Muitas tentativas em pouco tempo. Aguarde um instante e tente de novo.' : 'Não foi possível adicionar. Tente novamente.'); if (/quantidade|saldo|estoque|dispon/i.test(m)) setQtyError(m); else setError(m); return; }
+      setAdded(`${variants.length > 1 ? `${variantName(variant!)} adicionada` : 'Adicionado'} ao carrinho.`);
+    } catch { setError('Não foi possível conectar. Verifique sua conexão e tente novamente.'); }
+    finally { setBusy(false); }
+  }
+  if (!variants.length) return <p className="hint">Produto sem variação disponível no momento.</p>;
+  return <form className="stack" aria-label={`Adicionar ${product.name}`} onSubmit={(e) => void submit(e)}>
+    {variants.length > 1 && <fieldset><legend>Variação</legend><div className="options">{variants.map((v) => <div className="option" key={v.id}>
+      <input type="radio" name="variant" id={`v-${v.id}`} value={v.id} checked={selected === v.id} disabled={v.available < 1} onChange={() => { setSelected(v.id); setAdded(''); setQtyError(''); }} />
+      <label htmlFor={`v-${v.id}`}><span className="tick"><Icon name="check" size={16} /></span>{variantName(v)}{v.available < 1 && <span className="small"> · esgotada</span>}</label>
+    </div>)}</div></fieldset>}
+    {variant && <p className="small muted">{variant.available > 0 ? `${variant.available} ${variant.available === 1 ? 'disponível' : 'disponíveis'}` : 'Esgotada'} · SKU {variant.sku}</p>}
+    {soldOut ? <p><strong>Produto esgotado.</strong> <span className="muted">Volte mais tarde ou fale com a loja.</span></p> :
+    <div className="qty-row">
+      <Field label="Quantidade" error={qtyError}>{(a) => <input className="input" name="quantity" type="number" inputMode="numeric" min={1} max={Math.min(99, variant?.available || 1)} defaultValue={1} required {...a} />}</Field>
+      <button className="btn btn-primary" disabled={!ready || busy || !variant || variant.available < 1}>{busy ? 'Adicionando…' : 'Adicionar ao carrinho'}</button>
+    </div>}
+    <p role="status" className={added ? 'alert alert-success' : 'sr-only'} style={added ? { display: 'flex', gap: 'var(--space-8)', alignItems: 'center', flexWrap: 'wrap' } : undefined}>{added && <><Icon name="check" size={16} />{added} <a href={`/lojas/${slug}/carrinho`}>Ver carrinho</a></>}</p>
+    {error && <Alert tone="danger" role="alert" title="Não foi possível adicionar">{error}</Alert>}
   </form>;
 }
-function Cart({slug}:{slug:string}) {
-  type CartData={items:{variant_id:string;quantity:number;price_cents:string;name:string;sku:string;available:number;active:boolean;status:string}[];subtotal_cents:string;valid:boolean};
-  const [cart,setCart]=useState<CartData|null>(null),[error,setError]=useState(''),[quote,setQuote]=useState<{id:string;method:string;price_cents:string;total_cents:string;expires_at:string;days:number}|null>(null),[busy,setBusy]=useState(false),[address,setAddress]=useState<any>(null);
-  useEffect(()=>{api(slug,'').then(setCart).catch(e=>setError(e.message));},[slug]);
-  async function change(variant_id:string,quantity:number){setBusy(true);setQuote(null);setError('');try{setCart(await api(slug,'/items',{variant_id,quantity}));}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
-  return <section><h2>Seu carrinho</h2><p>Preços recalculados no servidor. Adicionar itens não reserva estoque.</p>{error&&<p className="error" role="alert">{error}</p>}{cart?<><ul>{cart.items.map(i=><li key={i.variant_id}><h3>{i.name} · {i.sku}</h3><p>{money(i.price_cents)} por unidade</p>{(!i.active||i.status!=='ACTIVE'||i.quantity>i.available)&&<p role="alert">Item indisponível ou quantidade acima do saldo. Revise.</p>}<form onSubmit={e=>{const b=fields(e);void change(i.variant_id,Number(b.quantity));}}><label>Quantidade de {i.name}<input name="quantity" type="number" min="0" max="99" defaultValue={i.quantity} required/></label><button disabled={busy}>Atualizar quantidade</button></form><button disabled={busy} onClick={()=>void change(i.variant_id,0)}>Remover {i.name}</button></li>)}</ul><p>Subtotal: <strong>{money(cart.subtotal_cents)}</strong></p>
-    <h3>Consultar entrega</h3><form aria-label="Calcular frete" onSubmit={e=>{const b=fields(e),kind=b.kind;delete b.kind;setError('');setQuote(null);setBusy(true);setAddress({complement:'',...b,cep:String(b.cep).replace('-','')});void api(slug,'/quotes',{kind,address:b}).then(setQuote).catch(e=>setError(e.message)).finally(()=>setBusy(false));}}>
-    <label>Método<select name="kind"><option value="TABLE">Entrega por tabela de CEP</option><option value="PICKUP">Retirada na loja</option><option value="CARRIER">Transportadora (cotação)</option></select></label><label>CEP<input name="cep" pattern="[0-9]{5}-?[0-9]{3}" required autoComplete="postal-code"/></label><label>Rua<input name="street" required autoComplete="street-address"/></label><label>Número<input name="number" required/></label><label>Cidade<input name="city" required autoComplete="address-level2"/></label><label>UF<input name="state" minLength={2} maxLength={2} required autoComplete="address-level1"/></label><label>Complemento<input name="complement"/></label><button disabled={busy||!cart.valid||cart.items.length===0}>Calcular frete</button></form>
-    {quote&&<div role="status"><p>{quote.method}: {money(quote.price_cents)} · prazo {quote.days} dia(s)</p><p>Total: <strong>{money(quote.total_cents)}</strong></p><p>Cotação {quote.id} válida até {new Date(quote.expires_at).toLocaleTimeString('pt-BR')}. Mudanças exigem nova cotação.</p></div>}{quote&&address&&<Checkout slug={slug} quote={quote} subtotal={cart.subtotal_cents} address={address}/>}</>:<p>Carregando carrinho…</p>}</section>;
+
+function Gallery({ product, url }: { product: Product; url: (id: string, size: string) => string }) {
+  const [index, setIndex] = useState(0), current = product.media[index];
+  if (!current) return <div className="media no-photo-media" role="img" aria-label="Produto sem foto"><Icon name="box" size={20} /><span>Sem foto</span></div>;
+  return <div className="gallery">
+    <figure className="media"><img src={url(current.id, 'large')} alt={product.media.length > 1 ? `${product.name} — imagem ${index + 1} de ${product.media.length}` : product.name} /></figure>
+    {product.media.length > 1 && <ul className="thumbs" aria-label="Imagens do produto">{product.media.map((m, i) => <li key={m.id}><button type="button" aria-label={`Mostrar imagem ${i + 1} de ${product.media.length}`} aria-current={i === index ? 'true' : undefined} onClick={() => setIndex(i)}><img src={url(m.id, 'small')} alt="" loading="lazy" /></button></li>)}</ul>}
+  </div>;
 }
-export default function Storefront({data,path=[],preview=false,previewTenant}:{data:StoreData;path?:string[];preview?:boolean;previewTenant?:string}) {
-  const {theme,route}=data,base=`/lojas/${route.slug}`,product=path[0]==='produtos'?data.products.find(p=>p.slug===path[1]):null,page=path[0]==='paginas'?theme.pages.find(p=>p.slug===path[1]):null,supplier=theme.supplier;
-  const mediaUrl=(asset:string,size:string)=>previewTenant?`/api/tenants/${previewTenant}/storefront/media/${asset}/${size}`:`/api/public/stores/${route.slug}/media/${asset}/${size}`;
-  return <main data-store={route.slug} style={{'--brand':theme.color,fontFamily:theme.font==='serif'?'Georgia,serif':'system-ui,sans-serif'} as React.CSSProperties}>
-    <a href="#conteudo">Ir para o conteúdo</a><header><p className="eyebrow">{preview?'PREVIEW PRIVADO':supplier?.synthetic?'LOJA SINTÉTICA · TESTE':'Loja independente'}</p><h1><a href={base}>{theme.title}</a></h1><p>{theme.description}</p>{theme.assets?.[0]&&<img className="product-image" src={mediaUrl(theme.assets[0],'large')} alt={theme.title} width="1280" height="480"/>}<nav aria-label="Navegação da loja" className="row">{theme.menu.map(m=><a key={m.path} href={`${base}${m.path==='/'?'':m.path}`}>{m.label}</a>)}<a href={`${base}/carrinho`}>Carrinho</a><a href={`${base}/atendimento`}>Atendimento</a><a href="/">Painel</a></nav></header>
-    {preview&&<aside className="local">Rascunho autorizado — não publicado. Carrinho desabilitado no preview.</aside>}
-    <div id="conteudo">{path[0]==='carrinho'?preview?<p>Não disponível no preview.</p>:<Cart slug={route.slug}/>:path[0]==='atendimento'?preview?<p>Não disponível no preview.</p>:<ContactPage slug={route.slug}/>:path[0]==='pedidos'&&path[1]?preview?<p>Não disponível no preview.</p>:<OrderView slug={route.slug} orderId={path[1]}/>:product?<section><h2>{product.name}</h2>{product.media.map(m=><img key={m.id} className="product-image" src={mediaUrl(m.id,'large')} alt={product.name} width="640" height="480"/>)}<p className="prose">{product.description}</p>{!preview&&<Add slug={route.slug} product={product}/>}<p>{supplier?.risks}</p></section>:page?<section><h2>{page.title}</h2><p className="prose">{page.body}</p></section>:<><section><h2>{theme.hero||'Conheça nosso catálogo'}</h2><form action={base} role="search"><label>Buscar produto ou SKU<input type="search" name="q" maxLength={100}/></label><button>Pesquisar</button></form><nav aria-label="Categorias" className="row"><a href={base}>Todos</a>{data.categories.map(c=><a key={c.slug} href={`${base}/categorias/${c.slug}`}>{c.name}</a>)}</nav></section><div className="grid">{data.products.map(p=><section key={p.id}>{p.media[0]&&<img className="product-image" src={mediaUrl(p.media[0].id,'small')} alt={p.name} width="480" height="360" loading="lazy"/>}<h2><a href={`${base}/produtos/${p.slug}`}>{p.name}</a></h2><p>{p.description.slice(0,150)}</p>{p.variants.filter(v=>v.active)[0]&&<p>A partir de {money(p.variants.filter(v=>v.active).reduce((min,v)=>BigInt(v.price_cents)<BigInt(min)?v.price_cents:min,p.variants.filter(v=>v.active)[0].price_cents))}</p>}<a href={`${base}/produtos/${p.slug}`}>Escolher variação</a></section>)}</div>{data.products.length===0&&<p>Nenhum produto encontrado nesta loja.</p>}</>}</div>
-    {supplier&&<footer><section><h2>Fornecedor e atendimento</h2><strong>{supplier.name}</strong>{supplier.document&&<p>Documento: {supplier.document}</p>}<p>{supplier.address}</p><p><a href={`mailto:${supplier.email}`}>{supplier.email}</a> · {supplier.phone}</p><h3>Entrega e restrições</h3><p className="prose">{supplier.delivery}</p><h3>Políticas do fornecedor</h3><p className="prose">{supplier.policies}</p>{supplier.synthetic&&<p>Ambiente TESTE — contatos e políticas fictícios; não realiza vendas.</p>}</section></footer>}
-  </main>;
+
+function Tiles({ products, base, url }: { products: Product[]; base: string; url: (id: string, size: string) => string }) {
+  return <ul className="tiles">{products.map((p) => { const price = priceLabel(p), soldOut = p.variants.filter((v) => v.active).every((v) => v.available < 1); return <li className="tile" key={p.id}>
+    {p.media[0] ? <figure className="media"><img src={url(p.media[0].id, 'small')} alt="" loading="lazy" /></figure> : <div className="media no-photo-media"><Icon name="box" size={20} /><span>Sem foto</span></div>}
+    <a href={`${base}/produtos/${p.slug}`}>{p.name}</a>
+    {price && <span className="price-sm">{price}</span>}
+    {soldOut && <span className="small muted">Esgotado</span>}
+  </li>; })}</ul>;
+}
+
+export default function Storefront({data,path=[],preview=false,previewTenant,q=''}:{data:StoreData;path?:string[];preview?:boolean;previewTenant?:string;q?:string}) {
+  const { theme, route } = data, base = `/lojas/${route.slug}`, supplier = theme.supplier;
+  const product = path[0] === 'produtos' ? data.products.find((p) => p.slug === path[1]) : null;
+  const page = path[0] === 'paginas' ? theme.pages.find((p) => p.slug === path[1]) : null;
+  const category = path[0] === 'categorias' ? data.categories.find((c) => c.slug === path[1]) : null;
+  const home = path.length === 0;
+  const url = (asset: string, size: string) => previewTenant ? `/api/tenants/${previewTenant}/storefront/media/${asset}/${size}` : `/api/public/stores/${route.slug}/media/${asset}/${size}`;
+  const here = `/${path.join('/')}`;
+  const menu = theme.menu.filter((m) => !/^\/?painel/.test(m.path));
+  const unavailable = <div className="store-page" style={{ paddingTop: 'var(--space-24)' }}><EmptyState icon="eye" title="Não disponível no preview">Carrinho, atendimento e pedidos funcionam só na vitrine publicada.</EmptyState></div>;
+  let content: ReactNode;
+  if (path[0] === 'carrinho') content = preview ? unavailable : <CartFlow slug={route.slug} />;
+  else if (path[0] === 'atendimento') content = preview ? unavailable : <ContactPage slug={route.slug} />;
+  else if (path[0] === 'pedidos' && path[1]) content = preview ? unavailable : <OrderView slug={route.slug} orderId={path[1]} />;
+  else if (product) content = <>
+    <nav aria-label="Trilha"><ol className="store-crumbs"><li><a href={base}>Início</a></li><li aria-current="page">{product.name}</li></ol></nav>
+    <div className="pdp">
+      <Gallery product={product} url={url} />
+      <div className="buy">
+        <div className="buy-head"><h1>{product.name}</h1>{priceLabel(product) && <p className="price">{priceLabel(product)}</p>}<p className="small muted">Frete calculado no carrinho, pelo CEP.</p></div>
+        {preview ? <p className="hint">Compra desabilitada no preview.</p> : <AddToCart slug={route.slug} product={product} />}
+        <div className="info-list">
+          {product.description && <section aria-labelledby="t-desc"><h2 id="t-desc">Descrição</h2><p className="prose">{product.description}</p></section>}
+          {supplier?.risks && <section aria-labelledby="t-risks"><h2 id="t-risks">Cuidados e riscos</h2><p className="prose">{supplier.risks}</p></section>}
+          {supplier?.delivery && <section aria-labelledby="t-delivery-info"><h2 id="t-delivery-info">Entrega e trocas</h2><p className="prose">{supplier.delivery}</p></section>}
+        </div>
+      </div>
+    </div>
+  </>;
+  else if (page) content = <article className="reading"><h1>{page.title}</h1><p className="prose">{page.body}</p></article>;
+  else content = <>
+    {home && !q ? <section className="store-intro" aria-labelledby="t-intro">
+      {theme.assets?.[0] && <img className="store-hero-image" src={url(theme.assets[0], 'large')} alt="" />}
+      <h2 id="t-intro">{theme.hero || 'Conheça nosso catálogo'}</h2>{theme.description && <p className="muted">{theme.description}</p>}
+    </section> : category ? <><nav aria-label="Trilha"><ol className="store-crumbs"><li><a href={base}>Início</a></li><li aria-current="page">{category.name}</li></ol></nav><h1 style={{ paddingBottom: 'var(--space-16)' }}>{category.name}</h1></> :
+      <h1 style={{ padding: 'var(--space-24) 0 var(--space-16)' }}>Resultados para “{q}”</h1>}
+    {data.categories.length > 0 && <nav className="category-nav catalog-bar" aria-label="Categorias"><ul>
+      <li><a href={base} aria-current={!category ? 'page' : undefined}>Todos</a></li>
+      {data.categories.map((c) => <li key={c.slug}><a href={`${base}/categorias/${c.slug}`} aria-current={category?.slug === c.slug ? 'page' : undefined}>{c.name}</a></li>)}
+    </ul></nav>}
+    {data.products.length > 0 ? <Tiles products={data.products} base={base} url={url} /> :
+      <div style={{ paddingBottom: 'var(--space-48)' }}>{q ? <EmptyState icon="search" title={`Nenhum produto encontrado para “${q}”`} action={<a className="btn btn-secondary" href={base}>Limpar busca</a>}>Confira a grafia ou busque pelo SKU.</EmptyState> :
+        <EmptyState icon="box" title={category ? 'Nenhum produto nesta categoria' : 'Nenhum produto publicado ainda'}>{category ? <a href={base}>Ver todos os produtos</a> : 'Volte em breve.'}</EmptyState>}</div>}
+  </>;
+  return <div className="surface-store" data-store={route.slug} style={storeStyle(theme.color, theme.font) as CSSProperties}>
+    <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
+    {preview && <div className="notice-bar store-notice"><div className="store-wrap cluster-tight"><Icon name="eye" size={16} /><strong>Preview privado do rascunho — não publicado.</strong>{previewTenant && <a href={`/painel/${previewTenant}?aba=vitrine`}>Voltar ao painel</a>}</div></div>}
+    {!preview && supplier?.synthetic && <div className="notice-bar store-notice"><div className="store-wrap">Loja sintética de TESTE: produtos, contatos e políticas fictícios; nenhuma venda real é feita.</div></div>}
+    <header className="store-header"><div className="store-wrap">
+      {home && !q ? <h1 className="store-name"><a href={base}>{theme.title}</a></h1> : <p className="store-name"><a href={base}>{theme.title}</a></p>}
+      <nav className="store-nav" aria-label="Navegação da loja"><ul>
+        {menu.map((m) => { const p = m.path === '/' ? '' : m.path; return <li key={m.path}><a href={`${base}${p}`} aria-current={(p || '/') === here ? 'page' : undefined}>{m.label}</a></li>; })}
+        {!menu.some((m) => m.path === '/atendimento') && <li><a href={`${base}/atendimento`} aria-current={here === '/atendimento' ? 'page' : undefined}>Atendimento</a></li>}
+      </ul></nav>
+      <form className="store-search" action={base} role="search">
+        <label className="sr-only" htmlFor="store-q">Buscar produto ou SKU</label>
+        <input className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produto ou SKU" />
+        <button className="btn btn-secondary" aria-label="Pesquisar"><Icon name="search" size={20} /></button>
+      </form>
+      <a className="store-cart btn btn-quiet" href={`${base}/carrinho`} aria-current={here === '/carrinho' ? 'page' : undefined}><Icon name="cart" size={20} />Carrinho</a>
+    </div></header>
+    <main id="conteudo" className="store-wrap" tabIndex={-1}>{content}</main>
+    {supplier && <footer className="store-footer"><div className="store-wrap cols">
+      <section aria-labelledby="t-supplier"><h2 id="t-supplier">Fornecedor e atendimento</h2><p><strong>{supplier.name}</strong></p>{supplier.document && <p>Documento: {supplier.document}</p>}<p>{supplier.address}</p><p><a href={`mailto:${supplier.email}`}>{supplier.email}</a> · {supplier.phone}</p><p><a href={`${base}/atendimento`}>Fale com a loja</a></p></section>
+      <section aria-labelledby="t-policies"><h2 id="t-policies">Políticas do fornecedor</h2><p className="prose">{supplier.policies}</p></section>
+      <section aria-labelledby="t-shipping"><h2 id="t-shipping">Entrega e restrições</h2><p className="prose">{supplier.delivery}</p>{theme.pages.length > 0 && <ul style={{ listStyle: 'none', marginTop: 'var(--space-12)' }}>{theme.pages.map((p) => <li key={p.slug}><a href={`${base}/paginas/${p.slug}`}>{p.title}</a></li>)}</ul>}{supplier.synthetic && <p className="small">Ambiente TESTE — contatos e políticas fictícios; não realiza vendas.</p>}</section>
+    </div></footer>}
+  </div>;
 }

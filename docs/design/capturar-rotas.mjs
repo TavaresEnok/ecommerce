@@ -20,6 +20,7 @@ const label = process.argv[2] && !process.argv[2].startsWith('--') ? process.arg
 const base = arg('base', 'http://localhost:3000');
 const widths = arg('widths', '390,768,1440').split(',').map(Number);
 const only = arg('only', '').split(',').filter(Boolean);
+const zoom = Number(arg('zoom', '1'));
 const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8'));
 const out = join(here, 'evidencias', label);
 mkdirSync(out, { recursive: true });
@@ -49,11 +50,16 @@ const personas = {
   employee: () => login(demo.employee),
   admin: () => login(demo.admin),
   buyerPending: async () => cookieOf(demo.orders.pending.cookie),
+  buyerPending2: async () => cookieOf((demo.orders.pending2 || demo.orders.pending).cookie),
   buyerPaid: async () => cookieOf(demo.orders.paid.cookie),
   buyerRejected: async () => cookieOf(demo.orders.rejected.cookie),
   buyerExcess: async () => cookieOf(demo.orders.excess.cookie),
 };
-const A = demo.storeA, Bs = demo.storeB, O = demo.orders;
+const A = demo.storeA, Bs = demo.storeB, Cs = demo.storeC || demo.storeB, O = demo.orders, P2 = O.pending2 || O.pending;
+// Compra pela interface: adicionar no produto, abrir o carrinho e avançar pelas etapas reais.
+const toCart = async (page) => { await page.getByRole('button', { name: 'Adicionar ao carrinho', exact: true }).click(); await page.getByRole('link', { name: 'Ver carrinho', exact: true }).click(); await page.getByRole('heading', { name: 'Seu carrinho', exact: true }).waitFor(); };
+const delivery = async (page, cep = '01001000') => { const f = page.getByRole('form', { name: 'Calcular frete' }); await f.getByLabel('CEP', { exact: true }).fill(cep); await f.getByLabel('Número', { exact: true }).fill('120'); await f.getByLabel('Rua', { exact: true }).fill('Rua das Acácias'); await f.getByLabel('Cidade', { exact: true }).fill('São Paulo'); await f.getByLabel('UF', { exact: true }).fill('SP'); await f.getByRole('button', { name: 'Calcular frete' }).click(); await page.waitForTimeout(1500); };
+const buyerStep = async (page) => { const f = page.getByRole('form', { name: 'Dados do comprador' }); await f.getByLabel('Nome completo').fill('Helena Prado TESTE'); await f.getByLabel('E-mail para comprovante').fill('helena.prado.muito.longo@example.test'); await f.getByRole('button', { name: 'Revisar pedido' }).click(); await page.getByText('Revise antes de confirmar').waitFor(); };
 const clickText = (name) => async (page) => { await page.getByRole('button', { name, exact: true }).first().click(); await page.waitForTimeout(1200); };
 // --- Cenários (código da rota no inventário de TELAS-E-FLUXOS.md) ---
 const scenarios = [
@@ -71,7 +77,7 @@ const scenarios = [
   { id: 'R02-frete', route: 'R02', persona: 'owner', path: `/painel/${A.id}?aba=frete` },
   { id: 'R03-pedidos', route: 'R03', persona: 'owner', path: `/painel/${A.id}/pedidos` },
   { id: 'R03-pedido-excedente', route: 'R03', persona: 'owner', path: `/painel/${A.id}/pedidos?pedido=${O.excess.id}`, legacy: clickText(`Nº ${O.excess.number}`) },
-  { id: 'R03-pedido-pendente', route: 'R03', persona: 'owner', path: `/painel/${A.id}/pedidos?pedido=${O.pending.id}`, legacy: clickText(`Nº ${O.pending.number}`) },
+  { id: 'R03-pedido-pendente', route: 'R03', persona: 'owner', path: `/painel/${A.id}/pedidos?pedido=${P2.id}`, legacy: clickText(`Nº ${P2.number}`) },
   { id: 'R03-pedidos-filtro', route: 'R03', persona: 'owner', path: `/painel/${A.id}/pedidos?pending=true` },
   { id: 'R03-pedido-funcionario', route: 'R03', persona: 'employee', path: `/painel/${A.id}/pedidos?pedido=${O.excess.id}` },
   { id: 'R04-atendimento', route: 'R04', persona: 'owner', path: `/painel/${A.id}/atendimento` },
@@ -86,22 +92,35 @@ const scenarios = [
   { id: 'R10-produto', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/camiseta` },
   { id: 'R10-produto-longo', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/jogo-xicaras-longo` },
   { id: 'R10-produto-b', route: 'R10', persona: 'anon', path: `/lojas/${Bs.slug}/produtos/camiseta` },
+  { id: 'R08-vitrine-c', route: 'R08', persona: 'anon', path: `/lojas/${Cs.slug}` },
+  { id: 'R08-404', route: 'R08', persona: 'anon', path: `/lojas/${A.slug}/produtos/nao-existe` },
+  { id: 'R10-produto-foto', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe` },
+  { id: 'R10-produto-foto-retrato', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await page.getByRole('button', { name: 'Mostrar imagem 2 de 2' }).click(); await page.waitForTimeout(800); } },
+  { id: 'R10-adicionado', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/camiseta`, act: async (page) => { await page.getByRole('radio', { name: 'Verde / M' }).check(); await page.getByRole('button', { name: 'Adicionar ao carrinho', exact: true }).click(); await page.getByRole('link', { name: 'Ver carrinho', exact: true }).waitFor(); } },
+  { id: 'R10-esgotado', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/tigela-funda` },
+  { id: 'R10-produto-c', route: 'R10', persona: 'anon', path: `/lojas/${Cs.slug}/produtos/camiseta` },
   { id: 'R11-pagina', route: 'R11', persona: 'anon', path: `/lojas/${A.slug}/paginas/sobre` },
   { id: 'R12-carrinho-vazio', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/carrinho` },
-  { id: 'R12-carrinho', route: 'R12', persona: 'buyerPaid', path: `/lojas/${A.slug}/carrinho` },
-  { id: 'R13-pendente', route: 'R13', persona: 'buyerPending', path: `/lojas/${A.slug}/pedidos/${O.pending.id}` },
+  { id: 'R12-itens', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: toCart },
+  { id: 'R12-cep-sem-atendimento', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page, '69900000'); } },
+  { id: 'R12-dados', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await page.getByRole('form', { name: 'Dados do comprador' }).waitFor(); } },
+  { id: 'R12-revisao', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await buyerStep(page); } },
+  { id: 'R12-corrigir-dados', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await buyerStep(page); await page.getByRole('button', { name: 'Corrigir dados' }).click(); await page.getByRole('form', { name: 'Dados do comprador' }).waitFor(); } },
+  { id: 'R13-pago', route: 'R13', persona: 'buyerPaid', path: `/lojas/${A.slug}/pedidos/${O.paid.id}` },
+  { id: 'R13-pendente', route: 'R13', persona: 'buyerPending2', path: `/lojas/${A.slug}/pedidos/${P2.id}` },
   { id: 'R13-recusado', route: 'R13', persona: 'buyerRejected', path: `/lojas/${A.slug}/pedidos/${O.rejected.id}` },
   { id: 'R13-nao-autorizado', route: 'R13', persona: 'anon', path: `/lojas/${A.slug}/pedidos/${O.paid.id}` },
   { id: 'R14-atendimento', route: 'R14', persona: 'anon', path: `/lojas/${A.slug}/atendimento` },
 ].filter((s) => !only.length || only.includes(s.route) || only.includes(s.id));
 
 const browser = await playwright.chromium.launch();
-const results = [];
+let results = [];
+try { const prev = JSON.parse(readFileSync(join(out, 'resultado.json'), 'utf8')).results; results = prev.filter((r) => !scenarios.some((s) => s.id === r.id && widths.includes(r.width) && (r.zoom || 1) === zoom)); } catch { /* primeira execução */ }
 const cookies = {};
 for (const s of scenarios) {
   cookies[s.persona] ??= await personas[s.persona]();
   for (const width of widths) {
-    const context = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+    const context = await browser.newContext({ viewport: { width: Math.round(width / zoom), height: Math.round(900 / zoom) }, deviceScaleFactor: zoom });
     if (cookies[s.persona].length) await context.addCookies(cookies[s.persona]);
     const page = await context.newPage();
     const errors = [];
@@ -123,11 +142,13 @@ for (const s of scenarios) {
           return !n || !n.trim();
         }).length;
         const small = [...document.querySelectorAll('main button, main a.btn, main [role=button], main input[type=radio]+label, main input[type=checkbox]')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 24 || r.width < 24); }).length;
-        return { overflow, unnamed, small, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
+        // Ações principais de toque abaixo de 44×44 px em telas estreitas (meta layout.touch-target).
+        const small44 = window.innerWidth < 768 ? [...document.querySelectorAll('main .btn:not(.btn-sm), main input[type=radio]+label, .store-nav a, .category-nav a, .thumbs button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 43.5 || r.width < 43.5); }).map((e) => (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30)) : [];
+        return { overflow, unnamed, small, small44, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
       });
-      await page.screenshot({ path: join(out, `${s.id}-${width}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
-      results.push({ ...s, legacy: undefined, act: undefined, width, status, ...report, errors });
-      console.log(`${s.id} ${width}px · HTTP ${status} · overflow ${report.overflow}px · sem nome ${report.unnamed} · alvos<24 ${report.small} · erros ${errors.length} · h1 "${report.h1.slice(0, 50)}"`);
+      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
+      results.push({ ...s, legacy: undefined, act: undefined, width, zoom, status, ...report, errors });
+      console.log(`${s.id} ${width}px · HTTP ${status} · overflow ${report.overflow}px · sem nome ${report.unnamed} · alvos<24 ${report.small} · <44 ${report.small44.length} · erros ${errors.length} · h1 "${report.h1.slice(0, 50)}"`);
     } catch (e) {
       results.push({ ...s, legacy: undefined, act: undefined, width, status, failure: e.message.slice(0, 300), errors });
       console.log(`${s.id} ${width}px · FALHA ${e.message.slice(0, 120)}`);
