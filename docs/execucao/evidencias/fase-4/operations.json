@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "simulation": true,
+  "externalHomologation": false,
+  "criteria": [
+    "T05 (operação)",
+    "T25",
+    "T32 (exportação/eliminação)",
+    "T35",
+    "T36",
+    "Expedição/retirada",
+    "Notificações e falha",
+    "Alertas"
+  ],
+  "tests": [
+    {
+      "name": "Expedição por transportadora: funcionário separa, envia e entrega; pedido concluído e notificações enfileiradas",
+      "result": "passed"
+    },
+    {
+      "name": "Retirada comprovada sem transportadora; bloqueios revalidados no backend",
+      "result": "passed"
+    },
+    {
+      "name": "T35/T05: revisão não financeira só pelo Dono; devolução pendente só encerra com confirmação do gateway",
+      "result": "passed"
+    },
+    {
+      "name": "T36: atendimento vinculado — protocolo, resposta, comunicação financeira antes do aceite, horário original preservado",
+      "result": "passed"
+    },
+    {
+      "name": "T36: contato geral sem compra — protocolo e código; acesso somente com o código e na loja certa",
+      "result": "passed"
+    },
+    {
+      "name": "Notificações: falha do provedor não apaga protocolo; esgota em FAILED, reenvio pelo Dono; link de acesso por fragmento",
+      "result": "passed"
+    },
+    {
+      "name": "T25: suspensão e pausa bloqueiam novas vendas; pedidos, pagamentos, devoluções e atendimento anteriores continuam",
+      "result": "passed"
+    },
+    {
+      "name": "T32 (parte 1): exportação privada com expiração e permissão; eliminação bloqueada em pedido aberto",
+      "result": "passed"
+    },
+    {
+      "name": "Fixtures de recuperação (antes do backup): T26 pagamento pendente/PREPARED e T32 pedido concluído com dados pessoais",
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-01T17:14:45.406Z"
+}

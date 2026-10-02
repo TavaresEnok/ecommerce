@@ -1,0 +1,9 @@
+services:
+  api:
+    environment: {APP_ENV: test, NODE_ENV: test, PUBLIC_ORIGIN: "http://web:3000", LOCAL_MAILBOX: "true"}
+  web:
+    ports: !override ["127.0.0.1:3100:3000"]
+  migrate:
+    environment: {APP_ENV: test, NODE_ENV: test}
+  worker:
+    environment: {APP_ENV: test, NODE_ENV: test, MAIL_PROVIDER: local, PUBLIC_ORIGIN: "http://web:3000"}

@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  title: E-commerce — compra e pagamentos (Fase 3)
+  version: 1.1.0-fase3
+  description: |
+    Contrato HTTP da API NestJS atrás do proxy `/api` do Next.js. Valores `_cents` são strings decimais de centavos (BIGINT), moeda BRL.
+    Pagamentos usam o provedor SIMULADO (APP_ENV development/test e PAYMENT_SIMULATION=true). Mercado Pago real está desabilitado
+    até a homologação da Fase 0; nenhuma rota inicia reembolso no gateway. POST públicos exigem `Origin` igual à origem pública
+    ou ao canônico da loja; rotas `/tenants` exigem cookie de sessão e `X-CSRF-Token`.
+servers: [{url: /api}]
+components:
+  securitySchemes:
+    session: {type: apiKey, in: cookie, name: session}
+    cart: {type: apiKey, in: cookie, name: cart_<tenant>, description: Cookie opaco HttpOnly do carrinho; único meio de o comprador acessar seus pedidos.}
+  schemas:
+    Cents: {type: string, pattern: '^[0-9]+$'}
+    Address:
+      type: object
+      required: [cep, street, number, city, state]
+      properties: {cep: {type: string, pattern: '^[0-9]{5}-?[0-9]{3}$'}, street: {type: string}, number: {type: string}, city: {type: string}, state: {type: string, minLength: 2, maxLength: 2}, complement: {type: string}}
+    Status:
+      type: object
+      properties:
+        order_status: {enum: [OPEN, COMPLETED, CANCELLED]}
+        payment_status: {enum: [UNPAID, PENDING, PAID, PARTIALLY_REFUNDED, REFUNDED, CHARGED_BACK]}
+        fulfillment_status: {enum: [UNFULFILLED, PROCESSING, SHIPPED, DELIVERED, RETURNED]}
+        dispute_status: {enum: [NONE, OPEN, WON, LOST]}
+    BuyerOrder:
+      allOf:
+        - $ref: '#/components/schemas/Status'
+        - type: object
+          description: Comprovante do comprador. Não contém notas internas, histórico nem identificadores do provedor.
+          properties:
+            id: {type: string, format: uuid}
+            number: {type: string}
+            simulation: {type: boolean}
+            subtotal_cents: {$ref: '#/components/schemas/Cents'}
+            shipping_cents: {$ref: '#/components/schemas/Cents'}
+            total_cents: {$ref: '#/components/schemas/Cents'}
+            buyer: {type: object, properties: {name: {type: string}, email: {type: string}}}
+            address: {$ref: '#/components/schemas/Address'}
+            supplier: {type: object, description: Snapshot do fornecedor no momento da compra}
+            shipping: {type: object, description: Snapshot do método/regra/versão de frete}
+            items: {type: array, items: {type: object, properties: {variant_id: {type: string}, quantity: {type: integer}, price_cents: {$ref: '#/components/schemas/Cents'}, snapshot: {type: object}}}}
+            attempts: {type: array, items: {type: object, properties: {id: {type: string}, method: {enum: [PIX, CARD]}, status: {enum: [PREPARED, PENDING, APPROVED, REJECTED, CANCELLED, EXPIRED, UNKNOWN]}, environment: {type: string}}}}
+            transactions: {type: array, items: {type: object, properties: {received_cents: {$ref: '#/components/schemas/Cents'}, classification: {enum: [PRINCIPAL, EXCESS, INCOMPATIBLE]}, refunded_cents: {$ref: '#/components/schemas/Cents'}}}}
+            incidents: {type: array, items: {type: object, properties: {code: {type: string}, status: {enum: [OPEN, RESOLVED]}}}}
+            protocols: {type: array, items: {type: object}}
+    MerchantOrder:
+      allOf:
+        - $ref: '#/components/schemas/BuyerOrder'
+        - type: object
+          properties:
+            incidents: {type: array, items: {type: object, properties: {id: {type: string}, code: {enum: [GATEWAY_IDENTITY_MISMATCH, GATEWAY_UNAVAILABLE, PAYMENT_UNCERTAIN, PAYMENT_VALUE_MISMATCH, EXCESS_PAYMENT, PAID_WITHOUT_STOCK, REFUND_ACTION_REQUIRED, REFUND_VALUE_MISMATCH, PARTIAL_REFUND_REVIEW]}, status: {type: string}, due_cents: {$ref: '#/components/schemas/Cents'}, note: {type: [string, 'null']}}}}
+            history: {type: array, items: {type: object, properties: {event: {type: string}, previous: {type: object}, current: {type: object}, reason: {type: string}, created_at: {type: string, format: date-time}}}}
+            address_corrections: {type: array, items: {type: object}}
+            outbox_failures: {type: integer}
+    Error: {type: object, properties: {statusCode: {type: integer}, error: {type: string}, requestId: {type: string}}}
+  responses:
+    Conflict: {description: Conflito de idempotência, preço/frete/estoque desatualizado ou estado que não admite a ação, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+    NotFound: {description: Recurso inexistente ou não autorizado (mesma resposta), content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+    Forbidden: {description: Ação exclusiva do Dono, content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+paths:
+  /public/stores/{slug}/payment-methods:
+    get: {summary: Meios habilitados (simulação, real_enabled=false, commission_enabled=false), responses: {'200': {description: OK}}}
+  /public/stores/{slug}/cart/checkout:
+    post:
+      summary: Confirmar intenção de compra (CHK-01..06)
+      description: Mesma chave+conteúdo devolve o mesmo pedido; nova chave para a mesma versão de carrinho também. Recalcula preço e cotação no servidor; total enviado só confere. Cria pedido, snapshots, reserva integral, tentativa PREPARED e evento outbox numa transação; o gateway é chamado depois, pelo worker.
+      security: [{cart: []}]
+      requestBody: {required: true, content: {application/json: {schema: {type: object, required: [key, quote_id, address, buyer, method, total_cents], properties: {key: {type: string, maxLength: 100}, quote_id: {type: string, format: uuid}, address: {$ref: '#/components/schemas/Address'}, buyer: {type: object, properties: {name: {type: string}, email: {type: string, format: email}}}, method: {enum: [PIX, CARD]}, total_cents: {$ref: '#/components/schemas/Cents'}}}}}}
+      responses: {'201': {description: Pedido, content: {application/json: {schema: {$ref: '#/components/schemas/BuyerOrder'}}}}, '409': {$ref: '#/components/responses/Conflict'}, '503': {description: Simulação desabilitada ou filas indisponíveis}}
+  /public/stores/{slug}/orders/{orderId}:
+    get: {summary: Comprovante e estado do pedido, security: [{cart: []}], responses: {'200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/BuyerOrder'}}}}, '404': {$ref: '#/components/responses/NotFound'}}}
+  /public/stores/{slug}/orders/{orderId}/attempts:
+    post:
+      summary: Nova tentativa de pagamento
+      description: Somente quando todas as anteriores estão REJECTED/CANCELLED/EXPIRED, pedido OPEN sem principal e reserva ativa. UNKNOWN/PENDING bloqueiam. Idempotente por key.
+      security: [{cart: []}]
+      requestBody: {content: {application/json: {schema: {type: object, required: [method, key], properties: {method: {enum: [PIX, CARD]}, key: {type: string}}}}}}
+      responses: {'201': {description: Pedido atualizado}, '409': {$ref: '#/components/responses/Conflict'}}
+  /public/stores/{slug}/orders/{orderId}/requests:
+    post:
+      summary: Protocolo de atendimento/arrependimento/cancelamento (seção 22.5)
+      description: Persistido antes da resposta; devolve id e horário. Não confirma cancelamento nem devolução financeira. Idempotente por key.
+      security: [{cart: []}]
+      requestBody: {content: {application/json: {schema: {type: object, required: [kind, message, key], properties: {kind: {enum: [SUPPORT, WITHDRAWAL, CANCELLATION]}, message: {type: string, maxLength: 2000}, key: {type: string}}}}}}
+      responses: {'201': {description: Protocolo, content: {application/json: {schema: {type: object, properties: {id: {type: string}, kind: {type: string}, created_at: {type: string}, acknowledgement: {type: string}}}}}}, '409': {$ref: '#/components/responses/Conflict'}}
+  /payments/simulated/{accountId}/webhook:
+    post:
+      summary: Notificação do provedor SIMULADO
+      description: Valida x-signature (HMAC por conta, ts ±5 min, comparação em tempo constante), persiste na inbox deduplicada por (conta, event_id) e responde; o processamento consulta o recurso autoritativo depois. 401 em assinatura inválida.
+      parameters: [{name: x-signature, in: header, required: true, schema: {type: string, example: 'ts=1700000000000,v1=<hex>'}}, {name: x-request-id, in: header, required: true, schema: {type: string}}]
+      requestBody: {content: {application/json: {schema: {type: object, properties: {event_id: {type: string}, resource_id: {type: string}}}}}}
+      responses: {'201': {description: Persistido}, '401': {description: Assinatura inválida}, '404': {description: Conta desconhecida}}
+  /tenants/{tenantId}/purchase/accounts:
+    get: {summary: Contas de pagamento da loja, security: [{session: []}], responses: {'200': {description: OK}}}
+  /tenants/{tenantId}/purchase/accounts/simulated:
+    post: {summary: Conectar conta SIMULADA (Dono), security: [{session: []}], responses: {'201': {description: OK}, '403': {$ref: '#/components/responses/Forbidden'}}}
+  /tenants/{tenantId}/purchase/accounts/{accountId}/revoke:
+    post: {summary: Revogar conta (Dono); bloqueia novas cobranças, security: [{session: []}], responses: {'201': {description: OK}, '403': {$ref: '#/components/responses/Forbidden'}}}
+  /tenants/{tenantId}/purchase/orders:
+    get: {summary: Últimos 100 pedidos (Dono/Funcionário), security: [{session: []}], responses: {'200': {description: OK}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}:
+    get: {summary: Pedido completo para operação, security: [{session: []}], responses: {'200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/MerchantOrder'}}}}, '404': {$ref: '#/components/responses/NotFound'}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/cancel:
+    post: {summary: Cancelar antes do envio (Dono); pago gera REFUND_ACTION_REQUIRED; tentativas abertas impedem, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, properties: {reason: {type: string}}}}}}, responses: {'201': {description: OK}, '403': {$ref: '#/components/responses/Forbidden'}, '409': {$ref: '#/components/responses/Conflict'}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/reallocate:
+    post: {summary: Realocar estoque para PAID_WITHOUT_STOCK (Dono), security: [{session: []}], responses: {'201': {description: OK}, '409': {$ref: '#/components/responses/Conflict'}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/address:
+    post: {summary: Correção auditada de endereço (Dono); o original permanece no pedido, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, properties: {address: {$ref: '#/components/schemas/Address'}, reason: {type: string}}}}}}, responses: {'201': {description: OK}, '409': {$ref: '#/components/responses/Conflict'}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/incidents/{incidentId}/note:
+    post: {summary: Anotar referência externa (Dono); não resolve pendência financeira, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/outbox/retry:
+    post: {summary: Reprocessar eventos que esgotaram tentativas (Dono), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/purchase/attempts/{attemptId}/simulate:
+    post:
+      summary: Alterar o fato do provedor SIMULADO (Dono, apenas development/test)
+      description: Gera webhook assinado; o pedido só muda após consulta autoritativa. Não movimenta dinheiro.
+      security: [{session: []}]
+      requestBody: {content: {application/json: {schema: {type: object, properties: {status: {enum: [PENDING, APPROVED, REJECTED, CANCELLED, EXPIRED, REFUNDED, DISPUTED, DISPUTE_WON, DISPUTE_LOST]}, amount_cents: {$ref: '#/components/schemas/Cents'}}}}}}
+      responses: {'201': {description: Enfileirado}, '400': {description: Devolução acima do recebido}}

@@ -1,0 +1,116 @@
+name: ecommerce-foundation
+x-app: &app
+  build: {context: ., target: app}
+  image: ecommerce-foundation:local
+
+  init: true
+  restart: unless-stopped
+  mem_limit: 768m
+  cpus: 1.0
+  logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}
+services:
+  postgres:
+    image: ecommerce-postgres:17.9
+    build: {context: ., dockerfile: infra/postgres/Dockerfile}
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Execute npm run setup}
+      MIGRATION_DB_PASSWORD: ${MIGRATION_DB_PASSWORD:?}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD:?}
+      BACKUP_DB_PASSWORD: ${BACKUP_DB_PASSWORD:?Execute npm run setup}
+    # WAL archiving enables point-in-time recovery; archive_timeout bounds the local RPO. External copy is D04.
+    command: [postgres, -c, wal_level=replica, -c, archive_mode=on, -c, "archive_command=test ! -f /var/lib/postgresql/wal-archive/%f && cp %p /var/lib/postgresql/wal-archive/%f", -c, archive_timeout=60]
+    volumes: ["postgres-data:/var/lib/postgresql/data", "pg-wal-archive:/var/lib/postgresql/wal-archive"]
+    healthcheck: {test: [CMD-SHELL, "pg_isready -U postgres -d ecommerce"], interval: 3s, timeout: 3s, retries: 30}
+    restart: unless-stopped
+    mem_limit: 768m
+    cpus: 1.0
+    logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}
+  redis:
+    image: redis:7.4.7-bookworm
+    command: [redis-server, --appendonly, "yes", --maxmemory, 128mb, --maxmemory-policy, noeviction]
+    volumes: ["redis-data:/data"]
+    healthcheck: {test: [CMD, redis-cli, ping], interval: 3s, timeout: 3s, retries: 30}
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.5
+  storage:
+    image: chrislusf/seaweedfs:4.17
+    command: [mini, -dir=/data, -ip=storage, -ip.bind=0.0.0.0, -webdav=false, -admin.ui=false, -master.resumeState=true]
+    environment: {AWS_ACCESS_KEY_ID: "${S3_ACCESS_KEY:?Execute npm run setup}", AWS_SECRET_ACCESS_KEY: "${S3_SECRET_KEY:?}"}
+    volumes: ["storage-data:/data"]
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 0.5
+    logging: {driver: json-file, options: {max-size: "10m", max-file: "3"}}
+  storage-init:
+    <<: *app
+    command: [node, -e, "import('@ecommerce/media').then(async m=>{for(let i=0;i<40;i++){try{await m.initializeStorage();process.exit(0)}catch{await new Promise(r=>setTimeout(r,2000))}}process.exit(1)})"]
+    environment: &s3 {S3_ENDPOINT: "${S3_ENDPOINT:?}", S3_ACCESS_KEY: "${S3_ACCESS_KEY:?}", S3_SECRET_KEY: "${S3_SECRET_KEY:?}", S3_BUCKET: "${S3_BUCKET:?}"}
+    restart: "no"
+    depends_on: {storage: {condition: service_started}}
+  migrate:
+    <<: *app
+    command: [node, scripts/migrate.mjs]
+    environment: {MIGRATION_DATABASE_URL: "${MIGRATION_DATABASE_URL:?}"}
+    restart: "no"
+    depends_on: {postgres: {condition: service_healthy}}
+  api:
+    <<: *app
+    command: [node, apps/api/dist/main.js]
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:?}
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL:?}
+      REDIS_URL: ${REDIS_URL:?}
+      COOKIE_SECRET: ${COOKIE_SECRET:?}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?}
+      LOCAL_MAILBOX: ${LOCAL_MAILBOX:-false}
+      PAYMENT_SIMULATION: ${PAYMENT_SIMULATION:-false}
+      PAYMENT_ENCRYPTION_KEY: ${PAYMENT_ENCRYPTION_KEY:-}
+      MFA_ENCRYPTION_KEY: ${MFA_ENCRYPTION_KEY:?Execute npm run setup}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PLATFORM_HOST: ${PLATFORM_HOST:-}
+      DNS_OVERRIDES: ${DNS_OVERRIDES:-}
+      TLS_PROBE_ORIGIN: ${TLS_PROBE_ORIGIN:-}
+      PORT: 3001
+      S3_ENDPOINT: ${S3_ENDPOINT:?}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:?}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:?}
+      S3_BUCKET: ${S3_BUCKET:?}
+      UPLOADS_DISABLED: ${UPLOADS_DISABLED:-false}
+      RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-}
+    depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}, storage-init: {condition: service_completed_successfully}}
+    healthcheck: {test: [CMD, node, -e, "fetch('http://localhost:3001/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 5s, retries: 30}
+  web:
+    <<: *app
+    command: [npm, run, start, -w, "@ecommerce/web"]
+    environment: {NODE_ENV: production, API_INTERNAL_URL: "http://api:3001"}
+    ports: ["127.0.0.1:${WEB_PORT:-3000}:3000"]
+    depends_on: {api: {condition: service_healthy}}
+    healthcheck: {test: [CMD, node, -e, "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 5s, retries: 30}
+  worker:
+    <<: *app
+    command: [node, apps/worker/dist/main.js]
+    environment: {<<: *s3, DATABASE_URL: "${DATABASE_URL:?}", REDIS_URL: "${REDIS_URL:?}", APP_ENV: "${APP_ENV:-development}", PAYMENT_SIMULATION: "${PAYMENT_SIMULATION:-false}", PAYMENT_ENCRYPTION_KEY: "${PAYMENT_ENCRYPTION_KEY:-}", MAIL_PROVIDER: "${MAIL_PROVIDER:-}", PUBLIC_ORIGIN: "${PUBLIC_ORIGIN:?}", SIMULATED_GATEWAY_LATENCY_MS: "${SIMULATED_GATEWAY_LATENCY_MS:-0}", SIMULATED_GATEWAY_FAILURE_RATE: "${SIMULATED_GATEWAY_FAILURE_RATE:-0}"}
+    depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}}
+    healthcheck: {test: [CMD, node, -e, "process.exit(Date.now()-Number(require('fs').readFileSync('/tmp/worker-heartbeat','utf8'))<20000?0:1)"], interval: 10s, timeout: 3s, retries: 10}
+  tests:
+    <<: *app
+    profiles: [verify]
+    build: {context: ., target: tests}
+    image: ecommerce-foundation-tests:local
+    restart: "no"
+    mem_limit: 1536m
+    cpus: 2.0
+    environment: {<<: *s3, APP_ENV: test, NODE_ENV: test, BASE_URL: "http://web:3000", PUBLIC_ORIGIN: "http://web:3000", DATABASE_URL: "${DATABASE_URL:?}", AUTH_DATABASE_URL: "${AUTH_DATABASE_URL:?}", MIGRATION_DATABASE_URL: "${MIGRATION_DATABASE_URL:?}", REDIS_URL: "${REDIS_URL:?}", CI: "true", PAYMENT_SIMULATION: "${PAYMENT_SIMULATION:-false}", PAYMENT_ENCRYPTION_KEY: "${PAYMENT_ENCRYPTION_KEY:-}"}
+    volumes: ["./artifacts:/app/artifacts"]
+    depends_on: {web: {condition: service_healthy}, worker: {condition: service_healthy}}
+volumes:
+  postgres-data:
+  redis-data:
+  storage-data:
+  pg-wal-archive:

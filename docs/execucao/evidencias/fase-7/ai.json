@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "simulation": true,
+  "externalHomologation": false,
+  "criteria": [
+    "T34",
+    "Autorização",
+    "Edição concorrente",
+    "Sanitização",
+    "Sem provedor",
+    "Compra independente da IA"
+  ],
+  "tests": [
+    {
+      "name": "Desligado por padrão e sem provedor: geração recusada, cadastro manual e compra seguem",
+      "result": "passed"
+    },
+    {
+      "name": "Autorização: só o Dono liga na loja; funcionário gera; outra loja não lê a geração",
+      "result": "passed"
+    },
+    {
+      "name": "Reserva antes da chamada, custo conciliado, idempotência e salvamento explícito sem publicar",
+      "result": "passed"
+    },
+    {
+      "name": "Edição concorrente: produto alterado depois da geração não é sobrescrito",
+      "result": "passed"
+    },
+    {
+      "name": "Sanitização: HTML/script removidos; instrução no conteúdo do produto é tratada como dado",
+      "result": "passed"
+    },
+    {
+      "name": "T34: concorrência na mesma loja limitada e orçamento nunca ultrapassado",
+      "result": "passed"
+    },
+    {
+      "name": "T34: timeout mantém reserva (UNKNOWN) até expiração controlada; saída excessiva limitada por max_tokens",
+      "result": "passed"
+    },
+    {
+      "name": "Teto global entre lojas e desligamento global/loja preservam cadastro e venda",
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-02T14:46:19.144Z"
+}

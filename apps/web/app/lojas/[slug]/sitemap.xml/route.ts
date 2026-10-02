@@ -1,0 +1,4 @@
+import { loadSitemap } from '../../../../components/store-data';
+export const dynamic='force-dynamic';
+const escape=(s:string)=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+export async function GET(_request:Request,{params}:{params:Promise<{slug:string}>}){const {slug}=await params,data=await loadSitemap(slug),paths=['/',...data.products.map(p=>`/produtos/${p.slug}`),...data.theme.pages.map(p=>`/paginas/${p.slug}`),...data.categories.map(c=>`/categorias/${c.slug}`)];return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map(p=>`<url><loc>${escape(data.route.canonical+p)}</loc></url>`).join('')}</urlset>`,{headers:{'Content-Type':'application/xml','Cache-Control':'no-store'}});}

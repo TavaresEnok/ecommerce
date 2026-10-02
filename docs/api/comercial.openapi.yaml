@@ -1,0 +1,52 @@
+openapi: 3.1.0
+info:
+  title: E-commerce — comercialização (Fase 6)
+  version: 1.1.0-fase6
+  description: |
+    MFA, administração da plataforma, planos/assinatura, reembolso iniciado, domínio próprio e frete por provedor.
+    "MFA" = sessão com verificação em duas etapas confirmada (403 caso contrário). Provedores de cobrança, pagamento e frete
+    são SIMULADOS (development/test); nenhum provedor real está homologado.
+servers: [{url: /api}]
+components:
+  securitySchemes:
+    session: {type: apiKey, in: cookie, name: session, description: Sessão + X-CSRF-Token em escritas}
+paths:
+  /auth/mfa/setup: {post: {summary: Gerar segredo TOTP (base32 e otpauth), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /auth/mfa/enable: {post: {summary: Ativar com código; retorna 10 códigos de recuperação (uma vez), security: [{session: []}], responses: {'201': {description: OK}, '401': {description: Código inválido}}}}
+  /auth/mfa/verify: {post: {summary: Confirmar MFA na sessão (TOTP ±30 s, sem replay, ou código de recuperação de uso único), security: [{session: []}], responses: {'201': {description: OK}, '401': {description: Inválido/reutilizado}}}}
+  /platform/tenants: {get: {summary: Lojas com plano e situação (administrador + MFA), security: [{session: []}], responses: {'200': {description: OK}, '403': {description: Não administrador ou sem MFA}}}}
+  /platform/tenants/{tenantId}: {get: {summary: Consulta de suporte; exige ?reason= e é auditada, security: [{session: []}], responses: {'200': {description: OK}, '400': {description: Motivo ausente}}}}
+  /platform/tenants/{tenantId}/suspend: {post: {summary: Suspender (motivo, auditoria); só novas vendas param, security: [{session: []}], responses: {'201': {description: OK}}}}
+  /platform/tenants/{tenantId}/reactivate: {post: {summary: Reativar (motivo, auditoria), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /platform/tenants/{tenantId}/plan: {post: {summary: Atribuir plano (motivo, auditoria), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /platform/plans:
+    get: {summary: Versões de plano, security: [{session: []}], responses: {'200': {description: OK}}}
+    post: {summary: Nova versão DRAFT (código, nome, preço em centavos ou null, MONTH, cotas, motivo), security: [{session: []}], responses: {'201': {description: OK}, '400': {description: Inválido}}}
+  /platform/plans/{planId}/activate: {post: {summary: DRAFT → ACTIVE; plano pago exige preço, security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Sem preço/transição inválida}}}}
+  /platform/plans/{planId}/retire: {post: {summary: ACTIVE → RETIRED (PILOT não), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /platform/alerts: {get: {summary: Alertas operacionais por loja, security: [{session: []}], responses: {'200': {description: OK}}}}
+  /platform/audit: {get: {summary: Últimas 100 ações auditadas, security: [{session: []}], responses: {'200': {description: OK}}}}
+  /platform/billing/run: {post: {summary: Executar ciclo de cobrança agora (motivo), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /tenants/{tenantId}/billing: {get: {summary: Plano, assinatura, faturas, uso e planos disponíveis (equipe), security: [{session: []}], responses: {'200': {description: OK}}}}
+  /tenants/{tenantId}/billing/plan: {post: {summary: Contratar/trocar plano (Dono + MFA); vale no próximo ciclo; 409 sem provedor homologado, security: [{session: []}], responses: {'201': {description: OK}, '403': {description: Sem MFA/funcionário}, '409': {description: Indisponível}}}}
+  /tenants/{tenantId}/billing/cancel: {post: {summary: Cancelar ao fim do período (Dono + MFA), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /billing/simulated/webhook:
+    post: {summary: Evento do provedor SIMULADO (x-billing-signature HMAC); deduplicado; status relido do provedor, requestBody: {content: {application/json: {schema: {type: object, properties: {tenant_id: {type: string}, event_id: {type: string}, invoice_id: {type: string}}}}}}, responses: {'201': {description: '{received, duplicate}'}, '401': {description: Assinatura inválida}}}
+  /tenants/{tenantId}/purchase/orders/{orderId}/refunds:
+    post:
+      summary: Devolução pela plataforma (Dono + MFA)
+      description: Intenção persistida antes da chamada; limite = recebido − confirmadas − abertas (serializado). Idempotente por key. Estados REQUESTED/UNKNOWN/PENDING/CONFIRMED/FAILED; CONFIRMED só com confirmação do provedor.
+      security: [{session: []}]
+      requestBody: {content: {application/json: {schema: {type: object, required: [transaction_id, amount_cents, key, reason], properties: {transaction_id: {type: string}, amount_cents: {type: string}, key: {type: string}, reason: {type: string}}}}}}
+      responses: {'201': {description: Solicitação}, '403': {description: Sem MFA/funcionário}, '409': {description: Excede saldo, disputa aberta, chave com conteúdo diferente}}
+  /tenants/{tenantId}/domains:
+    get: {summary: Domínios e registro TXT de prova, security: [{session: []}], responses: {'200': {description: OK}}}
+    post: {summary: Cadastrar hostname (Dono + MFA); normalizado, reservado recusado, token novo, security: [{session: []}], responses: {'201': {description: OK}, '400': {description: Inválido/reservado}}}
+  /tenants/{tenantId}/domains/{domainId}/verify: {post: {summary: Verificar TXT + CNAME e prova HTTPS da loja; 503 sem PLATFORM_HOST, security: [{session: []}], responses: {'201': {description: Estado resultante}}}}
+  /tenants/{tenantId}/domains/{domainId}/canonical: {post: {summary: Tornar canônico (ACTIVE), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /tenants/{tenantId}/domains/canonical/reset: {post: {summary: Voltar ao subdomínio gerenciado, security: [{session: []}], responses: {'201': {description: OK}}}}
+  /tenants/{tenantId}/domains/{domainId}/disable: {post: {summary: Remover (desativa rota e canônico), security: [{session: []}], responses: {'201': {description: OK}}}}
+  /internal/tls/ask: {get: {summary: 'Permissão de certificado para o Caddy (somente rede interna; bloqueado em /api/internal no proxy público)', parameters: [{name: domain, in: query, required: true, schema: {type: string}}], responses: {'200': {description: Autorizado}, '404': {description: Não autorizado}}}}
+  /tenants/{tenantId}/operations/carrier: {post: {summary: Configurar transportadora (Dono); só SIMULATED até D09, security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Provedor não homologado}}}}
+  /public/stores/{slug}/cart/quotes:
+    post: {summary: 'Cotação; kind=CARRIER consulta o provedor fora de transação (opcional service); validade = min(15 min, provedor)', responses: {'201': {description: 'Cotação com options'}, '409': {description: Itens sem dimensões/limites ou carrinho mudou}, '503': {description: Provedor indisponível — sem frete grátis}}}

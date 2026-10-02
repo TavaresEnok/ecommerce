@@ -1,0 +1,97 @@
+{
+  "phase": 1,
+  "specification": "1.1",
+  "startedAt": "2026-10-01T03:22:10.059Z",
+  "environment": "ecommerce-phase1-test",
+  "steps": [
+    {
+      "name": "Preparação isolada",
+      "result": "passed",
+      "durationMs": 2746
+    },
+    {
+      "name": "Build e tipos em Node LTS",
+      "result": "passed",
+      "durationMs": 80152
+    },
+    {
+      "name": "Migrations e saúde",
+      "result": "passed",
+      "durationMs": 18204
+    },
+    {
+      "name": "Tipos, T01/T02, acesso, worker e UI Playwright",
+      "result": "passed",
+      "durationMs": 23897
+    },
+    {
+      "name": "Logs sanitizados",
+      "result": "passed",
+      "durationMs": 557
+    },
+    {
+      "name": "Backup PostgreSQL 17",
+      "result": "passed",
+      "durationMs": 681
+    },
+    {
+      "name": "Restore em banco separado",
+      "result": "passed",
+      "durationMs": 992
+    },
+    {
+      "name": "Conferências após restore",
+      "result": "passed",
+      "durationMs": 4992
+    }
+  ],
+  "exitCode": 0,
+  "externalHomologation": false,
+  "sourceDigest": "71fec3a2849b191127b7aaeb28e6127cb5bf4780590a8aac28ed5f12ef05fb9c",
+  "tests": {
+    "passed": true,
+    "criteria": [
+      "T01",
+      "T02",
+      "FK representativa da Fase 1",
+      "Autenticação e autorização",
+      "Worker por tenant",
+      "Interface Playwright"
+    ],
+    "tests": [
+      "UUIDv7, papéis reais e FORCE RLS em todas as tabelas de loja",
+      "T01: endpoints negam leitura/escrita cruzada, IDs/Host não autorizam",
+      "T01: RLS bloqueia SELECT/INSERT/UPDATE cruzados no banco",
+      "T02: mesma conexão alterna A/B e perde contexto após commit/rollback",
+      "FK composta rejeita autoria por vínculo de outra loja",
+      "Convite de Funcionário vinculado ao e-mail, expiração/uso único e revogação",
+      "Sessões/tokens somente como hash, e-mail verificado e recuperação revoga sessões",
+      "Worker confirma recurso/ator e bloqueia job adulterado",
+      "Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais",
+      "Revogar vínculo e todas as sessões tem efeito imediato",
+      "Rate limiting e sanitização de campos sensíveis",
+      "EXPLAIN ANALYZE das consultas mínimas sem índices especulativos"
+    ],
+    "completedAt": "2026-10-01T03:24:15.051Z"
+  },
+  "restore": {
+    "passed": true,
+    "completedAt": "2026-10-01T03:24:20.404Z",
+    "sourceDatabase": "ecommerce",
+    "restoredDatabase": "ecommerce_restore",
+    "postgresMajor": 17,
+    "tenantSamples": 2,
+    "appRole": "app_user",
+    "checks": [
+      "configurações preservadas",
+      "vínculos preservados",
+      "usuários verificados preservados",
+      "RLS leitura/escrita",
+      "negação sem contexto",
+      "ENABLE/FORCE RLS"
+    ],
+    "checkDurationMs": 77,
+    "financialReconciliation": "Não aplicável: domínio de pagamentos ausente na Fase 1."
+  },
+  "finishedAt": "2026-10-01T03:24:22.903Z"
+}

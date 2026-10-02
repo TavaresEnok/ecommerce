@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "simulation": true,
+  "externalHomologation": false,
+  "criteria": [
+    "T20 (worker real)",
+    "T21",
+    "Fluxo comprador/lojista desktop/móvel"
+  ],
+  "tests": [
+    {
+      "name": "T21: jobs publicados e perdidos no Redis são reconstruídos do PostgreSQL e executados uma vez",
+      "result": "passed"
+    },
+    {
+      "name": "Webhook simulado → inbox durável → consulta autoritativa pelo worker → pago com baixa única",
+      "result": "passed"
+    },
+    {
+      "name": "Interface: comprador revisa, confirma, recebe comprovante e protocolo; lojista vê pedido (desktop/móvel)",
+      "result": "passed"
+    }
+  ],
+  "visual": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "pages": [
+        "produto",
+        "carrinho/frete",
+        "revisão",
+        "comprovante",
+        "protocolo",
+        "painel de pedidos"
+      ],
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pages": [
+        "produto",
+        "carrinho/frete",
+        "revisão",
+        "comprovante",
+        "protocolo",
+        "painel de pedidos"
+      ],
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-01T16:25:51.531Z"
+}

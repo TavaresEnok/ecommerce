@@ -1,0 +1,8 @@
+# T33: same images and per-service limits as compose.yaml; single client IP, so the per-IP limit is lifted here only.
+services:
+  web:
+    ports: !override ["127.0.0.1:3500:3000"]
+  api:
+    environment: {RATE_LIMIT_PER_MINUTE: "1000000"}
+  worker:
+    environment: {SIMULATED_GATEWAY_LATENCY_MS: "300", SIMULATED_GATEWAY_FAILURE_RATE: "0.02"}

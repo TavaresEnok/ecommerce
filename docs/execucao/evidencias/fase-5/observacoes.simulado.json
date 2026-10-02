@@ -1,0 +1,244 @@
+{
+  "mode": "SIMULADO",
+  "environment": "STAGING_LOCAL",
+  "passed": true,
+  "authorization": {
+    "reference": "SIMULADO — sem autorização real de ativação"
+  },
+  "stores": [
+    {
+      "id": "loja-ficticia-A",
+      "slug": "aurora-pila170bd",
+      "segment": "acessórios (fictício)",
+      "pilotReport": {
+        "tenant_id": "01a0fd38-4e64-7134-8360-bf4e8f070f28",
+        "period": {
+          "from": "2026-10-02T15:24:20.266Z",
+          "to": "2026-10-02T15:26:42.177Z"
+        },
+        "published": true,
+        "lifecycle": "ACTIVE",
+        "sales_paused": false,
+        "orders": {
+          "created": 8,
+          "paid": 7,
+          "completed": 0,
+          "cancelled": 0,
+          "gmv_paid_cents": "31430"
+        },
+        "checkout_failures": {
+          "PRICE_OR_SHIPPING_CHANGED": 1
+        },
+        "checkout_success_rate": 88.9,
+        "incidents": {
+          "opened": 1,
+          "resolved": 0,
+          "open_now": 1,
+          "median_resolution_minutes": null,
+          "by_code": {
+            "PARTIAL_REFUND_REVIEW": 1
+          }
+        },
+        "refunds": {
+          "count": 1,
+          "amount_cents": "500"
+        },
+        "support": {
+          "requests": 0,
+          "resolved": 0,
+          "overdue_now": 0,
+          "median_first_response_hours": null,
+          "median_resolution_hours": null,
+          "staff_minutes": 50,
+          "by_category": {
+            "ONBOARDING": 40,
+            "SHIPPING": 10
+          }
+        },
+        "notifications": {
+          "sent_or_simulated": 14,
+          "failed": 0,
+          "pending": 1
+        },
+        "media_bytes": "0",
+        "sample_note": "Amostra pequena: indicadores inconclusivos."
+      },
+      "t27": {
+        "result": "NÃO EXECUTADO",
+        "evidence": "T27 exige loja real com cobrança real."
+      }
+    },
+    {
+      "id": "loja-ficticia-B",
+      "slug": "brisa-pila170bd",
+      "segment": "papelaria (fictício)",
+      "pilotReport": {
+        "tenant_id": "01a0fd38-50fd-7690-bb36-99e6ae52d233",
+        "period": {
+          "from": "2026-10-02T15:24:20.266Z",
+          "to": "2026-10-02T15:27:26.030Z"
+        },
+        "published": true,
+        "lifecycle": "ACTIVE",
+        "sales_paused": false,
+        "orders": {
+          "created": 5,
+          "paid": 4,
+          "completed": 0,
+          "cancelled": 0,
+          "gmv_paid_cents": "17960"
+        },
+        "checkout_failures": {
+          "SALES_CLOSED": 1
+        },
+        "checkout_success_rate": 83.3,
+        "incidents": {
+          "opened": 0,
+          "resolved": 0,
+          "open_now": 0,
+          "median_resolution_minutes": null,
+          "by_code": {}
+        },
+        "refunds": {
+          "count": 0,
+          "amount_cents": "0"
+        },
+        "support": {
+          "requests": 0,
+          "resolved": 0,
+          "overdue_now": 0,
+          "median_first_response_hours": null,
+          "median_resolution_hours": null,
+          "staff_minutes": 35,
+          "by_category": {
+            "ONBOARDING": 25,
+            "SHIPPING": 10
+          }
+        },
+        "notifications": {
+          "sent_or_simulated": 8,
+          "failed": 0,
+          "pending": 1
+        },
+        "media_bytes": "0",
+        "sample_note": "Amostra pequena: indicadores inconclusivos."
+      },
+      "t27": {
+        "result": "NÃO EXECUTADO",
+        "evidence": "T27 exige loja real com cobrança real."
+      }
+    }
+  ],
+  "events": [
+    {
+      "store": "A",
+      "buyer": 0,
+      "action": "PAY",
+      "order": "1"
+    },
+    {
+      "store": "A",
+      "buyer": 1,
+      "action": "PAY",
+      "order": "2"
+    },
+    {
+      "store": "A",
+      "buyer": 2,
+      "action": "PAY",
+      "order": "3"
+    },
+    {
+      "store": "A",
+      "buyer": 3,
+      "action": "ABANDON"
+    },
+    {
+      "store": "A",
+      "buyer": 4,
+      "action": "REJECT",
+      "order": "4"
+    },
+    {
+      "store": "A",
+      "buyer": 5,
+      "action": "PAY",
+      "order": "5"
+    },
+    {
+      "store": "A",
+      "buyer": 6,
+      "action": "STALE_TOTAL"
+    },
+    {
+      "store": "A",
+      "buyer": 7,
+      "action": "PAY",
+      "order": "6"
+    },
+    {
+      "store": "A",
+      "buyer": 8,
+      "action": "REFUND",
+      "order": "7"
+    },
+    {
+      "store": "A",
+      "buyer": 9,
+      "action": "PAY",
+      "order": "8"
+    },
+    {
+      "store": "B",
+      "buyer": 0,
+      "action": "PAY",
+      "order": "1"
+    },
+    {
+      "store": "B",
+      "buyer": 1,
+      "action": "ABANDON"
+    },
+    {
+      "store": "B",
+      "buyer": 2,
+      "action": "PAY",
+      "order": "2"
+    },
+    {
+      "store": "B",
+      "buyer": 3,
+      "action": "PAUSED"
+    },
+    {
+      "store": "B",
+      "buyer": 4,
+      "action": "PAY",
+      "order": "3"
+    },
+    {
+      "store": "B",
+      "buyer": 5,
+      "action": "REJECT",
+      "order": "4"
+    },
+    {
+      "store": "B",
+      "buyer": 6,
+      "action": "PAY",
+      "order": "5"
+    },
+    {
+      "store": "B",
+      "buyer": 7,
+      "action": "ABANDON"
+    }
+  ],
+  "decision": {
+    "recommendation": "continuar observação",
+    "reasons": [
+      "Dados SIMULADOS validam apenas os instrumentos; decisão de avançar exige observação de lojas reais."
+    ]
+  },
+  "completedAt": "2026-10-02T15:26:26.040Z"
+}

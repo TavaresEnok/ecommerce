@@ -1,0 +1,13 @@
+{
+  "_instrucoes": "Modelo. Copie para observacoes.json SOMENTE com dados reais e sanitizados. Não inclua nomes, e-mails, documentos ou endereços.",
+  "environment": "PRODUCTION",
+  "authorization": { "reference": "ex.: ata/mensagem do responsável que autorizou a ativação", "date": "AAAA-MM-DD", "responsible": "papel, não nome pessoal se não autorizado" },
+  "period": { "from": "AAAA-MM-DD", "to": "AAAA-MM-DD" },
+  "stores": [
+    { "id": "loja-piloto-1", "segment": "ex.: acessórios", "activatedAt": "AAAA-MM-DD", "pilotReport": "saída de ops.mjs pilot-report para esta loja", "t27": { "date": "AAAA-MM-DD", "result": "OK|FALHA", "evidence": "referência sanitizada" } }
+  ],
+  "supportReports": [ { "source": "quem relatou", "date": "AAAA-MM-DD", "summary": "sem dados pessoais" } ],
+  "incidents": [ { "date": "AAAA-MM-DD", "severity": "crítico|alto|médio|baixo", "summary": "", "fix": "", "regression": "teste que cobre" } ],
+  "costs": { "currency": "BRL", "monthly": { "vm": null, "storage": null, "email": null, "domain": null }, "source": "faturas" },
+  "decision": { "recommendation": "avançar|ajustar|continuar observação", "reasons": [] }
+}

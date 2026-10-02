@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "steps": [
+    {
+      "step": "backup antigo contém dado eliminado depois",
+      "elapsedMs": 43
+    },
+    {
+      "step": "eliminações reaplicadas a partir do ledger externo",
+      "elapsedMs": 92
+    },
+    {
+      "step": "pós-restauração: vendas pausadas, PREPARED→UNKNOWN, e-mails retidos",
+      "elapsedMs": 101
+    },
+    {
+      "step": "estado do provedor SIMULADO reproduzido (equivale a consultar o gateway)",
+      "elapsedMs": 126
+    },
+    {
+      "step": "pagamentos e devolução posteriores conciliados",
+      "elapsedMs": 194
+    },
+    {
+      "step": "e-mails anteriores retidos para revisão; somente fatos novos enviados",
+      "elapsedMs": 212
+    },
+    {
+      "step": "vendas reabertas após conciliação",
+      "elapsedMs": 214
+    }
+  ],
+  "held": 30,
+  "newNotifications": 2,
+  "providerPayments": 15,
+  "erasures": {
+    "ledger": 1,
+    "applied": 1
+  },
+  "limitation": "Ensaio com pg_dump lógico em ambiente isolado; o provedor é SIMULADO. RPO real depende de WAL/PITR (ver pitr.json) e backup externo (D04).",
+  "completedAt": "2026-10-01T17:16:52.788Z"
+}

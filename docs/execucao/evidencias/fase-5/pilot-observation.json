@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "criteria": [
+    "Instrumentos de observação do piloto (Fase 5)"
+  ],
+  "tests": [
+    {
+      "name": "Falhas de checkout registradas por motivo, sem carrinho/comprador, isoladas por loja",
+      "result": "passed"
+    },
+    {
+      "name": "Relatório por loja agrega pedidos, falhas, atendimento e tempo de suporte sem dados pessoais",
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-02T01:13:26.046Z"
+}

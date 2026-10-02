@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "environment": "ecommerce-phase4-test",
+  "startedAt": "2026-10-01T17:16:54.769Z",
+  "method": "pg_basebackup (tar) + archive_command em volume local + recovery_target_time",
+  "steps": [
+    {
+      "step": "base backup físico",
+      "at": "2026-10-01T17:16:57.954Z"
+    },
+    {
+      "step": "marcadores antes/depois do alvo e WAL arquivado",
+      "segment": "000000010000000000000005"
+    }
+  ],
+  "rpoObservedSeconds": 59.3,
+  "archiveTimeoutSeconds": 60,
+  "target": "2026-10-01 17:18:02.280663+00",
+  "rtoDrillSeconds": 6.4,
+  "restored": {
+    "markers": [
+      "rpo-probe",
+      "before-target"
+    ],
+    "orders": 41,
+    "forceRls": true
+  },
+  "limitations": [
+    "Arquivo WAL e base ficam em volume LOCAL do mesmo host: não protege contra perda da VM. Cópia externa cifrada, retenção de 30 dias e chaves separadas dependem de D04.",
+    "RTO medido apenas para banco sintético pequeno; não inclui provisionamento de host, mídia, segredos nem conciliação.",
+    "Ferramenta mantida (pgBackRest/WAL-G) com destino externo continua recomendada para produção."
+  ],
+  "finishedAt": "2026-10-01T17:18:13.446Z"
+}

@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "mode": "SIMULADO (substitutos locais)",
+  "steps": [
+    {
+      "name": "HTTPS da plataforma via Caddy (autoridade local)",
+      "detail": {
+        "status": 200
+      },
+      "at": "2026-10-02T15:16:35.353Z"
+    },
+    {
+      "name": "Compra por HTTPS (pagamento SIMULADO)",
+      "detail": {
+        "order": "1"
+      },
+      "at": "2026-10-02T15:16:37.967Z"
+    },
+    {
+      "name": "E-mail transacional entregue por SMTP (Mailpit) com link seguro",
+      "detail": {
+        "subject": "AURORA TESTE: recebemos seu pedido nº 1",
+        "from": "nao-responda@lojas.demo.test"
+      },
+      "at": "2026-10-02T15:16:40.027Z"
+    },
+    {
+      "name": "Acesso ao pedido pelo link do e-mail",
+      "detail": {},
+      "at": "2026-10-02T15:16:40.045Z"
+    },
+    {
+      "name": "Domínio próprio: prova DNS + certificado emitido sob demanda + rota da loja certa",
+      "detail": {
+        "host": "loja-aurora.demo.test"
+      },
+      "at": "2026-10-02T15:16:40.585Z"
+    },
+    {
+      "name": "Hostname não comprovado: Caddy recusa emitir certificado",
+      "detail": {},
+      "at": "2026-10-02T15:16:40.597Z"
+    },
+    {
+      "name": "Domínio canônico aplicado",
+      "detail": {},
+      "at": "2026-10-02T15:16:40.680Z"
+    }
+  ],
+  "completedAt": "2026-10-02T15:16:40.680Z"
+}

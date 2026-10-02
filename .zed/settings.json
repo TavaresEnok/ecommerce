@@ -1,0 +1,184 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+{
+  "proxy": "",
+  "agent": {
+    "tool_permissions": {
+      "default": "allow",
+      "tools": {
+        "terminal": {
+          "default": "allow"
+        },
+        "read_file": {
+          "default": "allow"
+        },
+        "edit_file": {
+          "default": "allow"
+        },
+        "write_file": {
+          "default": "allow"
+        },
+        "create_directory": {
+          "default": "allow"
+        },
+        "delete_path": {
+          "default": "allow"
+        },
+        "move_path": {
+          "default": "allow"
+        },
+        "copy_path": {
+          "default": "allow"
+        },
+        "fetch": {
+          "default": "allow"
+        },
+        "diagnostics": {
+          "default": "allow"
+        }
+      }
+    },
+    "sandbox_permissions": {
+      "network_hosts": ["*"],
+      "write_paths": [
+        "C:\\Users\\Enok\\Documents\\projetos\\E-commerce",
+        "C:\\Users\\Enok\\Documents\\projetos",
+        "C:\\Users\\Enok\\.cache",
+        "C:\\Users\\Enok\\AppData\\Local\\Temp"
+      ]
+    },
+    "default_profile": "tudo",
+    "profiles": {
+      "tudo": {
+        "name": "tudo",
+        "tools": {
+          "read_file": true,
+          "edit_file": true,
+          "terminal": true,
+          "write_file": true,
+          "create_directory": true,
+          "delete_path": true,
+          "move_path": true,
+          "copy_path": true,
+          "fetch": true,
+          "diagnostics": true,
+          "grep": true,
+          "file_search": true,
+          "list_directory": true
+        },
+        "enable_all_context_servers": true,
+        "context_servers": {}
+      },
+      "write": {
+        "name": "write",
+        "tools": {
+          "read_file": true,
+          "edit_file": true,
+          "terminal": true,
+          "write_file": true,
+          "create_directory": true,
+          "delete_path": true,
+          "move_path": true,
+          "copy_path": true,
+          "fetch": true,
+          "diagnostics": true,
+          "grep": true,
+          "file_search": true,
+          "list_directory": true
+        },
+        "enable_all_context_servers": true,
+        "context_servers": {}
+      }
+    },
+    "default_model": {
+      "effort": "medium",
+      "provider": "zed.dev",
+      "model": "gpt-5.3-codex",
+      "enable_thinking": true
+    },
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "context_servers": {
+    "github": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_GITHUB_TOKEN"
+      }
+    },
+    "playwright": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@playwright/mcp@latest", "--headless"]
+    },
+    "context7": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "postgres": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:postgres@localhost:5432/dev_db"
+      ]
+    },
+    "sentry": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@sentry/mcp-server@latest"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "YOUR_SENTRY_TOKEN"
+      }
+    },
+    "cloudflare": {
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@cloudflare/mcp-server-cloudflare@latest"],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "YOUR_CLOUDFLARE_TOKEN"
+      }
+    }
+  },
+  "ssh_connections": [
+    {
+      "host": "168.194.13.17",
+      "username": "ia",
+      "port": 22,
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/ia/Documents"
+          ]
+        }
+      ]
+    },
+    {
+      "host": "168.194.13.17",
+      "username": "ia",
+      "port": 22,
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/ia/Documents/projetos/ViralForge"
+          ]
+        }
+      ]
+    },
+    {
+      "host": "ia",
+      "args": [],
+      "projects": []
+    }
+  ],
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "system",
+    "light": "Gruvbox Light",
+    "dark": "Gruvbox Dark"
+  }
+}

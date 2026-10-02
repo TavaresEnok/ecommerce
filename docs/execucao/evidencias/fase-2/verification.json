@@ -1,0 +1,338 @@
+{
+  "phase": 2,
+  "specification": "1.1",
+  "startedAt": "2026-10-01T05:03:05.657Z",
+  "environment": "ecommerce-phase2-test",
+  "steps": [
+    {
+      "name": "Preparação isolada",
+      "result": "passed",
+      "durationMs": 647
+    },
+    {
+      "name": "Build em Node LTS",
+      "result": "passed",
+      "durationMs": 112761
+    },
+    {
+      "name": "Migrations, S3 privado e saúde",
+      "result": "passed",
+      "durationMs": 19041
+    },
+    {
+      "name": "Tipos",
+      "result": "passed",
+      "durationMs": 21435
+    },
+    {
+      "name": "Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel",
+      "result": "passed",
+      "durationMs": 18293
+    },
+    {
+      "name": "Regressões T01/T02, acesso, worker e UI da fundação",
+      "result": "passed",
+      "durationMs": 15515
+    },
+    {
+      "name": "Logs sanitizados",
+      "result": "passed",
+      "durationMs": 933
+    },
+    {
+      "name": "Persistência S3 após reinício local",
+      "result": "passed",
+      "durationMs": 18377
+    },
+    {
+      "name": "Backup PostgreSQL 17",
+      "result": "passed",
+      "durationMs": 1277
+    },
+    {
+      "name": "Restore separado",
+      "result": "passed",
+      "durationMs": 1599
+    },
+    {
+      "name": "Conferências após restore",
+      "result": "passed",
+      "durationMs": 4551
+    }
+  ],
+  "exitCode": 0,
+  "externalHomologation": false,
+  "sourceDigest": "a7a45ddd3f084d4e544b96865e4f7f0cf73072970633f77dbef211d91eb14512",
+  "foundation": {
+    "passed": true,
+    "criteria": [
+      "T01",
+      "T02",
+      "FK representativa da Fase 1",
+      "Autenticação e autorização",
+      "Worker por tenant",
+      "Interface Playwright"
+    ],
+    "tests": [
+      "UUIDv7, papéis reais e FORCE RLS em todas as tabelas de loja",
+      "T01: endpoints negam leitura/escrita cruzada, IDs/Host não autorizam",
+      "T01: RLS bloqueia SELECT/INSERT/UPDATE cruzados no banco",
+      "T02: mesma conexão alterna A/B e perde contexto após commit/rollback",
+      "FK composta rejeita autoria por vínculo de outra loja",
+      "Convite de Funcionário vinculado ao e-mail, expiração/uso único e revogação",
+      "Sessões/tokens somente como hash, e-mail verificado e recuperação revoga sessões",
+      "Worker confirma recurso/ator e bloqueia job adulterado",
+      "Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais",
+      "Revogar vínculo e todas as sessões tem efeito imediato",
+      "Rate limiting e sanitização de campos sensíveis",
+      "EXPLAIN ANALYZE das consultas mínimas sem índices especulativos"
+    ],
+    "completedAt": "2026-10-01T05:06:13.307Z"
+  },
+  "restore": {
+    "passed": true,
+    "completedAt": "2026-10-01T05:06:38.816Z",
+    "sourceDatabase": "ecommerce",
+    "restoredDatabase": "ecommerce_restore",
+    "postgresMajor": 17,
+    "tenantSamples": 2,
+    "appRole": "app_user",
+    "checks": [
+      "configurações preservadas",
+      "vínculos preservados",
+      "usuários verificados preservados",
+      "RLS leitura/escrita",
+      "negação sem contexto",
+      "ENABLE/FORCE RLS"
+    ],
+    "checkDurationMs": 84,
+    "financialReconciliation": "Não aplicável: domínio de pagamentos ausente na Fase 1."
+  },
+  "storefront": {
+    "passed": true,
+    "criteria": [
+      "T01",
+      "T02",
+      "FK catálogo (T03 parcial)",
+      "T22",
+      "T23",
+      "T37",
+      "Catálogo/estoque",
+      "Carrinho/preço/frete"
+    ],
+    "tests": [
+      {
+        "name": "Produto simples, atributos explícitos, SKU único e estoque auditado",
+        "result": "passed"
+      },
+      {
+        "name": "Ajustes concorrentes serializados e plano real de consulta por tenant",
+        "result": "passed"
+      },
+      {
+        "name": "T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta",
+        "result": "passed"
+      },
+      {
+        "name": "T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica",
+        "result": "passed"
+      },
+      {
+        "name": "T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado",
+        "result": "passed"
+      },
+      {
+        "name": "Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento",
+        "result": "passed"
+      },
+      {
+        "name": "Frete com prioridade, retirada, CEP não atendido, validade e fingerprint",
+        "result": "passed"
+      },
+      {
+        "name": "Arquivamento invalida oferta e carrinho, estoque continua auditável",
+        "result": "passed"
+      },
+      {
+        "name": "Slug histórico redireciona sem reutilização e domínio não mistura lojas",
+        "result": "passed"
+      },
+      {
+        "name": "T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE",
+        "result": "passed"
+      },
+      {
+        "name": "Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel",
+        "result": "passed"
+      }
+    ],
+    "visual": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pages": [
+          "catálogo",
+          "busca",
+          "produto",
+          "carrinho/frete"
+        ],
+        "result": "passed",
+        "screenshot": "artifacts/phase2-store-1440.png"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pages": [
+          "catálogo",
+          "busca",
+          "produto",
+          "carrinho/frete"
+        ],
+        "result": "passed",
+        "screenshot": "artifacts/phase2-store-390.png"
+      }
+    ],
+    "queryPlan": [
+      {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Result",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 4.18,
+              "Total Cost": 10.53,
+              "Plan Rows": 1,
+              "Plan Width": 48,
+              "Actual Startup Time": 0.212,
+              "Actual Total Time": 0.228,
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0f5da-b195-770e-8f83-97b05792e241'::uuid)",
+              "Shared Hit Blocks": 2,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Bitmap Heap Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Relation Name": "products",
+                  "Alias": "products",
+                  "Startup Cost": 4.18,
+                  "Total Cost": 10.53,
+                  "Plan Rows": 1,
+                  "Plan Width": 48,
+                  "Actual Startup Time": 0.202,
+                  "Actual Total Time": 0.218,
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Recheck Cond": "(tenant_id = '01a0f5da-b195-770e-8f83-97b05792e241'::uuid)",
+                  "Rows Removed by Index Recheck": 0,
+                  "Filter": "((status = 'ACTIVE'::text) AND (search_document @@ websearch_to_tsquery('portuguese'::regconfig, shop.search_text('cafes'::text))))",
+                  "Rows Removed by Filter": 1,
+                  "Exact Heap Blocks": 1,
+                  "Lossy Heap Blocks": 0,
+                  "Shared Hit Blocks": 2,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0,
+                  "Plans": [
+                    {
+                      "Node Type": "Bitmap Index Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Index Name": "products_tenant_id_slug_key",
+                      "Startup Cost": 0,
+                      "Total Cost": 4.16,
+                      "Plan Rows": 2,
+                      "Plan Width": 0,
+                      "Actual Startup Time": 0.008,
+                      "Actual Total Time": 0.008,
+                      "Actual Rows": 5,
+                      "Actual Loops": 1,
+                      "Index Cond": "(tenant_id = '01a0f5da-b195-770e-8f83-97b05792e241'::uuid)",
+                      "Shared Hit Blocks": 1,
+                      "Shared Read Blocks": 0,
+                      "Shared Dirtied Blocks": 0,
+                      "Shared Written Blocks": 0,
+                      "Local Hit Blocks": 0,
+                      "Local Read Blocks": 0,
+                      "Local Dirtied Blocks": 0,
+                      "Local Written Blocks": 0,
+                      "Temp Read Blocks": 0,
+                      "Temp Written Blocks": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning": {
+              "Shared Hit Blocks": 161,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+            },
+            "Planning Time": 5.198,
+            "Triggers": [],
+            "Execution Time": 0.302
+          }
+        ]
+      }
+    ],
+    "indexDecision": "GIN parcial de tsvector português após EXPLAIN ANALYZE registrado antes da migration. UNIQUE por tenant cobre escopo. Fixture pequena não é ensaio de capacidade.",
+    "stores": [
+      {
+        "tenantId": "01a0f5da-b195-770e-8f83-97b05792e241",
+        "slug": "aurora-c0269e4f03",
+        "canonical": "http://aurora-c0269e4f03.localhost:3000"
+      },
+      {
+        "tenantId": "01a0f5da-b54b-7188-bc4d-0470288223e2",
+        "slug": "brisa-c0269e4f03",
+        "canonical": "http://brisa-c0269e4f03.localhost:3000"
+      }
+    ],
+    "completedAt": "2026-10-01T05:05:57.575Z"
+  },
+  "storefront-restore": {
+    "passed": true,
+    "completedAt": "2026-10-01T05:06:40.120Z",
+    "tenants": 2,
+    "checks": [
+      "catálogo",
+      "estoque sem reserva",
+      "publicação imutável",
+      "carrinhos/itens/cotações",
+      "RLS",
+      "referências S3 existentes"
+    ],
+    "limitation": "Este teste restaura PostgreSQL; não é restauração externa do bucket. O volume S3 local permanece intacto."
+  },
+  "finishedAt": "2026-10-01T05:06:40.869Z"
+}

@@ -1,0 +1,45 @@
+{
+  "mode": "SIMULADO",
+  "label": "SIMULADO — não é homologação externa real",
+  "generatedAt": "2026-10-02T15:26:58.758Z",
+  "provisional": true,
+  "decisions": {
+    "D03": {
+      "choice": "Caddy On-Demand TLS na própria VM (sem CDN de terceiros)",
+      "status": "PROVISÓRIA",
+      "note": "Cloudflare for SaaS permanece alternativa; homologado só em staging local com autoridade interna."
+    },
+    "D07": {
+      "plans": [
+        {
+          "code": "PILOT",
+          "price_cents": 0,
+          "interval": "NONE"
+        },
+        {
+          "code": "BASICO",
+          "price_cents": 4990,
+          "interval": "MONTH"
+        },
+        {
+          "code": "PRO",
+          "price_cents": 12990,
+          "interval": "MONTH"
+        }
+      ],
+      "billingProvider": "SimulatedBillingProvider",
+      "fiscal": "Sem emissão de NFS-e até orientação contábil",
+      "status": "PROVISÓRIA — valores de demonstração, não cadastrados como ACTIVE"
+    },
+    "D09": {
+      "choice": "Tabela própria por CEP + retirada local; agregador (Melhor Envio candidato) não integrado",
+      "status": "PROVISÓRIA"
+    }
+  },
+  "realPending": [
+    "Aprovação dos preços pelo responsável do negócio",
+    "Contrato com provedor de cobrança recorrente",
+    "Orientação fiscal",
+    "Conta no agregador de frete"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-01",
+  "environment": "ecommerce-foundation / development / http://localhost:3000",
+  "executor": "Agente de desenvolvimento via Playwright MCP (não homologação humana/externa)",
+  "sourceDigest": "a7a45ddd3f084d4e544b96865e4f7f0cf73072970633f77dbef211d91eb14512",
+  "result": "passed",
+  "externalHomologation": false,
+  "viewports": [{"width":1440,"height":900},{"width":390,"height":844}],
+  "stores": ["aurora-ccf985a553", "brisa-ccf985a553"],
+  "checks": [
+    "Catálogo e fornecedor sintético TESTE visíveis",
+    "Variação Verde/M selecionada no produto e adicionada ao carrinho visitante",
+    "Carrinho Aurora mantém aurora-Verde, quantidade 1 e preço 5100 centavos após navegação/reload e migration 0004",
+    "Atributos cor=Verde/tamanho=M preservados após normalização relacional de dados existentes",
+    "Busca CAFÉS encontra Caneca café aurora usando português/unaccent",
+    "Cotação CEP 01001000: frete 1500 centavos, total 6600 centavos e validade explícita",
+    "CEP 99999999: erro explícito, sem cotação gratuita fictícia",
+    "Carrinho Brisa permanece vazio e subtotal 0 no mesmo navegador",
+    "Sem overflow horizontal em 390px e 1440px",
+    "Tab alcança link Ir para o conteúdo; Enter navega para #conteudo",
+    "Aviso de compra/pagamento desabilitados e noindex/nofollow",
+    "Inspeção das screenshots da vitrine/carrinho e painel móvel geradas pelo Playwright"
+  ],
+  "screenshots": ["mcp-desktop.png", "mcp-mobile.png", "../../../../artifacts/phase2-store-390.png", "../../../../artifacts/phase2-admin-390.png"],
+  "limits": [
+    "Sem auditoria completa WCAG ou referência de pixel perfeito",
+    "404 esperado para CEP não atendido; favicon.ico ausente observado inicialmente, sem falha de JavaScript no fluxo",
+    "Painel e preview autorizado também verificados pela suíte Playwright integrada; MCP complementar não usou os acessos privados do seed"
+  ]
+}

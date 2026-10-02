@@ -1,0 +1,22 @@
+{
+  "mode": "SIMULADO",
+  "label": "SIMULADO — não é homologação externa real",
+  "generatedAt": "2026-10-02T15:26:58.758Z",
+  "substitute": "SimulatedAiProvider (sem chamada paga)",
+  "model": "claude-opus-5-5 (configurado, não chamado)",
+  "covered": [
+    "Desligado por padrão e sem provedor: geração recusada, cadastro manual e compra seguem",
+    "Autorização: só o Dono liga na loja; funcionário gera; outra loja não lê a geração",
+    "Reserva antes da chamada, custo conciliado, idempotência e salvamento explícito sem publicar",
+    "Edição concorrente: produto alterado depois da geração não é sobrescrito",
+    "Sanitização: HTML/script removidos; instrução no conteúdo do produto é tratada como dado",
+    "T34: concorrência na mesma loja limitada e orçamento nunca ultrapassado",
+    "T34: timeout mantém reserva (UNKNOWN) até expiração controlada; saída excessiva limitada por max_tokens",
+    "Teto global entre lojas e desligamento global/loja preservam cadastro e venda"
+  ],
+  "realPending": [
+    "Chave ANTHROPIC_API_KEY real",
+    "Orçamento mensal autorizado",
+    "Uma chamada paga controlada com reconciliação de custo registrada"
+  ]
+}

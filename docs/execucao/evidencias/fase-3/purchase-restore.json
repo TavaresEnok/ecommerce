@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "completedAt": "2026-10-01T16:26:50.907Z",
+  "counts": {
+    "transactions": 12,
+    "incidents": 20,
+    "receipts": 49,
+    "inconsistent": 0
+  },
+  "preparedAttempts": 0,
+  "checks": [
+    "pedido e total",
+    "recebimento principal",
+    "incidentes",
+    "recibos de consumo",
+    "tentativas enviadas não voltam a PREPARED"
+  ],
+  "limitation": "Conciliação com pagamentos posteriores ao ponto restaurado (T26) é ensaio operacional da Fase 4."
+}

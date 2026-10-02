@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "simulation": true,
+  "externalHomologation": false,
+  "criteria": [
+    "T27 (simulado)",
+    "Interface de operação desktop/móvel"
+  ],
+  "stores": [
+    {
+      "store": "aurora-f472e5aa1b",
+      "order": "1",
+      "total_cents": "7480",
+      "seller": "conta SIMULADA da própria loja",
+      "notifications": [
+        "ORDER_RECEIVED:SIMULATED",
+        "PAYMENT_CONFIRMED:SIMULATED",
+        "SHIPPED:SIMULATED",
+        "DELIVERED:SIMULATED"
+      ]
+    },
+    {
+      "store": "brisa-f472e5aa1b",
+      "order": "1",
+      "total_cents": "7480",
+      "seller": "conta SIMULADA da própria loja",
+      "notifications": [
+        "ORDER_RECEIVED:SIMULATED",
+        "PAYMENT_CONFIRMED:SIMULATED",
+        "SHIPPED:SIMULATED",
+        "DELIVERED:SIMULATED"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "name": "Duas lojas: compra, recebimento na conta correta, estoque, e-mails e entrega",
+      "result": "passed"
+    },
+    {
+      "name": "Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel)",
+      "result": "passed"
+    }
+  ],
+  "visual": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "pages": [
+        "contato público",
+        "atendimento",
+        "pedidos/expedição",
+        "operação"
+      ],
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pages": [
+        "contato público",
+        "atendimento",
+        "pedidos/expedição",
+        "operação"
+      ],
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-01T17:15:19.908Z"
+}

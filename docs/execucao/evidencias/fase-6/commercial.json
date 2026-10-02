@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "simulation": true,
+  "externalHomologation": false,
+  "criteria": [
+    "MFA",
+    "Administração da plataforma",
+    "T18",
+    "T28",
+    "T29",
+    "T31",
+    "T37 (domínio próprio)",
+    "T38",
+    "Cotas"
+  ],
+  "tests": [
+    {
+      "name": "MFA (TOTP): ativação, códigos de recuperação, nova sessão exige verificação, replay recusado",
+      "result": "passed"
+    },
+    {
+      "name": "Administração da plataforma: papel concedido só pelo operador, MFA obrigatório, motivo e auditoria",
+      "result": "passed"
+    },
+    {
+      "name": "Planos versionados: pago só ativa com preço; PILOT não se aposenta; versão é imutável",
+      "result": "passed"
+    },
+    {
+      "name": "T29: contratação, cobrança simulada, webhook assinado/deduplicado, renovação sem fatura duplicada",
+      "result": "passed"
+    },
+    {
+      "name": "T29: falha de cobrança → PAST_DUE com 7 dias de tolerância → SUSPENDED bloqueia só vendas novas; pagamento reabre",
+      "result": "passed"
+    },
+    {
+      "name": "T29: troca de plano no próximo ciclo, cancelamento ao fim do período; sem MFA/funcionário recusados",
+      "result": "passed"
+    },
+    {
+      "name": "Cotas do plano: produtos/variações/equipe no servidor, concorrência na última vaga, downgrade preserva dados",
+      "result": "passed"
+    },
+    {
+      "name": "T38: cota rigorosa de mídia com reserva atômica, concorrência, expiração e conciliação dos contadores",
+      "result": "passed"
+    },
+    {
+      "name": "T18: devolução pela plataforma — MFA, idempotência, saldo serializado, recusa, resposta perdida e retomada sem duplicar",
+      "result": "passed"
+    },
+    {
+      "name": "T28/T37: domínio próprio — prova TXT, rota HTTPS para a loja certa, canônico com 301, remoção e nova prova para outra loja",
+      "result": "passed"
+    },
+    {
+      "name": "T31: frete por provedor — cotação válida, mudança de regra/expiração invalidam, falha não gera frete grátis",
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-02T03:07:22.662Z"
+}

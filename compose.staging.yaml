@@ -1,0 +1,43 @@
+# Homologação LOCAL com substitutos fictícios (nada aqui é produção): HTTPS por autoridade local do Caddy, SMTP de captura
+# (Mailpit), DNS por arquivo de zona, armazenamento "externo" separado. Uso: node scripts/staging.mjs up|check|down
+services:
+  web:
+    ports: !override ["127.0.0.1:3900:3000"]
+    environment: {PLATFORM_HOST: lojas.demo.test}
+  api:
+    environment:
+      PLATFORM_HOST: lojas.demo.test
+      DNS_OVERRIDES_FILE: /staging/dns.json
+      TLS_PROBE_CA_FILE: /staging/caddy-root.crt
+    volumes: ["./.local/staging:/staging:ro", "caddy-data:/caddy-data:ro"]
+  worker:
+    environment: {MAIL_PROVIDER: smtp, SMTP_HOST: mailpit, SMTP_PORT: "1025", SMTP_FROM: nao-responda@lojas.demo.test, SMTP_STARTTLS: "false", PUBLIC_ORIGIN: "https://localhost:8443"}
+  tests:
+    environment: {APP_ENV: staging, BASE_URL: "https://lojas.demo.test", PUBLIC_ORIGIN: "https://localhost:8443", NODE_EXTRA_CA_CERTS: /staging/caddy-root.crt, OFFSITE_S3_ENDPOINT: "http://offsite:8333", OFFSITE_S3_ACCESS_KEY: "${OFFSITE_S3_ACCESS_KEY:?}", OFFSITE_S3_SECRET_KEY: "${OFFSITE_S3_SECRET_KEY:?}", OFFSITE_BACKUP_KEY: "${OFFSITE_BACKUP_KEY:?}"}
+    volumes: ["caddy-data:/caddy-data:ro", "./.local/staging:/staging"]
+  mailpit:
+    image: axllent/mailpit:v1.27.10
+    ports: ["127.0.0.1:8025:8025"]
+    restart: unless-stopped
+    mem_limit: 128m
+  caddy:
+    image: caddy:2.10.2-alpine
+    ports: ["127.0.0.1:8443:443"]
+    volumes: ["./infra/Caddyfile.staging:/etc/caddy/Caddyfile:ro", "caddy-data:/data"]
+    depends_on: {web: {condition: service_healthy}}
+    restart: unless-stopped
+    mem_limit: 128m
+    networks:
+      default:
+        aliases: [lojas.demo.test, loja-aurora.demo.test, loja-brisa.demo.test, loja-intrusa.demo.test]
+  offsite:
+    image: chrislusf/seaweedfs:4.17
+    command: [mini, -dir=/data, -ip=offsite, -ip.bind=0.0.0.0, -webdav=false, -admin.ui=false]
+    environment: {AWS_ACCESS_KEY_ID: "${OFFSITE_S3_ACCESS_KEY:?}", AWS_SECRET_ACCESS_KEY: "${OFFSITE_S3_SECRET_KEY:?}"}
+    ports: ["127.0.0.1:8433:8333"]
+    volumes: ["offsite-data:/data"]
+    restart: unless-stopped
+    mem_limit: 384m
+volumes:
+  caddy-data:
+  offsite-data:

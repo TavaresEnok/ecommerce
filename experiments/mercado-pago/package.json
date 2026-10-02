@@ -1,0 +1,13 @@
+{
+  "name": "mercado-pago-poc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fase 0: POC isolada do Mercado Pago (Payments v1 / Checkout Transparente). Sem dependências externas; não compartilha banco nem lockfile com o produto.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "test": "node --test test/poc.test.ts",
+    "verify": "node verify.mjs",
+    "serve": "node src/server.ts"
+  }
+}

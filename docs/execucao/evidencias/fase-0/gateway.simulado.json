@@ -1,0 +1,35 @@
+{
+  "mode": "SIMULADO",
+  "label": "SIMULADO — não é homologação externa real",
+  "generatedAt": "2026-10-02T15:26:58.758Z",
+  "substitute": "SimulatedGateway (banco) no lugar do Mercado Pago sandbox",
+  "covered": [
+    "Fluxo principal: checkout, snapshots, reserva integral, outbox e baixa única após confirmação autoritativa",
+    "T03: FKs compostas e RLS impedem vínculos de compra entre lojas",
+    "T04: comprador só acessa o pedido do próprio carrinho; número/ID não autorizam",
+    "T05: funcionário lê pedidos, mas não configura gateway, cancela pago, resolve incidente ou simula",
+    "T06: duas compras concorrentes da última unidade — uma reserva integral vence",
+    "T07: carrinho com item indisponível não deixa pedido nem reserva parcial",
+    "T08/T09: mesma chave e nova chave retornam o mesmo pedido; conteúdo diferente gera conflito",
+    "T10: preço/frete alterados ou total adulterado exigem nova confirmação",
+    "T11: criação recebida com resposta perdida e criação nunca entregue — mesma operação, sem duplicar",
+    "T12: webhook repetido, consulta repetida e fato fora de ordem — um reconhecimento, sem regressão",
+    "T13: assinatura inválida, vendedor/moeda/valor incompatíveis não confirmam pagamento",
+    "T14: confirmação concorrente com expiração — estado serializado, sem baixa ou liberação dupla",
+    "Expiração: gateway confirma encerramento → libera e cancela; incerteza só libera após 60 min sem declarar não pago",
+    "T15: aprovação após liberação — realoca com saldo; sem saldo abre PAID_WITHOUT_STOCK e bloqueia até realocação do Dono",
+    "T16: duas tentativas pagas — dois recebimentos, uma baixa, excedente acompanhado até devolução confirmada",
+    "T17/T35: aprovação em pedido cancelado não reabre; devolução externa repetida/atrasada concilia uma vez; anotação não fabrica status",
+    "T19: devolução parcial e disputa preservam fatos sem apagar pagamento ou entrega",
+    "T20: falha entre commit e publicação — evento durável, consumo repetido/concorrente sem efeito duplicado",
+    "T24: alterar produto, fornecedor e tema após compra preserva snapshots; correção de endereço auditada",
+    "T36 (protocolo): solicitação durável, confirmação imediata, idempotente e com acesso autorizado",
+    "Conta revogada bloqueia novas cobranças; pedidos anteriores continuam consultáveis",
+    "EXPLAIN ANALYZE das consultas de reconciliação como app_user"
+  ],
+  "realPending": [
+    "Conta de comprador de teste do Mercado Pago (MP_TEST_BUYER_EMAIL) para homologate.ts",
+    "Client ID/secret OAuth e segunda conta vendedora (marketplace/split)",
+    "Webhook em URL HTTPS pública com assinatura validada"
+  ]
+}

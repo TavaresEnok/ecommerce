@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "visual": [
+    {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "pages": [
+        "operação/MFA/plano/domínio/frete",
+        "plataforma"
+      ],
+      "result": "passed"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pages": [
+        "operação/MFA/plano/domínio/frete",
+        "plataforma"
+      ],
+      "result": "passed"
+    }
+  ],
+  "completedAt": "2026-10-02T03:07:59.886Z"
+}

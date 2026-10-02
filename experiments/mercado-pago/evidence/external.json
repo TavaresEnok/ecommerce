@@ -1,0 +1,26 @@
+{
+  "environment": "SANDBOX",
+  "operator": "agente (sessão autorizada pelo responsável)",
+  "items": [
+    {
+      "capability": "TEST_ACCOUNT_CONFIRMED",
+      "method": "-",
+      "result": "OK",
+      "reference": "seller:3277226594",
+      "detail": {
+        "site": "MLB"
+      },
+      "at": "2026-10-02T14:25:37.527Z"
+    },
+    {
+      "capability": "HOMOLOGATION_ERROR",
+      "method": "-",
+      "result": "FAILED",
+      "reference": "-",
+      "detail": {
+        "error": "HTTP 401 {\"cause\":[{\"code\":7,\"data\":\"02-10-2026T14:25:36UTC;0e0e5a18-11c2-4647-8dcb-0b10374a4796\",\"description\":\"Unauthorized use of live credentials\"}],\"error\":\"unauthorized\",\"message\":\"Unauthorized use of li"
+      },
+      "at": "2026-10-02T14:25:38.240Z"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# IA — rascunho de descrição de produto (Fase 7)
+
+Priorização: o responsável pediu para seguir todas as fases até o fim (02/10/2026); isso registra a escolha desta melhoria. **Demanda de lojistas ainda não medida** (piloto real pendente) e **D11 sem orçamento aprovado**: o recurso nasce **desligado** na plataforma e em cada loja.
+
+- **Provedor único:** Anthropic Messages API via SDK oficial `@anthropic-ai/sdk` 0.131.0 (fixado). Modelo `claude-opus-5-5` (padrão atual da referência da API). Preço de referência US$ 4 / US$ 20 por milhão de tokens de entrada/saída (tabela da referência, cache de 25/09/2026) — gravado em `platform.ai_policy` com `price_reference`; mudança de preço é nova versão da política.
+- **Fallback em recusa:** `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`) ligado por padrão; resposta com `stop_reason: refusal` sem texto vira FAILED/`REFUSAL`, sem salvar nada.
+- **Custo controlado:** esforço `low`; o raciocínio do modelo é cobrado como saída, então `max_tokens` (4 000) limita o gasto. Antes da chamada reserva-se o pior caso (entrada estimada × preço + `max_tokens` × preço) sob lock global e da loja; depois concilia-se com o `usage` real. Sem retentativa automática: timeout/conexão perdida = UNKNOWN, reserva retida até expiração controlada de 24 h. Tetos padrão: US$ 2/mês por loja, US$ 20/mês global, 1 geração simultânea por loja e 4 globais (ajustáveis pela administração com MFA, motivo e auditoria). Valores em micro-USD inteiros.
+- **Entrada mínima:** nome, categoria, atributos e descrição atual do produto (até 4 000 caracteres), delimitados como dado (`<produto>`), com instrução explícita para ignorar pedidos contidos nele. Nunca compradores, pedidos, documentos ou segredos.
+- **Saída:** texto simples sanitizado (sem HTML/scripts, ≤ 8 000). Salvar é ação explícita de quem gerencia o catálogo; não publica e recusa (409) se o produto foi editado depois da geração. Edição com HTML pelo lojista é recusada como no cadastro manual.
+- **Desligamento:** global (plataforma) e por loja (Dono). Falha, falta de orçamento ou desligamento não afetam cadastro manual, checkout, pagamentos ou pedidos.
+- **Simulador** (`provider=SIMULATED`) só em development/test, para os testes de orçamento/concorrência; não comprova o fornecedor.

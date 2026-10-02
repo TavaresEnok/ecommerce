@@ -1,0 +1,33 @@
+openapi: 3.1.0
+info:
+  title: E-commerce — descrição com IA (Fase 7)
+  version: 1.1.0-fase7
+  description: Rascunho de descrição; custo em micro-USD inteiros como string. Recurso desligado por padrão (global e por loja).
+servers: [{url: /api}]
+components:
+  securitySchemes:
+    session: {type: apiKey, in: cookie, name: session, description: Sessão + X-CSRF-Token em escritas}
+  schemas:
+    Generation:
+      type: object
+      properties:
+        id: {type: string}
+        status: {enum: [RESERVED, SUCCEEDED, FAILED, UNKNOWN, RELEASED, SAVED, DISCARDED]}
+        model: {type: string}
+        reserved_micros: {type: string}
+        cost_micros: {type: [string, 'null']}
+        input_tokens: {type: [integer, 'null']}
+        output_tokens: {type: [integer, 'null']}
+        stop_reason: {type: [string, 'null']}
+        draft: {type: [string, 'null']}
+        error_code: {type: [string, 'null']}
+paths:
+  /tenants/{tenantId}/catalogue/products/{productId}/ai-description:
+    post: {summary: Gerar rascunho (Dono/Funcionário); idempotente por key; reserva o custo máximo antes da chamada, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, required: [key], properties: {key: {type: string}}}}}}, responses: {'201': {description: Geração, content: {application/json: {schema: {$ref: '#/components/schemas/Generation'}}}}, '409': {description: Desligado ou orçamento esgotado}, '429': {description: Geração simultânea em andamento}}}
+  /tenants/{tenantId}/catalogue/ai-generations/{generationId}: {get: {summary: Consultar geração, security: [{session: []}], responses: {'200': {description: OK}}}}
+  /tenants/{tenantId}/catalogue/ai-generations/{generationId}/save: {post: {summary: 'Salvar no produto (texto opcional editado, sem HTML); não publica; 409 se o produto mudou depois da geração', security: [{session: []}], responses: {'201': {description: OK}, '400': {description: Texto inválido}, '409': {description: Conflito}}}}
+  /tenants/{tenantId}/catalogue/ai-generations/{generationId}/discard: {post: {summary: Descartar rascunho, security: [{session: []}], responses: {'201': {description: OK}}}}
+  /tenants/{tenantId}/ai/settings:
+    get: {summary: Estado, modelo, teto e uso do mês, security: [{session: []}], responses: {'200': {description: OK}}}
+    post: {summary: Ligar/desligar na loja e limite mensal ≤ teto da plataforma (Dono), security: [{session: []}], responses: {'201': {description: OK}, '403': {description: Não é Dono}}}
+  /platform/ai/policy: {post: {summary: 'Liga/desliga global, provedor e tetos (administrador + MFA, motivo, auditoria); ANTHROPIC exige ANTHROPIC_API_KEY', security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Sem chave}}}}

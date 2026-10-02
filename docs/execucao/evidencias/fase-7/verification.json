@@ -1,0 +1,1146 @@
+{
+  "phase": 7,
+  "specification": "1.1",
+  "startedAt": "2026-10-02T14:42:56.506Z",
+  "environment": "ecommerce-phase7-test",
+  "steps": [
+    {
+      "name": "Preparação isolada",
+      "result": "passed",
+      "durationMs": 4497
+    },
+    {
+      "name": "Build em Node LTS",
+      "result": "passed",
+      "durationMs": 129798
+    },
+    {
+      "name": "Migrations, S3 privado e saúde",
+      "result": "passed",
+      "durationMs": 28448
+    },
+    {
+      "name": "Tipos",
+      "result": "passed",
+      "durationMs": 27068
+    },
+    {
+      "name": "Fase 3+4: núcleo transacional e operação do piloto com worker parado",
+      "result": "passed",
+      "durationMs": 38740
+    },
+    {
+      "name": "Worker real: T21, interface e T27 em duas lojas",
+      "result": "passed",
+      "durationMs": 68610
+    },
+    {
+      "name": "Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel",
+      "result": "passed",
+      "durationMs": 20815
+    },
+    {
+      "name": "Regressões T01/T02, acesso, worker e UI da fundação",
+      "result": "passed",
+      "durationMs": 17294
+    },
+    {
+      "name": "Logs sanitizados",
+      "result": "passed",
+      "durationMs": 1245
+    },
+    {
+      "name": "Persistência S3 após reinício local",
+      "result": "passed",
+      "durationMs": 27198
+    },
+    {
+      "name": "CLI do operador: status e alertas por loja",
+      "result": "passed",
+      "durationMs": 4972
+    },
+    {
+      "name": "Backup PostgreSQL 17",
+      "result": "passed",
+      "durationMs": 1516
+    },
+    {
+      "name": "Fatos após o backup: pagamentos/devolução e eliminação com ledger externo",
+      "result": "passed",
+      "durationMs": 9504
+    },
+    {
+      "name": "Restore separado",
+      "result": "passed",
+      "durationMs": 3739
+    },
+    {
+      "name": "Conferências após restore",
+      "result": "passed",
+      "durationMs": 6417
+    },
+    {
+      "name": "PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO)",
+      "result": "passed",
+      "durationMs": 83439
+    }
+  ],
+  "exitCode": 2,
+  "externalHomologation": false,
+  "sourceDigest": "1edfacb00f2c9762031c6db850abf9f45ba92ce0d2e1f4c31671d19adc013ab6",
+  "opsStatus": {
+    "tenants": 18,
+    "alertCodes": [
+      "FINANCIAL_COMMUNICATION_PENDING",
+      "FINANCIAL_INCIDENT_OPEN",
+      "PAYMENT_UNCERTAIN"
+    ]
+  },
+  "foundation": {
+    "passed": true,
+    "criteria": [
+      "T01",
+      "T02",
+      "FK representativa da Fase 1",
+      "Autenticação e autorização",
+      "Worker por tenant",
+      "Interface Playwright"
+    ],
+    "tests": [
+      "UUIDv7, papéis reais e FORCE RLS em todas as tabelas de loja",
+      "T01: endpoints negam leitura/escrita cruzada, IDs/Host não autorizam",
+      "T01: RLS bloqueia SELECT/INSERT/UPDATE cruzados no banco",
+      "T02: mesma conexão alterna A/B e perde contexto após commit/rollback",
+      "FK composta rejeita autoria por vínculo de outra loja",
+      "Convite de Funcionário vinculado ao e-mail, expiração/uso único e revogação",
+      "Sessões/tokens somente como hash, e-mail verificado e recuperação revoga sessões",
+      "Worker confirma recurso/ator e bloqueia job adulterado",
+      "Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais",
+      "Revogar vínculo e todas as sessões tem efeito imediato",
+      "Rate limiting e sanitização de campos sensíveis",
+      "EXPLAIN ANALYZE das consultas mínimas sem índices especulativos"
+    ],
+    "completedAt": "2026-10-02T14:48:35.599Z"
+  },
+  "restore": {
+    "passed": true,
+    "completedAt": "2026-10-02T14:49:29.411Z",
+    "sourceDatabase": "ecommerce",
+    "restoredDatabase": "ecommerce_restore",
+    "postgresMajor": 17,
+    "tenantSamples": 2,
+    "appRole": "app_user",
+    "checks": [
+      "configurações preservadas",
+      "vínculos preservados",
+      "usuários verificados preservados",
+      "RLS leitura/escrita",
+      "negação sem contexto",
+      "ENABLE/FORCE RLS"
+    ],
+    "checkDurationMs": 77,
+    "financialReconciliation": "Não aplicável: domínio de pagamentos ausente na Fase 1."
+  },
+  "storefront": {
+    "passed": true,
+    "criteria": [
+      "T01",
+      "T02",
+      "FK catálogo (T03 parcial)",
+      "T22",
+      "T23",
+      "T37",
+      "Catálogo/estoque",
+      "Carrinho/preço/frete"
+    ],
+    "tests": [
+      {
+        "name": "Produto simples, atributos explícitos, SKU único e estoque auditado",
+        "result": "passed"
+      },
+      {
+        "name": "Ajustes concorrentes serializados e plano real de consulta por tenant",
+        "result": "passed"
+      },
+      {
+        "name": "T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta",
+        "result": "passed"
+      },
+      {
+        "name": "T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica",
+        "result": "passed"
+      },
+      {
+        "name": "T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado",
+        "result": "passed"
+      },
+      {
+        "name": "Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento",
+        "result": "passed"
+      },
+      {
+        "name": "Frete com prioridade, retirada, CEP não atendido, validade e fingerprint",
+        "result": "passed"
+      },
+      {
+        "name": "Arquivamento invalida oferta e carrinho, estoque continua auditável",
+        "result": "passed"
+      },
+      {
+        "name": "Slug histórico redireciona sem reutilização e domínio não mistura lojas",
+        "result": "passed"
+      },
+      {
+        "name": "T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE",
+        "result": "passed"
+      },
+      {
+        "name": "Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel",
+        "result": "passed"
+      }
+    ],
+    "visual": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pages": [
+          "catálogo",
+          "busca",
+          "produto",
+          "carrinho/frete"
+        ],
+        "result": "passed",
+        "screenshot": "artifacts/phase2-store-1440.png"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pages": [
+          "catálogo",
+          "busca",
+          "produto",
+          "carrinho/frete"
+        ],
+        "result": "passed",
+        "screenshot": "artifacts/phase2-store-390.png"
+      }
+    ],
+    "queryPlan": [
+      {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Result",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.14,
+              "Total Cost": 6.48,
+              "Plan Rows": 1,
+              "Plan Width": 32,
+              "Actual Startup Time": 0.244,
+              "Actual Total Time": 0.261,
+              "Actual Rows": 1,
+              "Actual Loops": 1,
+              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fd16-2e40-76a9-a2bc-c9f1d765a125'::uuid)",
+              "Shared Hit Blocks": 3,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Index Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Scan Direction": "Forward",
+                  "Index Name": "products_tenant_id_slug_key",
+                  "Relation Name": "products",
+                  "Alias": "products",
+                  "Startup Cost": 0.14,
+                  "Total Cost": 6.48,
+                  "Plan Rows": 1,
+                  "Plan Width": 32,
+                  "Actual Startup Time": 0.234,
+                  "Actual Total Time": 0.251,
+                  "Actual Rows": 1,
+                  "Actual Loops": 1,
+                  "Index Cond": "(tenant_id = '01a0fd16-2e40-76a9-a2bc-c9f1d765a125'::uuid)",
+                  "Rows Removed by Index Recheck": 0,
+                  "Filter": "((status = 'ACTIVE'::text) AND (search_document @@ websearch_to_tsquery('portuguese'::regconfig, shop.search_text('cafes'::text))))",
+                  "Rows Removed by Filter": 1,
+                  "Shared Hit Blocks": 3,
+                  "Shared Read Blocks": 0,
+                  "Shared Dirtied Blocks": 0,
+                  "Shared Written Blocks": 0,
+                  "Local Hit Blocks": 0,
+                  "Local Read Blocks": 0,
+                  "Local Dirtied Blocks": 0,
+                  "Local Written Blocks": 0,
+                  "Temp Read Blocks": 0,
+                  "Temp Written Blocks": 0
+                }
+              ]
+            },
+            "Planning": {
+              "Shared Hit Blocks": 153,
+              "Shared Read Blocks": 0,
+              "Shared Dirtied Blocks": 0,
+              "Shared Written Blocks": 0,
+              "Local Hit Blocks": 0,
+              "Local Read Blocks": 0,
+              "Local Dirtied Blocks": 0,
+              "Local Written Blocks": 0,
+              "Temp Read Blocks": 0,
+              "Temp Written Blocks": 0
+            },
+            "Planning Time": 5.776,
+            "Triggers": [],
+            "Execution Time": 0.337
+          }
+        ]
+      }
+    ],
+    "indexDecision": "GIN parcial de tsvector português após EXPLAIN ANALYZE registrado antes da migration. UNIQUE por tenant cobre escopo. Fixture pequena não é ensaio de capacidade.",
+    "stores": [
+      {
+        "tenantId": "01a0fd16-2e40-76a9-a2bc-c9f1d765a125",
+        "slug": "aurora-fde0b465f9",
+        "canonical": "http://aurora-fde0b465f9.localhost:3000"
+      },
+      {
+        "tenantId": "01a0fd16-31ec-71df-b99d-5d9db43a5211",
+        "slug": "brisa-fde0b465f9",
+        "canonical": "http://brisa-fde0b465f9.localhost:3000"
+      }
+    ],
+    "completedAt": "2026-10-02T14:48:17.852Z"
+  },
+  "storefront-restore": {
+    "passed": true,
+    "completedAt": "2026-10-02T14:49:30.311Z",
+    "tenants": 2,
+    "checks": [
+      "catálogo",
+      "estoque sem reserva",
+      "publicação imutável",
+      "carrinhos/itens/cotações",
+      "RLS",
+      "referências S3 existentes"
+    ],
+    "limitation": "Este teste restaura PostgreSQL; não é restauração externa do bucket. O volume S3 local permanece intacto."
+  },
+  "purchase": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "T03",
+      "T04",
+      "T05",
+      "T06",
+      "T07",
+      "T08",
+      "T09",
+      "T10",
+      "T11",
+      "T12",
+      "T13",
+      "T14",
+      "T15",
+      "T16",
+      "T17",
+      "T19",
+      "T20",
+      "T24",
+      "T35 (núcleo)",
+      "T36 (protocolo/confirmação)"
+    ],
+    "tests": [
+      {
+        "name": "Fluxo principal: checkout, snapshots, reserva integral, outbox e baixa única após confirmação autoritativa",
+        "result": "passed"
+      },
+      {
+        "name": "T03: FKs compostas e RLS impedem vínculos de compra entre lojas",
+        "result": "passed"
+      },
+      {
+        "name": "T04: comprador só acessa o pedido do próprio carrinho; número/ID não autorizam",
+        "result": "passed"
+      },
+      {
+        "name": "T05: funcionário lê pedidos, mas não configura gateway, cancela pago, resolve incidente ou simula",
+        "result": "passed"
+      },
+      {
+        "name": "T06: duas compras concorrentes da última unidade — uma reserva integral vence",
+        "result": "passed"
+      },
+      {
+        "name": "T07: carrinho com item indisponível não deixa pedido nem reserva parcial",
+        "result": "passed"
+      },
+      {
+        "name": "T08/T09: mesma chave e nova chave retornam o mesmo pedido; conteúdo diferente gera conflito",
+        "result": "passed"
+      },
+      {
+        "name": "T10: preço/frete alterados ou total adulterado exigem nova confirmação",
+        "result": "passed"
+      },
+      {
+        "name": "T11: criação recebida com resposta perdida e criação nunca entregue — mesma operação, sem duplicar",
+        "result": "passed"
+      },
+      {
+        "name": "T12: webhook repetido, consulta repetida e fato fora de ordem — um reconhecimento, sem regressão",
+        "result": "passed"
+      },
+      {
+        "name": "T13: assinatura inválida, vendedor/moeda/valor incompatíveis não confirmam pagamento",
+        "result": "passed"
+      },
+      {
+        "name": "T14: confirmação concorrente com expiração — estado serializado, sem baixa ou liberação dupla",
+        "result": "passed"
+      },
+      {
+        "name": "Expiração: gateway confirma encerramento → libera e cancela; incerteza só libera após 60 min sem declarar não pago",
+        "result": "passed"
+      },
+      {
+        "name": "T15: aprovação após liberação — realoca com saldo; sem saldo abre PAID_WITHOUT_STOCK e bloqueia até realocação do Dono",
+        "result": "passed"
+      },
+      {
+        "name": "T16: duas tentativas pagas — dois recebimentos, uma baixa, excedente acompanhado até devolução confirmada",
+        "result": "passed"
+      },
+      {
+        "name": "T17/T35: aprovação em pedido cancelado não reabre; devolução externa repetida/atrasada concilia uma vez; anotação não fabrica status",
+        "result": "passed"
+      },
+      {
+        "name": "T19: devolução parcial e disputa preservam fatos sem apagar pagamento ou entrega",
+        "result": "passed"
+      },
+      {
+        "name": "T20: falha entre commit e publicação — evento durável, consumo repetido/concorrente sem efeito duplicado",
+        "result": "passed"
+      },
+      {
+        "name": "T24: alterar produto, fornecedor e tema após compra preserva snapshots; correção de endereço auditada",
+        "result": "passed"
+      },
+      {
+        "name": "T36 (protocolo): solicitação durável, confirmação imediata, idempotente e com acesso autorizado",
+        "result": "passed"
+      },
+      {
+        "name": "Conta revogada bloqueia novas cobranças; pedidos anteriores continuam consultáveis",
+        "result": "passed"
+      },
+      {
+        "name": "EXPLAIN ANALYZE das consultas de reconciliação como app_user",
+        "result": "passed"
+      }
+    ],
+    "queryPlans": {
+      "attempts_due": {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.15,
+              "Total Cost": 8.17,
+              "Plan Rows": 1,
+              "Plan Width": 24,
+              "Actual Startup Time": 0.029,
+              "Actual Total Time": 0.033,
+              "Actual Rows": 3,
+              "Actual Loops": 1,
+              "Plans": [
+                {
+                  "Node Type": "Result",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Startup Cost": 0.15,
+                  "Total Cost": 8.17,
+                  "Plan Rows": 1,
+                  "Plan Width": 24,
+                  "Actual Startup Time": 0.027,
+                  "Actual Total Time": 0.03,
+                  "Actual Rows": 3,
+                  "Actual Loops": 1,
+                  "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid)",
+                  "Plans": [
+                    {
+                      "Node Type": "Index Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Scan Direction": "Forward",
+                      "Index Name": "payment_attempts_due",
+                      "Relation Name": "payment_attempts",
+                      "Alias": "a",
+                      "Startup Cost": 0.15,
+                      "Total Cost": 8.17,
+                      "Plan Rows": 1,
+                      "Plan Width": 24,
+                      "Actual Startup Time": 0.015,
+                      "Actual Total Time": 0.017,
+                      "Actual Rows": 3,
+                      "Actual Loops": 1,
+                      "Index Cond": "((tenant_id = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid) AND (next_check_at <= now()))",
+                      "Rows Removed by Index Recheck": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning Time": 0.237,
+            "Triggers": [],
+            "Execution Time": 0.072
+          }
+        ]
+      },
+      "outbox_pending": {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 8.18,
+              "Total Cost": 8.18,
+              "Plan Rows": 1,
+              "Plan Width": 24,
+              "Actual Startup Time": 0.164,
+              "Actual Total Time": 0.169,
+              "Actual Rows": 25,
+              "Actual Loops": 1,
+              "Plans": [
+                {
+                  "Node Type": "Sort",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Startup Cost": 8.18,
+                  "Total Cost": 8.18,
+                  "Plan Rows": 1,
+                  "Plan Width": 24,
+                  "Actual Startup Time": 0.163,
+                  "Actual Total Time": 0.165,
+                  "Actual Rows": 25,
+                  "Actual Loops": 1,
+                  "Sort Key": [
+                    "occurred_at"
+                  ],
+                  "Sort Method": "quicksort",
+                  "Sort Space Used": 28,
+                  "Sort Space Type": "Memory",
+                  "Plans": [
+                    {
+                      "Node Type": "Result",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Startup Cost": 0.15,
+                      "Total Cost": 8.17,
+                      "Plan Rows": 1,
+                      "Plan Width": 24,
+                      "Actual Startup Time": 0.06,
+                      "Actual Total Time": 0.089,
+                      "Actual Rows": 48,
+                      "Actual Loops": 1,
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid)",
+                      "Plans": [
+                        {
+                          "Node Type": "Index Scan",
+                          "Parent Relationship": "Outer",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Scan Direction": "Forward",
+                          "Index Name": "purchase_outbox_pending",
+                          "Relation Name": "purchase_outbox",
+                          "Alias": "purchase_outbox",
+                          "Startup Cost": 0.15,
+                          "Total Cost": 8.17,
+                          "Plan Rows": 1,
+                          "Plan Width": 24,
+                          "Actual Startup Time": 0.05,
+                          "Actual Total Time": 0.069,
+                          "Actual Rows": 48,
+                          "Actual Loops": 1,
+                          "Index Cond": "((tenant_id = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid) AND (next_run_at <= now()))",
+                          "Rows Removed by Index Recheck": 0
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning Time": 0.235,
+            "Triggers": [],
+            "Execution Time": 0.214
+          }
+        ]
+      },
+      "inbox_pending": {
+        "QUERY PLAN": [
+          {
+            "Plan": {
+              "Node Type": "Limit",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 0.14,
+              "Total Cost": 8.16,
+              "Plan Rows": 1,
+              "Plan Width": 24,
+              "Actual Startup Time": 0.083,
+              "Actual Total Time": 0.084,
+              "Actual Rows": 0,
+              "Actual Loops": 1,
+              "Plans": [
+                {
+                  "Node Type": "Result",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Startup Cost": 0.14,
+                  "Total Cost": 8.16,
+                  "Plan Rows": 1,
+                  "Plan Width": 24,
+                  "Actual Startup Time": 0.081,
+                  "Actual Total Time": 0.082,
+                  "Actual Rows": 0,
+                  "Actual Loops": 1,
+                  "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid)",
+                  "Plans": [
+                    {
+                      "Node Type": "Index Scan",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Scan Direction": "Forward",
+                      "Index Name": "payment_inbox_pending",
+                      "Relation Name": "payment_inbox",
+                      "Alias": "payment_inbox",
+                      "Startup Cost": 0.14,
+                      "Total Cost": 8.16,
+                      "Plan Rows": 1,
+                      "Plan Width": 24,
+                      "Actual Startup Time": 0.072,
+                      "Actual Total Time": 0.072,
+                      "Actual Rows": 0,
+                      "Actual Loops": 1,
+                      "Index Cond": "(tenant_id = '01a0fd14-eb98-7582-a333-f74eb814c1fe'::uuid)",
+                      "Rows Removed by Index Recheck": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "Planning Time": 0.698,
+            "Triggers": [],
+            "Execution Time": 0.118
+          }
+        ]
+      }
+    },
+    "indexDecision": "Índices parciais de pendências por tenant (0006) cobrem as consultas periódicas; fixture pequena, sem ensaio de capacidade.",
+    "stores": [
+      {
+        "tenantId": "01a0fd14-eb98-7582-a333-f74eb814c1fe",
+        "slug": "aurora-p3021c33af"
+      },
+      {
+        "tenantId": "01a0fd14-efd5-72d6-99bd-1dc8d62ebbae",
+        "slug": "brisa-p3021c33af"
+      }
+    ],
+    "completedAt": "2026-10-02T14:46:48.603Z"
+  },
+  "purchase-worker": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "T20 (worker real)",
+      "T21",
+      "Fluxo comprador/lojista desktop/móvel"
+    ],
+    "tests": [
+      {
+        "name": "T21: jobs publicados e perdidos no Redis são reconstruídos do PostgreSQL e executados uma vez",
+        "result": "passed"
+      },
+      {
+        "name": "Webhook simulado → inbox durável → consulta autoritativa pelo worker → pago com baixa única",
+        "result": "passed"
+      },
+      {
+        "name": "Interface: comprador revisa, confirma, recebe comprovante e protocolo; lojista vê pedido (desktop/móvel)",
+        "result": "passed"
+      }
+    ],
+    "visual": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pages": [
+          "produto",
+          "carrinho/frete",
+          "revisão",
+          "comprovante",
+          "protocolo",
+          "painel de pedidos"
+        ],
+        "result": "passed"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pages": [
+          "produto",
+          "carrinho/frete",
+          "revisão",
+          "comprovante",
+          "protocolo",
+          "painel de pedidos"
+        ],
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:47:56.719Z"
+  },
+  "purchase-restore": {
+    "passed": true,
+    "completedAt": "2026-10-02T14:49:26.632Z",
+    "counts": {
+      "transactions": 12,
+      "incidents": 20,
+      "receipts": 49,
+      "inconsistent": 0
+    },
+    "preparedAttempts": 0,
+    "checks": [
+      "pedido e total",
+      "recebimento principal",
+      "incidentes",
+      "recibos de consumo",
+      "tentativas enviadas não voltam a PREPARED"
+    ],
+    "limitation": "Conciliação com pagamentos posteriores ao ponto restaurado (T26) é ensaio operacional da Fase 4."
+  },
+  "operations": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "T05 (operação)",
+      "T25",
+      "T32 (exportação/eliminação)",
+      "T35",
+      "T36",
+      "Expedição/retirada",
+      "Notificações e falha",
+      "Alertas"
+    ],
+    "tests": [
+      {
+        "name": "Expedição por transportadora: funcionário separa, envia e entrega; pedido concluído e notificações enfileiradas",
+        "result": "passed"
+      },
+      {
+        "name": "Retirada comprovada sem transportadora; bloqueios revalidados no backend",
+        "result": "passed"
+      },
+      {
+        "name": "T35/T05: revisão não financeira só pelo Dono; devolução pendente só encerra com confirmação do gateway",
+        "result": "passed"
+      },
+      {
+        "name": "T36: atendimento vinculado — protocolo, resposta, comunicação financeira antes do aceite, horário original preservado",
+        "result": "passed"
+      },
+      {
+        "name": "T36: contato geral sem compra — protocolo e código; acesso somente com o código e na loja certa",
+        "result": "passed"
+      },
+      {
+        "name": "Notificações: falha do provedor não apaga protocolo; esgota em FAILED, reenvio pelo Dono; link de acesso por fragmento",
+        "result": "passed"
+      },
+      {
+        "name": "T25: suspensão e pausa bloqueiam novas vendas; pedidos, pagamentos, devoluções e atendimento anteriores continuam",
+        "result": "passed"
+      },
+      {
+        "name": "T32 (parte 1): exportação privada com expiração e permissão; eliminação bloqueada em pedido aberto",
+        "result": "passed"
+      },
+      {
+        "name": "Fixtures de recuperação (antes do backup): T26 pagamento pendente/PREPARED e T32 pedido concluído com dados pessoais",
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:46:36.921Z"
+  },
+  "pilot-flow": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "T27 (simulado)",
+      "Interface de operação desktop/móvel"
+    ],
+    "stores": [
+      {
+        "store": "aurora-f4cb3dfa11",
+        "order": "1",
+        "total_cents": "7480",
+        "seller": "conta SIMULADA da própria loja",
+        "notifications": [
+          "ORDER_RECEIVED:SIMULATED",
+          "PAYMENT_CONFIRMED:SIMULATED",
+          "SHIPPED:SIMULATED",
+          "DELIVERED:SIMULATED"
+        ]
+      },
+      {
+        "store": "brisa-f4cb3dfa11",
+        "order": "1",
+        "total_cents": "7480",
+        "seller": "conta SIMULADA da própria loja",
+        "notifications": [
+          "ORDER_RECEIVED:SIMULATED",
+          "PAYMENT_CONFIRMED:SIMULATED",
+          "SHIPPED:SIMULATED",
+          "DELIVERED:SIMULATED"
+        ]
+      }
+    ],
+    "tests": [
+      {
+        "name": "Duas lojas: compra, recebimento na conta correta, estoque, e-mails e entrega",
+        "result": "passed"
+      },
+      {
+        "name": "Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel)",
+        "result": "passed"
+      }
+    ],
+    "visual": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pages": [
+          "contato público",
+          "atendimento",
+          "pedidos/expedição",
+          "operação"
+        ],
+        "result": "passed"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pages": [
+          "contato público",
+          "atendimento",
+          "pedidos/expedição",
+          "operação"
+        ],
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:47:29.196Z"
+  },
+  "post-backup": {
+    "passed": true,
+    "facts": [
+      "APPROVED x2 e devolução parcial após o backup (provedor SIMULADO)",
+      "eliminação com ledger externo no S3"
+    ],
+    "completedAt": "2026-10-02T14:49:20.023Z"
+  },
+  "recovery": {
+    "passed": true,
+    "steps": [
+      {
+        "step": "backup antigo contém dado eliminado depois",
+        "elapsedMs": 44
+      },
+      {
+        "step": "eliminações reaplicadas a partir do ledger externo",
+        "elapsedMs": 116
+      },
+      {
+        "step": "pós-restauração: vendas pausadas, PREPARED→UNKNOWN, e-mails retidos",
+        "elapsedMs": 135
+      },
+      {
+        "step": "estado do provedor SIMULADO reproduzido (equivale a consultar o gateway)",
+        "elapsedMs": 188
+      },
+      {
+        "step": "pagamentos e devolução posteriores conciliados",
+        "elapsedMs": 383
+      },
+      {
+        "step": "e-mails anteriores retidos para revisão; somente fatos novos enviados",
+        "elapsedMs": 427
+      },
+      {
+        "step": "vendas reabertas após conciliação",
+        "elapsedMs": 434
+      }
+    ],
+    "held": 30,
+    "newNotifications": 2,
+    "providerPayments": 15,
+    "erasures": {
+      "ledger": 1,
+      "applied": 1
+    },
+    "limitation": "Ensaio com pg_dump lógico em ambiente isolado; o provedor é SIMULADO. RPO real depende de WAL/PITR (ver pitr.json) e backup externo (D04).",
+    "completedAt": "2026-10-02T14:49:28.025Z"
+  },
+  "pitr": {
+    "passed": true,
+    "environment": "ecommerce-phase7-test",
+    "startedAt": "2026-10-02T14:49:31.113Z",
+    "method": "pg_basebackup (tar) + archive_command em volume local + recovery_target_time",
+    "steps": [
+      {
+        "step": "base backup físico",
+        "at": "2026-10-02T14:49:35.383Z"
+      },
+      {
+        "step": "marcadores antes/depois do alvo e WAL arquivado",
+        "segment": "000000010000000000000005"
+      }
+    ],
+    "rpoObservedSeconds": 60.1,
+    "archiveTimeoutSeconds": 60,
+    "target": "2026-10-02 14:50:40.878254+00",
+    "rtoDrillSeconds": 7.6,
+    "restored": {
+      "markers": [
+        "rpo-probe",
+        "before-target"
+      ],
+      "orders": 49,
+      "forceRls": true
+    },
+    "limitations": [
+      "Arquivo WAL e base ficam em volume LOCAL do mesmo host: não protege contra perda da VM. Cópia externa cifrada, retenção de 30 dias e chaves separadas dependem de D04.",
+      "RTO medido apenas para banco sintético pequeno; não inclui provisionamento de host, mídia, segredos nem conciliação.",
+      "Ferramenta mantida (pgBackRest/WAL-G) com destino externo continua recomendada para produção."
+    ],
+    "finishedAt": "2026-10-02T14:50:54.297Z"
+  },
+  "pilot-observation": {
+    "passed": true,
+    "criteria": [
+      "Instrumentos de observação do piloto (Fase 5)"
+    ],
+    "tests": [
+      {
+        "name": "Falhas de checkout registradas por motivo, sem carrinho/comprador, isoladas por loja",
+        "result": "passed"
+      },
+      {
+        "name": "Relatório por loja agrega pedidos, falhas, atendimento e tempo de suporte sem dados pessoais",
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:46:40.147Z"
+  },
+  "commercial": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "MFA",
+      "Administração da plataforma",
+      "T18",
+      "T28",
+      "T29",
+      "T31",
+      "T37 (domínio próprio)",
+      "T38",
+      "Cotas"
+    ],
+    "tests": [
+      {
+        "name": "MFA (TOTP): ativação, códigos de recuperação, nova sessão exige verificação, replay recusado",
+        "result": "passed"
+      },
+      {
+        "name": "Administração da plataforma: papel concedido só pelo operador, MFA obrigatório, motivo e auditoria",
+        "result": "passed"
+      },
+      {
+        "name": "Planos versionados: pago só ativa com preço; PILOT não se aposenta; versão é imutável",
+        "result": "passed"
+      },
+      {
+        "name": "T29: contratação, cobrança simulada, webhook assinado/deduplicado, renovação sem fatura duplicada",
+        "result": "passed"
+      },
+      {
+        "name": "T29: falha de cobrança → PAST_DUE com 7 dias de tolerância → SUSPENDED bloqueia só vendas novas; pagamento reabre",
+        "result": "passed"
+      },
+      {
+        "name": "T29: troca de plano no próximo ciclo, cancelamento ao fim do período; sem MFA/funcionário recusados",
+        "result": "passed"
+      },
+      {
+        "name": "Cotas do plano: produtos/variações/equipe no servidor, concorrência na última vaga, downgrade preserva dados",
+        "result": "passed"
+      },
+      {
+        "name": "T38: cota rigorosa de mídia com reserva atômica, concorrência, expiração e conciliação dos contadores",
+        "result": "passed"
+      },
+      {
+        "name": "T18: devolução pela plataforma — MFA, idempotência, saldo serializado, recusa, resposta perdida e retomada sem duplicar",
+        "result": "passed"
+      },
+      {
+        "name": "T28/T37: domínio próprio — prova TXT, rota HTTPS para a loja certa, canônico com 301, remoção e nova prova para outra loja",
+        "result": "passed"
+      },
+      {
+        "name": "T31: frete por provedor — cotação válida, mudança de regra/expiração invalidam, falha não gera frete grátis",
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:46:29.025Z"
+  },
+  "commercial-ui": {
+    "passed": true,
+    "visual": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "pages": [
+          "operação/MFA/plano/domínio/frete",
+          "plataforma"
+        ],
+        "result": "passed"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "pages": [
+          "operação/MFA/plano/domínio/frete",
+          "plataforma"
+        ],
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:47:14.054Z"
+  },
+  "ai": {
+    "passed": true,
+    "simulation": true,
+    "externalHomologation": false,
+    "criteria": [
+      "T34",
+      "Autorização",
+      "Edição concorrente",
+      "Sanitização",
+      "Sem provedor",
+      "Compra independente da IA"
+    ],
+    "tests": [
+      {
+        "name": "Desligado por padrão e sem provedor: geração recusada, cadastro manual e compra seguem",
+        "result": "passed"
+      },
+      {
+        "name": "Autorização: só o Dono liga na loja; funcionário gera; outra loja não lê a geração",
+        "result": "passed"
+      },
+      {
+        "name": "Reserva antes da chamada, custo conciliado, idempotência e salvamento explícito sem publicar",
+        "result": "passed"
+      },
+      {
+        "name": "Edição concorrente: produto alterado depois da geração não é sobrescrito",
+        "result": "passed"
+      },
+      {
+        "name": "Sanitização: HTML/script removidos; instrução no conteúdo do produto é tratada como dado",
+        "result": "passed"
+      },
+      {
+        "name": "T34: concorrência na mesma loja limitada e orçamento nunca ultrapassado",
+        "result": "passed"
+      },
+      {
+        "name": "T34: timeout mantém reserva (UNKNOWN) até expiração controlada; saída excessiva limitada por max_tokens",
+        "result": "passed"
+      },
+      {
+        "name": "Teto global entre lojas e desligamento global/loja preservam cadastro e venda",
+        "result": "passed"
+      }
+    ],
+    "completedAt": "2026-10-02T14:46:19.144Z"
+  },
+  "capacity": {
+    "passed": true,
+    "quick": false,
+    "targets": {
+      "publicReadP95Ms": {
+        "target": 500,
+        "observed": 165
+      },
+      "checkoutP95Ms": {
+        "target": 2000,
+        "observed": 93
+      },
+      "unexpectedFailurePercent": {
+        "target": 1,
+        "observed": 0
+      },
+      "invariants": {
+        "violations": 0,
+        "lastUnitWinners": 1
+      }
+    }
+  },
+  "error": "PENDENTE_EXTERNA: sem observações reais do piloto (autorização de ativação, lojas convidadas e período observado). PENDENTE_EXTERNA: decisões comerciais (D03 domínio/borda, D07 preço/recorrência/fiscal, D09 frete) e homologação dos provedores não registradas. PENDENTE_EXTERNA: homologação do provedor de IA real (chave, orçamento autorizado e chamada paga controlada) não registrada.",
+  "finishedAt": "2026-10-02T14:50:54.352Z"
+}

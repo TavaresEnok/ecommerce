@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: E-commerce — operação do piloto (Fase 4)
+  version: 1.1.0-fase4
+  description: |
+    Expedição, atendimento, notificações, suspensão/pausa, exportação e eliminação. Complementa compra.openapi.yaml.
+    Rotas `/tenants` exigem sessão + `X-CSRF-Token`; "Dono" indica ação exclusiva do papel OWNER (403 para Funcionário).
+    Erros: `{statusCode, error, requestId}`; recurso de outra loja responde 404. Paginação: no máximo 100 itens.
+servers: [{url: /api}]
+components:
+  securitySchemes:
+    session: {type: apiKey, in: cookie, name: session}
+    cart: {type: apiKey, in: cookie, name: cart_<tenant>}
+    orderLink: {type: apiKey, in: header, name: X-Order-Token, description: Segredo do link do e-mail (vem no fragmento `#acesso=`); hash, 90 dias, revogável.}
+    supportToken: {type: apiKey, in: header, name: X-Support-Token, description: Código de acompanhamento do contato geral, exibido uma única vez.}
+    exportToken: {type: apiKey, in: header, name: X-Export-Token, description: Segredo da exportação, válido por 15 minutos.}
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id: {type: string, format: uuid}
+        kind: {enum: [SUPPORT, WITHDRAWAL, CANCELLATION, DATA_ACCESS, DATA_ERASURE, CONTACT]}
+        status: {enum: [OPEN, IN_PROGRESS, RESOLVED]}
+        outcome: {enum: [ACCEPTED, DECLINED, WITHDRAWN_BY_CONSUMER, INFORMED, null]}
+        created_at: {type: string, format: date-time, description: Horário original, imutável}
+        due_at: {type: string, format: date-time}
+        messages: {type: array, items: {type: object, properties: {author: {enum: [CONSUMER, STAFF, SYSTEM]}, body: {type: string}, created_at: {type: string}}}}
+    Status:
+      type: object
+      properties:
+        financial_incidents: {type: integer}
+        payment_uncertain: {type: integer}
+        support_overdue: {type: integer}
+        financial_communication_pending: {type: integer}
+        notifications_pending: {type: integer}
+        notifications_failed: {type: integer}
+        suspended: {type: boolean}
+        sales_paused: {type: boolean}
+        alerts: {type: array, items: {type: object, properties: {code: {type: string}, severity: {enum: [critical, warning]}, value: {type: integer}}}}
+paths:
+  /public/stores/{slug}/orders/{orderId}:
+    get: {summary: Pedido (cookie do carrinho ou link do e-mail), security: [{cart: []}, {orderLink: []}], responses: {'200': {description: OK}, '404': {description: Não autorizado}}}
+  /public/stores/{slug}/orders/{orderId}/requests/{requestId}:
+    get: {summary: Protocolo vinculado ao pedido, security: [{cart: []}, {orderLink: []}], responses: {'200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Ticket'}}}}}}
+  /public/stores/{slug}/orders/{orderId}/requests/{requestId}/messages:
+    post: {summary: Resposta do consumidor (409 se concluído), security: [{cart: []}, {orderLink: []}], requestBody: {content: {application/json: {schema: {type: object, properties: {body: {type: string, maxLength: 4000}}}}}}, responses: {'201': {description: OK}, '409': {description: Concluído}}}
+  /public/stores/{slug}/support:
+    post: {summary: Contato geral sem compra (idempotente por key), requestBody: {content: {application/json: {schema: {type: object, required: [name, email, message, key], properties: {name: {type: string}, email: {type: string, format: email}, message: {type: string}, key: {type: string}}}}}}, responses: {'201': {description: 'Protocolo, horário, prazo e token (somente na primeira resposta)'}}}
+  /public/stores/{slug}/support/{requestId}:
+    get: {summary: Acompanhar contato geral, security: [{supportToken: []}], responses: {'200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Ticket'}}}}, '404': {description: Código inválido ou outra loja}}}
+  /public/stores/{slug}/support/{requestId}/messages:
+    post: {summary: Mensagem do contato geral, security: [{supportToken: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders:
+    get:
+      summary: Lista filtrada (até 100)
+      security: [{session: []}]
+      parameters:
+        - {name: order_status, in: query, schema: {enum: [OPEN, COMPLETED, CANCELLED]}}
+        - {name: payment_status, in: query, schema: {type: string}}
+        - {name: fulfillment_status, in: query, schema: {type: string}}
+        - {name: number, in: query, schema: {type: string}}
+        - {name: pending, in: query, schema: {enum: ['true']}, description: Somente pedidos com incidente ou protocolo aberto}
+      responses: {'200': {description: 'Inclui open_incidents, refund_due_cents e open_requests'}}
+  /tenants/{tenantId}/operations/orders/{orderId}/impediments:
+    get: {summary: Motivos que bloqueiam expedição, security: [{session: []}], responses: {'200': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/process:
+    post: {summary: UNFULFILLED → PROCESSING (revalida pagamento/impedimentos), security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Bloqueado}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/ship:
+    post: {summary: PROCESSING → SHIPPED; um envio por pedido, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, required: [carrier], properties: {carrier: {type: string}, tracking: {type: string}}}}}}, responses: {'201': {description: OK}, '409': {description: Bloqueado, retirada ou já enviado}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/pickup-ready:
+    post: {summary: Retirada pronta (avisa comprador), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/deliver:
+    post: {summary: DELIVERED + COMPLETED; retirada exige comprovação, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, properties: {proof: {type: string}}}}}}, responses: {'201': {description: OK}, '400': {description: Comprovação ausente}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/return:
+    post: {summary: Devolução física → RETURNED (sem repor estoque), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/incidents/{incidentId}/resolve:
+    post: {summary: Concluir revisão não financeira (Dono), security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Pendência financeira só encerra por confirmação do gateway}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/reconcile:
+    post: {summary: Solicitar nova consulta ao gateway, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/fiscal:
+    post: {summary: Referência de documento fiscal externo, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/access/revoke:
+    post: {summary: Revogar links de acompanhamento (Dono), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/notifications:
+    get: {summary: E-mails do pedido e status (PENDING, SENT, SIMULATED, FAILED, HELD), security: [{session: []}], responses: {'200': {description: OK}}}
+  /tenants/{tenantId}/operations/notifications/{notificationId}/retry:
+    post: {summary: Reenviar FAILED/HELD (Dono), security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Não admite}}}
+  /tenants/{tenantId}/operations/orders/{orderId}/erase:
+    post: {summary: Anonimizar dados pessoais (Dono); bloqueado por pedido aberto/pendência/disputa, security: [{session: []}], responses: {'201': {description: OK}, '409': {description: Retenção justificada}}}
+  /tenants/{tenantId}/operations/support:
+    get: {summary: Protocolos (filter=open|overdue|all), security: [{session: []}], responses: {'200': {description: 'Inclui overdue e financial_action_required'}}}
+  /tenants/{tenantId}/operations/support/{requestId}:
+    get: {summary: Protocolo completo, security: [{session: []}], responses: {'200': {description: OK}}}
+  /tenants/{tenantId}/operations/support/{requestId}/assign:
+    post: {summary: Assumir, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/support/{requestId}/reply:
+    post: {summary: Responder (notifica), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/support/{requestId}/resolve:
+    post: {summary: Concluir; ACCEPTED é do Dono e exige comunicação financeira prévia quando houve pagamento, security: [{session: []}], requestBody: {content: {application/json: {schema: {type: object, properties: {outcome: {enum: [ACCEPTED, DECLINED, WITHDRAWN_BY_CONSUMER, INFORMED]}, resolution: {type: string}}}}}}, responses: {'201': {description: OK}, '403': {description: Dono}, '409': {description: Comunicação financeira ausente}}}
+  /tenants/{tenantId}/operations/support/{requestId}/financial:
+    post: {summary: Registrar comunicação ao meio de pagamento (Dono); não confirma devolução, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/exports:
+    post: {summary: Criar exportação STORE ou CONSUMER (Dono); devolve id e token de 15 min, security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/exports/{exportId}:
+    get: {summary: Baixar exportação (Dono), security: [{session: [], exportToken: []}], responses: {'200': {description: JSON}, '404': {description: Token inválido}, '410': {description: Expirado}}}
+  /tenants/{tenantId}/operations/sales/pause:
+    post: {summary: Pausar novas vendas (Dono), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/sales/resume:
+    post: {summary: Retomar vendas (Dono), security: [{session: []}], responses: {'201': {description: OK}}}
+  /tenants/{tenantId}/operations/status:
+    get: {summary: Status operacional e alertas da loja, security: [{session: []}], responses: {'200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Status'}}}}}}

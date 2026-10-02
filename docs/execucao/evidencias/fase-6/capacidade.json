@@ -1,0 +1,2957 @@
+{
+ "test": "T33",
+ "quick": false,
+ "phases": [
+  {
+   "name": "frio",
+   "rps": 20,
+   "seconds": 60
+  },
+  {
+   "name": "sustentado",
+   "rps": 20,
+   "seconds": 1800
+  },
+  {
+   "name": "pico",
+   "rps": 40,
+   "seconds": 300
+  }
+ ],
+ "startedAt": "2026-10-02T02:18:10.969Z",
+ "environment": {
+  "project": "ecommerce-capacity-test",
+  "host": "Docker Desktop (Windows), ~4 GB para o Docker",
+  "limits": "por serviço conforme compose.yaml (api/web/worker/postgres 1 CPU e 768 MB)",
+  "gateway": "SIMULADO, 300 ms de latência e 2% de erro na emissão/consulta",
+  "rateLimit": "limite por IP elevado só neste projeto (cliente único)"
+ },
+ "resources": [
+  {
+   "moment": "antes da carga",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:21:46.223Z",
+   "containers": [
+    {
+     "service": "web",
+     "cpu": "19.01%",
+     "memory": "114.9MiB / 768MiB",
+     "memory_percent": "14.97%",
+     "network": "18.7MB / 19.8MB",
+     "block": "17.5MB / 4.1kB"
+    },
+    {
+     "service": "api",
+     "cpu": "0.00%",
+     "memory": "92.42MiB / 768MiB",
+     "memory_percent": "12.03%",
+     "network": "27.8kB / 5.1kB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.07%",
+     "memory": "83.79MiB / 768MiB",
+     "memory_percent": "10.91%",
+     "network": "288kB / 274kB",
+     "block": "5.18MB / 106kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.30%",
+     "memory": "6.152MiB / 256MiB",
+     "memory_percent": "2.40%",
+     "network": "120kB / 172kB",
+     "block": "9.37MB / 53.2kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.36%",
+     "memory": "57.29MiB / 512MiB",
+     "memory_percent": "11.19%",
+     "network": "6.75kB / 1.44kB",
+     "block": "81.6MB / 397kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "0.09%",
+     "memory": "74.81MiB / 768MiB",
+     "memory_percent": "9.74%",
+     "network": "49.7MB / 31MB",
+     "block": "29.7MB / 260MB"
+    }
+   ],
+   "database": {
+    "bytes": 27170483,
+    "connections": 11,
+    "wal_archive_bytes": 33558528,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:22:51.009Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.74%",
+     "memory": "156.8MiB / 1.5GiB",
+     "memory_percent": "10.21%",
+     "network": "84.5MB / 486kB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.99%",
+     "memory": "149MiB / 768MiB",
+     "memory_percent": "19.40%",
+     "network": "29.6MB / 20.3MB",
+     "block": "17.6MB / 4.1kB"
+    },
+    {
+     "service": "api",
+     "cpu": "11.44%",
+     "memory": "127.9MiB / 768MiB",
+     "memory_percent": "16.65%",
+     "network": "13.3MB / 104MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.34%",
+     "memory": "53.93MiB / 768MiB",
+     "memory_percent": "7.02%",
+     "network": "1.04MB / 1.21MB",
+     "block": "5.18MB / 164kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "5.49%",
+     "memory": "6.891MiB / 256MiB",
+     "memory_percent": "2.69%",
+     "network": "278kB / 204kB",
+     "block": "9.54MB / 209kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.42%",
+     "memory": "58.4MiB / 512MiB",
+     "memory_percent": "11.41%",
+     "network": "7.13kB / 1.56kB",
+     "block": "81.6MB / 434kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "23.78%",
+     "memory": "87.13MiB / 768MiB",
+     "memory_percent": "11.34%",
+     "network": "60.2MB / 44.5MB",
+     "block": "30.2MB / 263MB"
+    }
+   ],
+   "database": {
+    "bytes": 27825843,
+    "connections": 13,
+    "wal_archive_bytes": 33558528,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:23:50.870Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "5.49%",
+     "memory": "159.2MiB / 1.5GiB",
+     "memory_percent": "10.36%",
+     "network": "174MB / 1MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "14.74%",
+     "memory": "150MiB / 768MiB",
+     "memory_percent": "19.53%",
+     "network": "40.3MB / 20.7MB",
+     "block": "17.6MB / 4.1kB"
+    },
+    {
+     "service": "api",
+     "cpu": "31.34%",
+     "memory": "124MiB / 768MiB",
+     "memory_percent": "16.14%",
+     "network": "24.5MB / 213MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.80%",
+     "memory": "53.88MiB / 768MiB",
+     "memory_percent": "7.02%",
+     "network": "2.3MB / 2.72MB",
+     "block": "5.18MB / 221kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.48%",
+     "memory": "6.875MiB / 256MiB",
+     "memory_percent": "2.69%",
+     "network": "412kB / 250kB",
+     "block": "9.65MB / 414kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.35%",
+     "memory": "58.19MiB / 512MiB",
+     "memory_percent": "11.37%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 467kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "27.36%",
+     "memory": "86.97MiB / 768MiB",
+     "memory_percent": "11.32%",
+     "network": "70.1MB / 56.4MB",
+     "block": "30.4MB / 267MB"
+    }
+   ],
+   "database": {
+    "bytes": 28227251,
+    "connections": 11,
+    "wal_archive_bytes": 33558528,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:24:50.837Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "4.15%",
+     "memory": "161MiB / 1.5GiB",
+     "memory_percent": "10.48%",
+     "network": "263MB / 1.47MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.44%",
+     "memory": "154.8MiB / 768MiB",
+     "memory_percent": "20.15%",
+     "network": "52.1MB / 21.2MB",
+     "block": "17.6MB / 4.1kB"
+    },
+    {
+     "service": "api",
+     "cpu": "23.67%",
+     "memory": "126.3MiB / 768MiB",
+     "memory_percent": "16.45%",
+     "network": "35.9MB / 321MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "6.12%",
+     "memory": "54.92MiB / 768MiB",
+     "memory_percent": "7.15%",
+     "network": "3.65MB / 4.26MB",
+     "block": "5.18MB / 274kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "5.50%",
+     "memory": "6.895MiB / 256MiB",
+     "memory_percent": "2.69%",
+     "network": "517kB / 285kB",
+     "block": "9.74MB / 569kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.36%",
+     "memory": "58.87MiB / 512MiB",
+     "memory_percent": "11.50%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 500kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "13.34%",
+     "memory": "92.93MiB / 768MiB",
+     "memory_percent": "12.10%",
+     "network": "79.9MB / 68.6MB",
+     "block": "30.4MB / 270MB"
+    }
+   ],
+   "database": {
+    "bytes": 28473011,
+    "connections": 12,
+    "wal_archive_bytes": 33558528,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:25:50.837Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "4.70%",
+     "memory": "159.6MiB / 1.5GiB",
+     "memory_percent": "10.39%",
+     "network": "355MB / 1.95MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "4.34%",
+     "memory": "155.7MiB / 768MiB",
+     "memory_percent": "20.28%",
+     "network": "63.3MB / 21.7MB",
+     "block": "17.6MB / 4.1kB"
+    },
+    {
+     "service": "api",
+     "cpu": "31.14%",
+     "memory": "129MiB / 768MiB",
+     "memory_percent": "16.79%",
+     "network": "47.4MB / 434MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.08%",
+     "memory": "55.45MiB / 768MiB",
+     "memory_percent": "7.22%",
+     "network": "5.15MB / 5.88MB",
+     "block": "5.18MB / 524kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "1.09%",
+     "memory": "9.691MiB / 256MiB",
+     "memory_percent": "3.79%",
+     "network": "625kB / 322kB",
+     "block": "9.85MB / 762kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.31%",
+     "memory": "58.67MiB / 512MiB",
+     "memory_percent": "11.46%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 541kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "19.61%",
+     "memory": "88MiB / 768MiB",
+     "memory_percent": "11.46%",
+     "network": "89.9MB / 81MB",
+     "block": "30.4MB / 311MB"
+    }
+   ],
+   "database": {
+    "bytes": 28792499,
+    "connections": 12,
+    "wal_archive_bytes": 50335744,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:26:50.878Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "4.15%",
+     "memory": "169.3MiB / 1.5GiB",
+     "memory_percent": "11.02%",
+     "network": "442MB / 2.43MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.30%",
+     "memory": "160.8MiB / 768MiB",
+     "memory_percent": "20.93%",
+     "network": "74.4MB / 22.1MB",
+     "block": "17.6MB / 16.4kB"
+    },
+    {
+     "service": "api",
+     "cpu": "8.75%",
+     "memory": "137.9MiB / 768MiB",
+     "memory_percent": "17.96%",
+     "network": "58.8MB / 540MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.29%",
+     "memory": "56.72MiB / 768MiB",
+     "memory_percent": "7.39%",
+     "network": "6.77MB / 7.57MB",
+     "block": "5.18MB / 578kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.63%",
+     "memory": "7.645MiB / 256MiB",
+     "memory_percent": "2.99%",
+     "network": "765kB / 370kB",
+     "block": "10MB / 983kB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.31%",
+     "memory": "58.79MiB / 512MiB",
+     "memory_percent": "11.48%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 627kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "9.20%",
+     "memory": "88.06MiB / 768MiB",
+     "memory_percent": "11.47%",
+     "network": "100MB / 93.5MB",
+     "block": "30.5MB / 370MB"
+    }
+   ],
+   "database": {
+    "bytes": 29103795,
+    "connections": 11,
+    "wal_archive_bytes": 67112960,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:27:50.908Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "4.52%",
+     "memory": "169.6MiB / 1.5GiB",
+     "memory_percent": "11.04%",
+     "network": "533MB / 2.89MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "4.73%",
+     "memory": "161.6MiB / 768MiB",
+     "memory_percent": "21.04%",
+     "network": "86.2MB / 22.6MB",
+     "block": "17.6MB / 123kB"
+    },
+    {
+     "service": "api",
+     "cpu": "10.49%",
+     "memory": "133.5MiB / 768MiB",
+     "memory_percent": "17.38%",
+     "network": "70.7MB / 650MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "4.97%",
+     "memory": "55.84MiB / 768MiB",
+     "memory_percent": "7.27%",
+     "network": "8.38MB / 9.22MB",
+     "block": "5.18MB / 631kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "7.19%",
+     "memory": "7.457MiB / 256MiB",
+     "memory_percent": "2.91%",
+     "network": "850kB / 398kB",
+     "block": "10.1MB / 1.11MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.42%",
+     "memory": "58.36MiB / 512MiB",
+     "memory_percent": "11.40%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 676kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "20.39%",
+     "memory": "96.18MiB / 768MiB",
+     "memory_percent": "12.52%",
+     "network": "110MB / 106MB",
+     "block": "30.6MB / 428MB"
+    }
+   ],
+   "database": {
+    "bytes": 29226675,
+    "connections": 12,
+    "wal_archive_bytes": 83890176,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:28:50.895Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "9.53%",
+     "memory": "167.4MiB / 1.5GiB",
+     "memory_percent": "10.90%",
+     "network": "624MB / 3.36MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "4.05%",
+     "memory": "159.5MiB / 768MiB",
+     "memory_percent": "20.77%",
+     "network": "95.9MB / 23MB",
+     "block": "17.6MB / 123kB"
+    },
+    {
+     "service": "api",
+     "cpu": "10.91%",
+     "memory": "124.3MiB / 768MiB",
+     "memory_percent": "16.19%",
+     "network": "81.3MB / 759MB",
+     "block": "3.33MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.08%",
+     "memory": "57.06MiB / 768MiB",
+     "memory_percent": "7.43%",
+     "network": "10.1MB / 10.9MB",
+     "block": "5.18MB / 680kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.43%",
+     "memory": "7.562MiB / 256MiB",
+     "memory_percent": "2.95%",
+     "network": "951kB / 432kB",
+     "block": "10.2MB / 1.26MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.33%",
+     "memory": "59.07MiB / 512MiB",
+     "memory_percent": "11.54%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 725kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "8.98%",
+     "memory": "93.02MiB / 768MiB",
+     "memory_percent": "12.11%",
+     "network": "120MB / 118MB",
+     "block": "30.6MB / 486MB"
+    }
+   ],
+   "database": {
+    "bytes": 29431475,
+    "connections": 12,
+    "wal_archive_bytes": 100667392,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:29:51.284Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "8.50%",
+     "memory": "168.3MiB / 1.5GiB",
+     "memory_percent": "10.96%",
+     "network": "717MB / 3.85MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "54.93%",
+     "memory": "166.8MiB / 768MiB",
+     "memory_percent": "21.72%",
+     "network": "104MB / 23.4MB",
+     "block": "17.8MB / 295kB"
+    },
+    {
+     "service": "api",
+     "cpu": "56.04%",
+     "memory": "125.7MiB / 768MiB",
+     "memory_percent": "16.37%",
+     "network": "94MB / 869MB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.49%",
+     "memory": "57.74MiB / 768MiB",
+     "memory_percent": "7.52%",
+     "network": "11.9MB / 12.6MB",
+     "block": "5.18MB / 803kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "7.95%",
+     "memory": "7.746MiB / 256MiB",
+     "memory_percent": "3.03%",
+     "network": "1.07MB / 471kB",
+     "block": "10.3MB / 1.45MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.48%",
+     "memory": "59.38MiB / 512MiB",
+     "memory_percent": "11.60%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 791kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "16.75%",
+     "memory": "90.86MiB / 768MiB",
+     "memory_percent": "11.83%",
+     "network": "131MB / 132MB",
+     "block": "30.7MB / 543MB"
+    }
+   ],
+   "database": {
+    "bytes": 29750963,
+    "connections": 11,
+    "wal_archive_bytes": 117444608,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:30:51.233Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.48%",
+     "memory": "174.3MiB / 1.5GiB",
+     "memory_percent": "11.35%",
+     "network": "800MB / 4.32MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.86%",
+     "memory": "171.1MiB / 768MiB",
+     "memory_percent": "22.28%",
+     "network": "115MB / 23.8MB",
+     "block": "17.8MB / 295kB"
+    },
+    {
+     "service": "api",
+     "cpu": "8.21%",
+     "memory": "122.1MiB / 768MiB",
+     "memory_percent": "15.90%",
+     "network": "106MB / 971MB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.00%",
+     "memory": "58.07MiB / 768MiB",
+     "memory_percent": "7.56%",
+     "network": "13.9MB / 14.4MB",
+     "block": "5.18MB / 856kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.43%",
+     "memory": "7.887MiB / 256MiB",
+     "memory_percent": "3.08%",
+     "network": "1.19MB / 514kB",
+     "block": "10.5MB / 1.68MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.44%",
+     "memory": "59.41MiB / 512MiB",
+     "memory_percent": "11.60%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.6MB / 852kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "16.53%",
+     "memory": "100.4MiB / 768MiB",
+     "memory_percent": "13.07%",
+     "network": "141MB / 145MB",
+     "block": "30.7MB / 577MB"
+    }
+   ],
+   "database": {
+    "bytes": 30095027,
+    "connections": 12,
+    "wal_archive_bytes": 134221824,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:31:51.479Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.33%",
+     "memory": "172MiB / 1.5GiB",
+     "memory_percent": "11.20%",
+     "network": "891MB / 4.79MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "2.12%",
+     "memory": "171.9MiB / 768MiB",
+     "memory_percent": "22.38%",
+     "network": "124MB / 24.2MB",
+     "block": "17.8MB / 340kB"
+    },
+    {
+     "service": "api",
+     "cpu": "11.15%",
+     "memory": "130.4MiB / 768MiB",
+     "memory_percent": "16.98%",
+     "network": "118MB / 1.08GB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "0.98%",
+     "memory": "57.59MiB / 768MiB",
+     "memory_percent": "7.50%",
+     "network": "15.8MB / 16.1MB",
+     "block": "5.18MB / 909kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.55%",
+     "memory": "7.918MiB / 256MiB",
+     "memory_percent": "3.09%",
+     "network": "1.29MB / 548kB",
+     "block": "10.6MB / 1.84MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.22%",
+     "memory": "59.02MiB / 512MiB",
+     "memory_percent": "11.53%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 975kB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "18.46%",
+     "memory": "94.18MiB / 768MiB",
+     "memory_percent": "12.26%",
+     "network": "151MB / 159MB",
+     "block": "30.7MB / 622MB"
+    }
+   ],
+   "database": {
+    "bytes": 30430899,
+    "connections": 11,
+    "wal_archive_bytes": 150999040,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:32:51.278Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "8.09%",
+     "memory": "171.6MiB / 1.5GiB",
+     "memory_percent": "11.17%",
+     "network": "978MB / 5.28MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "29.88%",
+     "memory": "168MiB / 768MiB",
+     "memory_percent": "21.88%",
+     "network": "133MB / 24.5MB",
+     "block": "17.8MB / 340kB"
+    },
+    {
+     "service": "api",
+     "cpu": "41.34%",
+     "memory": "155.3MiB / 768MiB",
+     "memory_percent": "20.22%",
+     "network": "129MB / 1.18GB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "6.90%",
+     "memory": "57.44MiB / 768MiB",
+     "memory_percent": "7.48%",
+     "network": "18.2MB / 18.2MB",
+     "block": "5.18MB / 963kB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.58%",
+     "memory": "8.207MiB / 256MiB",
+     "memory_percent": "3.21%",
+     "network": "1.45MB / 601kB",
+     "block": "10.7MB / 2.1MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.40%",
+     "memory": "58.35MiB / 512MiB",
+     "memory_percent": "11.40%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.04MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "16.06%",
+     "memory": "117MiB / 768MiB",
+     "memory_percent": "15.24%",
+     "network": "162MB / 172MB",
+     "block": "30.8MB / 661MB"
+    }
+   ],
+   "database": {
+    "bytes": 30783155,
+    "connections": 12,
+    "wal_archive_bytes": 167776256,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:33:50.567Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.15%",
+     "memory": "171.7MiB / 1.5GiB",
+     "memory_percent": "11.18%",
+     "network": "1.06GB / 5.76MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "8.09%",
+     "memory": "166.8MiB / 768MiB",
+     "memory_percent": "21.72%",
+     "network": "144MB / 24.9MB",
+     "block": "17.8MB / 340kB"
+    },
+    {
+     "service": "api",
+     "cpu": "28.95%",
+     "memory": "129.9MiB / 768MiB",
+     "memory_percent": "16.92%",
+     "network": "140MB / 1.29GB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "10.43%",
+     "memory": "57.45MiB / 768MiB",
+     "memory_percent": "7.48%",
+     "network": "20.3MB / 20MB",
+     "block": "5.18MB / 1.02MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "4.14%",
+     "memory": "7.996MiB / 256MiB",
+     "memory_percent": "3.12%",
+     "network": "1.57MB / 643kB",
+     "block": "10.8MB / 2.3MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.27%",
+     "memory": "58.61MiB / 512MiB",
+     "memory_percent": "11.45%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.11MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "8.61%",
+     "memory": "118.1MiB / 768MiB",
+     "memory_percent": "15.38%",
+     "network": "172MB / 184MB",
+     "block": "30.8MB / 699MB"
+    }
+   ],
+   "database": {
+    "bytes": 30922419,
+    "connections": 14,
+    "wal_archive_bytes": 184553472,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:34:50.927Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.91%",
+     "memory": "173.6MiB / 1.5GiB",
+     "memory_percent": "11.30%",
+     "network": "1.15GB / 6.23MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.01%",
+     "memory": "172MiB / 768MiB",
+     "memory_percent": "22.39%",
+     "network": "153MB / 25.3MB",
+     "block": "17.8MB / 340kB"
+    },
+    {
+     "service": "api",
+     "cpu": "10.82%",
+     "memory": "129.6MiB / 768MiB",
+     "memory_percent": "16.87%",
+     "network": "150MB / 1.39GB",
+     "block": "3.4MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.81%",
+     "memory": "57.64MiB / 768MiB",
+     "memory_percent": "7.50%",
+     "network": "22.7MB / 21.9MB",
+     "block": "5.18MB / 1.07MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.33%",
+     "memory": "8.012MiB / 256MiB",
+     "memory_percent": "3.13%",
+     "network": "1.67MB / 678kB",
+     "block": "10.9MB / 2.47MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.42%",
+     "memory": "58.83MiB / 512MiB",
+     "memory_percent": "11.49%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.19MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "22.53%",
+     "memory": "137.1MiB / 768MiB",
+     "memory_percent": "17.85%",
+     "network": "181MB / 197MB",
+     "block": "30.8MB / 736MB"
+    }
+   ],
+   "database": {
+    "bytes": 31143603,
+    "connections": 15,
+    "wal_archive_bytes": 201330688,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:35:50.769Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.90%",
+     "memory": "170.8MiB / 1.5GiB",
+     "memory_percent": "11.12%",
+     "network": "1.24GB / 6.72MB",
+     "block": "12.3kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.01%",
+     "memory": "172MiB / 768MiB",
+     "memory_percent": "22.40%",
+     "network": "164MB / 25.7MB",
+     "block": "17.8MB / 340kB"
+    },
+    {
+     "service": "api",
+     "cpu": "15.24%",
+     "memory": "124.4MiB / 768MiB",
+     "memory_percent": "16.20%",
+     "network": "162MB / 1.5GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.37%",
+     "memory": "57.35MiB / 768MiB",
+     "memory_percent": "7.47%",
+     "network": "25.1MB / 23.8MB",
+     "block": "5.21MB / 1.27MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "6.67%",
+     "memory": "7.969MiB / 256MiB",
+     "memory_percent": "3.11%",
+     "network": "1.81MB / 724kB",
+     "block": "11.1MB / 2.73MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.49%",
+     "memory": "57.81MiB / 512MiB",
+     "memory_percent": "11.29%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.3MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "26.07%",
+     "memory": "135.3MiB / 768MiB",
+     "memory_percent": "17.62%",
+     "network": "192MB / 210MB",
+     "block": "31MB / 780MB"
+    }
+   ],
+   "database": {
+    "bytes": 31602355,
+    "connections": 14,
+    "wal_archive_bytes": 218107904,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:36:50.726Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.78%",
+     "memory": "171.3MiB / 1.5GiB",
+     "memory_percent": "11.15%",
+     "network": "1.32GB / 7.2MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.02%",
+     "memory": "168.9MiB / 768MiB",
+     "memory_percent": "21.99%",
+     "network": "173MB / 26.1MB",
+     "block": "17.9MB / 451kB"
+    },
+    {
+     "service": "api",
+     "cpu": "24.49%",
+     "memory": "124.5MiB / 768MiB",
+     "memory_percent": "16.21%",
+     "network": "173MB / 1.6GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.31%",
+     "memory": "56.35MiB / 768MiB",
+     "memory_percent": "7.34%",
+     "network": "27.7MB / 25.9MB",
+     "block": "5.28MB / 1.49MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.37%",
+     "memory": "8.008MiB / 256MiB",
+     "memory_percent": "3.13%",
+     "network": "1.93MB / 766kB",
+     "block": "11.2MB / 2.95MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.44%",
+     "memory": "57.91MiB / 512MiB",
+     "memory_percent": "11.31%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.46MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "39.77%",
+     "memory": "152.2MiB / 768MiB",
+     "memory_percent": "19.81%",
+     "network": "202MB / 224MB",
+     "block": "31MB / 819MB"
+    }
+   ],
+   "database": {
+    "bytes": 31774387,
+    "connections": 15,
+    "wal_archive_bytes": 234885120,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:37:50.900Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.47%",
+     "memory": "173.4MiB / 1.5GiB",
+     "memory_percent": "11.29%",
+     "network": "1.41GB / 7.68MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "25.99%",
+     "memory": "169.2MiB / 768MiB",
+     "memory_percent": "22.03%",
+     "network": "181MB / 26.4MB",
+     "block": "17.9MB / 807kB"
+    },
+    {
+     "service": "api",
+     "cpu": "15.98%",
+     "memory": "125.7MiB / 768MiB",
+     "memory_percent": "16.36%",
+     "network": "184MB / 1.7GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "4.71%",
+     "memory": "56.94MiB / 768MiB",
+     "memory_percent": "7.41%",
+     "network": "30.3MB / 27.9MB",
+     "block": "5.28MB / 1.64MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.44%",
+     "memory": "8.289MiB / 256MiB",
+     "memory_percent": "3.24%",
+     "network": "2.06MB / 812kB",
+     "block": "11.4MB / 3.19MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.42%",
+     "memory": "58.14MiB / 512MiB",
+     "memory_percent": "11.35%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.7MB / 1.55MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "27.38%",
+     "memory": "166.9MiB / 768MiB",
+     "memory_percent": "21.73%",
+     "network": "212MB / 236MB",
+     "block": "31.1MB / 858MB"
+    }
+   ],
+   "database": {
+    "bytes": 31987379,
+    "connections": 14,
+    "wal_archive_bytes": 251662336,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:38:51.122Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.46%",
+     "memory": "172.2MiB / 1.5GiB",
+     "memory_percent": "11.21%",
+     "network": "1.5GB / 8.16MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.02%",
+     "memory": "166.8MiB / 768MiB",
+     "memory_percent": "21.71%",
+     "network": "192MB / 26.8MB",
+     "block": "17.9MB / 807kB"
+    },
+    {
+     "service": "api",
+     "cpu": "14.79%",
+     "memory": "130.5MiB / 768MiB",
+     "memory_percent": "16.99%",
+     "network": "195MB / 1.81GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "4.24%",
+     "memory": "56.96MiB / 768MiB",
+     "memory_percent": "7.42%",
+     "network": "33.2MB / 29.9MB",
+     "block": "5.28MB / 1.69MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.31%",
+     "memory": "8.062MiB / 256MiB",
+     "memory_percent": "3.15%",
+     "network": "2.18MB / 851kB",
+     "block": "11.5MB / 3.39MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.40%",
+     "memory": "58.23MiB / 512MiB",
+     "memory_percent": "11.37%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.8MB / 1.64MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "28.58%",
+     "memory": "180.1MiB / 768MiB",
+     "memory_percent": "23.45%",
+     "network": "222MB / 250MB",
+     "block": "31.1MB / 896MB"
+    }
+   ],
+   "database": {
+    "bytes": 32167603,
+    "connections": 16,
+    "wal_archive_bytes": 268439552,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:39:51.501Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.55%",
+     "memory": "175.1MiB / 1.5GiB",
+     "memory_percent": "11.40%",
+     "network": "1.58GB / 8.64MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "8.63%",
+     "memory": "167.4MiB / 768MiB",
+     "memory_percent": "21.80%",
+     "network": "202MB / 27.2MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "15.19%",
+     "memory": "132.2MiB / 768MiB",
+     "memory_percent": "17.22%",
+     "network": "206MB / 1.91GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "1.69%",
+     "memory": "56.35MiB / 768MiB",
+     "memory_percent": "7.34%",
+     "network": "35.8MB / 31.9MB",
+     "block": "5.28MB / 1.74MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.38%",
+     "memory": "8.051MiB / 256MiB",
+     "memory_percent": "3.14%",
+     "network": "2.29MB / 889kB",
+     "block": "11.6MB / 3.58MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.44%",
+     "memory": "58.54MiB / 512MiB",
+     "memory_percent": "11.43%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.8MB / 1.86MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "27.30%",
+     "memory": "196.9MiB / 768MiB",
+     "memory_percent": "25.63%",
+     "network": "232MB / 263MB",
+     "block": "31.2MB / 935MB"
+    }
+   ],
+   "database": {
+    "bytes": 32282291,
+    "connections": 14,
+    "wal_archive_bytes": 285216768,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:40:50.837Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.40%",
+     "memory": "176.7MiB / 1.5GiB",
+     "memory_percent": "11.50%",
+     "network": "1.67GB / 9.11MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.10%",
+     "memory": "169.8MiB / 768MiB",
+     "memory_percent": "22.11%",
+     "network": "212MB / 27.7MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "13.28%",
+     "memory": "126.9MiB / 768MiB",
+     "memory_percent": "16.52%",
+     "network": "217MB / 2.02GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.36%",
+     "memory": "56.3MiB / 768MiB",
+     "memory_percent": "7.33%",
+     "network": "38.8MB / 34MB",
+     "block": "5.28MB / 1.8MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "3.96%",
+     "memory": "8.395MiB / 256MiB",
+     "memory_percent": "3.28%",
+     "network": "2.41MB / 929kB",
+     "block": "11.7MB / 3.84MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.49%",
+     "memory": "58.04MiB / 512MiB",
+     "memory_percent": "11.34%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.8MB / 1.97MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "24.71%",
+     "memory": "196MiB / 768MiB",
+     "memory_percent": "25.51%",
+     "network": "242MB / 276MB",
+     "block": "31.2MB / 979MB"
+    }
+   ],
+   "database": {
+    "bytes": 32585395,
+    "connections": 15,
+    "wal_archive_bytes": 301993984,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:41:50.796Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "7.30%",
+     "memory": "157.6MiB / 1.5GiB",
+     "memory_percent": "10.26%",
+     "network": "1.76GB / 9.58MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "2.22%",
+     "memory": "167.8MiB / 768MiB",
+     "memory_percent": "21.85%",
+     "network": "223MB / 28.1MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "36.91%",
+     "memory": "140.4MiB / 768MiB",
+     "memory_percent": "18.29%",
+     "network": "228MB / 2.12GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.21%",
+     "memory": "56.37MiB / 768MiB",
+     "memory_percent": "7.34%",
+     "network": "41.7MB / 36MB",
+     "block": "5.28MB / 1.85MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.63%",
+     "memory": "8.18MiB / 256MiB",
+     "memory_percent": "3.20%",
+     "network": "2.51MB / 965kB",
+     "block": "11.8MB / 4.01MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.52%",
+     "memory": "57.58MiB / 512MiB",
+     "memory_percent": "11.25%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.8MB / 2.18MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "22.42%",
+     "memory": "191MiB / 768MiB",
+     "memory_percent": "24.87%",
+     "network": "252MB / 290MB",
+     "block": "31.2MB / 1.04GB"
+    }
+   ],
+   "database": {
+    "bytes": 32732851,
+    "connections": 12,
+    "wal_archive_bytes": 318771200,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:42:51.121Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.37%",
+     "memory": "159.8MiB / 1.5GiB",
+     "memory_percent": "10.40%",
+     "network": "1.85GB / 10.1MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "23.09%",
+     "memory": "168.6MiB / 768MiB",
+     "memory_percent": "21.96%",
+     "network": "229MB / 28.3MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "11.84%",
+     "memory": "134.1MiB / 768MiB",
+     "memory_percent": "17.46%",
+     "network": "240MB / 2.23GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.48%",
+     "memory": "55.42MiB / 768MiB",
+     "memory_percent": "7.22%",
+     "network": "45MB / 38.3MB",
+     "block": "5.28MB / 1.9MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "4.04%",
+     "memory": "8.441MiB / 256MiB",
+     "memory_percent": "3.30%",
+     "network": "2.63MB / 1MB",
+     "block": "12MB / 4.22MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.46%",
+     "memory": "58.01MiB / 512MiB",
+     "memory_percent": "11.33%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 2.29MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "21.00%",
+     "memory": "196.2MiB / 768MiB",
+     "memory_percent": "25.54%",
+     "network": "263MB / 304MB",
+     "block": "31.3MB / 1.07GB"
+    }
+   ],
+   "database": {
+    "bytes": 32962227,
+    "connections": 14,
+    "wal_archive_bytes": 335548416,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:43:51.131Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "7.03%",
+     "memory": "176.5MiB / 1.5GiB",
+     "memory_percent": "11.49%",
+     "network": "1.93GB / 10.5MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.00%",
+     "memory": "167.8MiB / 768MiB",
+     "memory_percent": "21.85%",
+     "network": "238MB / 28.7MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "13.13%",
+     "memory": "134.6MiB / 768MiB",
+     "memory_percent": "17.52%",
+     "network": "253MB / 2.33GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.56%",
+     "memory": "54.92MiB / 768MiB",
+     "memory_percent": "7.15%",
+     "network": "48.1MB / 40.5MB",
+     "block": "5.28MB / 1.95MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.32%",
+     "memory": "8.219MiB / 256MiB",
+     "memory_percent": "3.21%",
+     "network": "2.74MB / 1.04MB",
+     "block": "12.1MB / 4.42MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.45%",
+     "memory": "58.09MiB / 512MiB",
+     "memory_percent": "11.35%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 2.41MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "24.95%",
+     "memory": "197.3MiB / 768MiB",
+     "memory_percent": "25.69%",
+     "network": "275MB / 320MB",
+     "block": "31.3MB / 1.11GB"
+    }
+   ],
+   "database": {
+    "bytes": 33248947,
+    "connections": 14,
+    "wal_archive_bytes": 352325632,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:44:50.990Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "5.57%",
+     "memory": "164.9MiB / 1.5GiB",
+     "memory_percent": "10.74%",
+     "network": "2.02GB / 11MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "3.30%",
+     "memory": "167.7MiB / 768MiB",
+     "memory_percent": "21.84%",
+     "network": "248MB / 29.1MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "19.09%",
+     "memory": "139.5MiB / 768MiB",
+     "memory_percent": "18.17%",
+     "network": "265MB / 2.44GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "4.67%",
+     "memory": "60.53MiB / 768MiB",
+     "memory_percent": "7.88%",
+     "network": "51.5MB / 42.7MB",
+     "block": "5.28MB / 2.01MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "2.63%",
+     "memory": "8.133MiB / 256MiB",
+     "memory_percent": "3.18%",
+     "network": "2.83MB / 1.07MB",
+     "block": "12.2MB / 4.56MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.37%",
+     "memory": "56.66MiB / 512MiB",
+     "memory_percent": "11.07%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 2.53MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "15.28%",
+     "memory": "186.2MiB / 768MiB",
+     "memory_percent": "24.25%",
+     "network": "286MB / 335MB",
+     "block": "31.7MB / 1.15GB"
+    }
+   ],
+   "database": {
+    "bytes": 33363635,
+    "connections": 14,
+    "wal_archive_bytes": 369102848,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:45:51.976Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "11.02%",
+     "memory": "165.6MiB / 1.5GiB",
+     "memory_percent": "10.78%",
+     "network": "2.11GB / 11.5MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "31.16%",
+     "memory": "167.1MiB / 768MiB",
+     "memory_percent": "21.75%",
+     "network": "258MB / 29.5MB",
+     "block": "17.9MB / 905kB"
+    },
+    {
+     "service": "api",
+     "cpu": "23.91%",
+     "memory": "129.1MiB / 768MiB",
+     "memory_percent": "16.81%",
+     "network": "277MB / 2.54GB",
+     "block": "3.52MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "5.44%",
+     "memory": "66.98MiB / 768MiB",
+     "memory_percent": "8.72%",
+     "network": "54.8MB / 45MB",
+     "block": "5.28MB / 2.06MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.51%",
+     "memory": "8.254MiB / 256MiB",
+     "memory_percent": "3.22%",
+     "network": "2.93MB / 1.11MB",
+     "block": "12.3MB / 4.8MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.41%",
+     "memory": "56.68MiB / 512MiB",
+     "memory_percent": "11.07%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 2.65MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "67.22%",
+     "memory": "206.9MiB / 768MiB",
+     "memory_percent": "26.94%",
+     "network": "297MB / 349MB",
+     "block": "31.7MB / 1.2GB"
+    }
+   ],
+   "database": {
+    "bytes": 33527475,
+    "connections": 14,
+    "wal_archive_bytes": 385880064,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:46:50.650Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.42%",
+     "memory": "167.8MiB / 1.5GiB",
+     "memory_percent": "10.92%",
+     "network": "2.2GB / 11.9MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "2.81%",
+     "memory": "166.9MiB / 768MiB",
+     "memory_percent": "21.74%",
+     "network": "266MB / 29.8MB",
+     "block": "17.9MB / 1.62MB"
+    },
+    {
+     "service": "api",
+     "cpu": "9.12%",
+     "memory": "138.8MiB / 768MiB",
+     "memory_percent": "18.07%",
+     "network": "287MB / 2.65GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.26%",
+     "memory": "73.43MiB / 768MiB",
+     "memory_percent": "9.56%",
+     "network": "58.3MB / 47.3MB",
+     "block": "5.28MB / 2.11MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.60%",
+     "memory": "8.473MiB / 256MiB",
+     "memory_percent": "3.31%",
+     "network": "3.03MB / 1.14MB",
+     "block": "12.4MB / 4.96MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.43%",
+     "memory": "56.08MiB / 512MiB",
+     "memory_percent": "10.95%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 2.9MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "13.19%",
+     "memory": "207.4MiB / 768MiB",
+     "memory_percent": "27.01%",
+     "network": "307MB / 363MB",
+     "block": "31.8MB / 1.24GB"
+    }
+   ],
+   "database": {
+    "bytes": 33650355,
+    "connections": 16,
+    "wal_archive_bytes": 402657280,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:47:50.591Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "4.98%",
+     "memory": "173.7MiB / 1.5GiB",
+     "memory_percent": "11.31%",
+     "network": "2.28GB / 12.4MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "17.36%",
+     "memory": "167.5MiB / 768MiB",
+     "memory_percent": "21.81%",
+     "network": "275MB / 30.2MB",
+     "block": "17.9MB / 1.62MB"
+    },
+    {
+     "service": "api",
+     "cpu": "24.84%",
+     "memory": "129.4MiB / 768MiB",
+     "memory_percent": "16.84%",
+     "network": "299MB / 2.75GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "1.38%",
+     "memory": "74.4MiB / 768MiB",
+     "memory_percent": "9.69%",
+     "network": "62MB / 49.8MB",
+     "block": "5.28MB / 2.17MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "3.52%",
+     "memory": "8.621MiB / 256MiB",
+     "memory_percent": "3.37%",
+     "network": "3.17MB / 1.19MB",
+     "block": "12.5MB / 5.18MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.31%",
+     "memory": "56.6MiB / 512MiB",
+     "memory_percent": "11.05%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.04MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "8.56%",
+     "memory": "195.3MiB / 768MiB",
+     "memory_percent": "25.43%",
+     "network": "318MB / 377MB",
+     "block": "31.8MB / 1.28GB"
+    }
+   ],
+   "database": {
+    "bytes": 33953459,
+    "connections": 13,
+    "wal_archive_bytes": 419434496,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:48:50.745Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.04%",
+     "memory": "164.8MiB / 1.5GiB",
+     "memory_percent": "10.73%",
+     "network": "2.37GB / 12.9MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "11.70%",
+     "memory": "167.5MiB / 768MiB",
+     "memory_percent": "21.81%",
+     "network": "284MB / 30.6MB",
+     "block": "17.9MB / 1.62MB"
+    },
+    {
+     "service": "api",
+     "cpu": "9.63%",
+     "memory": "133MiB / 768MiB",
+     "memory_percent": "17.31%",
+     "network": "310MB / 2.86GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.69%",
+     "memory": "80.2MiB / 768MiB",
+     "memory_percent": "10.44%",
+     "network": "65.7MB / 52.2MB",
+     "block": "5.28MB / 2.22MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.36%",
+     "memory": "8.301MiB / 256MiB",
+     "memory_percent": "3.24%",
+     "network": "3.27MB / 1.22MB",
+     "block": "12.6MB / 5.36MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.30%",
+     "memory": "56.36MiB / 512MiB",
+     "memory_percent": "11.01%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.17MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "16.46%",
+     "memory": "207MiB / 768MiB",
+     "memory_percent": "26.95%",
+     "network": "328MB / 392MB",
+     "block": "31.8MB / 1.32GB"
+    }
+   ],
+   "database": {
+    "bytes": 34191027,
+    "connections": 15,
+    "wal_archive_bytes": 436211712,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:49:50.752Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "6.30%",
+     "memory": "164.6MiB / 1.5GiB",
+     "memory_percent": "10.72%",
+     "network": "2.46GB / 13.4MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "20.48%",
+     "memory": "167.2MiB / 768MiB",
+     "memory_percent": "21.78%",
+     "network": "294MB / 31MB",
+     "block": "17.9MB / 2.44MB"
+    },
+    {
+     "service": "api",
+     "cpu": "29.01%",
+     "memory": "138.4MiB / 768MiB",
+     "memory_percent": "18.02%",
+     "network": "321MB / 2.96GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.79%",
+     "memory": "81.35MiB / 768MiB",
+     "memory_percent": "10.59%",
+     "network": "69.5MB / 54.8MB",
+     "block": "5.28MB / 3.04MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.35%",
+     "memory": "8.207MiB / 256MiB",
+     "memory_percent": "3.21%",
+     "network": "3.39MB / 1.26MB",
+     "block": "12.7MB / 5.55MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.31%",
+     "memory": "54.89MiB / 512MiB",
+     "memory_percent": "10.72%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.31MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "13.65%",
+     "memory": "201.4MiB / 768MiB",
+     "memory_percent": "26.22%",
+     "network": "339MB / 406MB",
+     "block": "31.9MB / 1.36GB"
+    }
+   ],
+   "database": {
+    "bytes": 34477747,
+    "connections": 14,
+    "wal_archive_bytes": 452988928,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:50:51.038Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "2.59%",
+     "memory": "169.7MiB / 1.5GiB",
+     "memory_percent": "11.05%",
+     "network": "2.55GB / 13.8MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.03%",
+     "memory": "166.7MiB / 768MiB",
+     "memory_percent": "21.70%",
+     "network": "305MB / 31.4MB",
+     "block": "17.9MB / 2.44MB"
+    },
+    {
+     "service": "api",
+     "cpu": "22.23%",
+     "memory": "126.1MiB / 768MiB",
+     "memory_percent": "16.42%",
+     "network": "332MB / 3.07GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "2.96%",
+     "memory": "81.36MiB / 768MiB",
+     "memory_percent": "10.59%",
+     "network": "73.5MB / 57.3MB",
+     "block": "5.28MB / 3.09MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "4.08%",
+     "memory": "8.551MiB / 256MiB",
+     "memory_percent": "3.34%",
+     "network": "3.5MB / 1.3MB",
+     "block": "12.9MB / 5.82MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.29%",
+     "memory": "54.98MiB / 512MiB",
+     "memory_percent": "10.74%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.45MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "57.36%",
+     "memory": "213.5MiB / 768MiB",
+     "memory_percent": "27.79%",
+     "network": "350MB / 420MB",
+     "block": "31.9MB / 1.4GB"
+    }
+   ],
+   "database": {
+    "bytes": 34608819,
+    "connections": 16,
+    "wal_archive_bytes": 469766144,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:51:50.826Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "2.97%",
+     "memory": "170.4MiB / 1.5GiB",
+     "memory_percent": "11.09%",
+     "network": "2.63GB / 14.3MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "4.30%",
+     "memory": "169MiB / 768MiB",
+     "memory_percent": "22.00%",
+     "network": "314MB / 31.8MB",
+     "block": "17.9MB / 2.44MB"
+    },
+    {
+     "service": "api",
+     "cpu": "14.45%",
+     "memory": "127.9MiB / 768MiB",
+     "memory_percent": "16.66%",
+     "network": "343MB / 3.17GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.13%",
+     "memory": "81.58MiB / 768MiB",
+     "memory_percent": "10.62%",
+     "network": "77.6MB / 60MB",
+     "block": "5.28MB / 3.2MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.59%",
+     "memory": "8.445MiB / 256MiB",
+     "memory_percent": "3.30%",
+     "network": "3.61MB / 1.34MB",
+     "block": "13.1MB / 6MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.31%",
+     "memory": "54.82MiB / 512MiB",
+     "memory_percent": "10.71%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.74MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "36.77%",
+     "memory": "220.3MiB / 768MiB",
+     "memory_percent": "28.68%",
+     "network": "360MB / 435MB",
+     "block": "31.9MB / 1.44GB"
+    }
+   ],
+   "database": {
+    "bytes": 34764467,
+    "connections": 16,
+    "wal_archive_bytes": 486543360,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:52:51.147Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "3.31%",
+     "memory": "162.4MiB / 1.5GiB",
+     "memory_percent": "10.57%",
+     "network": "2.72GB / 14.8MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "0.00%",
+     "memory": "168MiB / 768MiB",
+     "memory_percent": "21.88%",
+     "network": "323MB / 32.1MB",
+     "block": "17.9MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "7.37%",
+     "memory": "130.9MiB / 768MiB",
+     "memory_percent": "17.05%",
+     "network": "354MB / 3.28GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "10.96%",
+     "memory": "80.74MiB / 768MiB",
+     "memory_percent": "10.51%",
+     "network": "81.7MB / 62.6MB",
+     "block": "5.28MB / 3.26MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.53%",
+     "memory": "8.68MiB / 256MiB",
+     "memory_percent": "3.39%",
+     "network": "3.71MB / 1.37MB",
+     "block": "13.2MB / 6.18MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.40%",
+     "memory": "54.41MiB / 512MiB",
+     "memory_percent": "10.63%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 3.9MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "12.50%",
+     "memory": "223.1MiB / 768MiB",
+     "memory_percent": "29.05%",
+     "network": "371MB / 450MB",
+     "block": "32MB / 1.48GB"
+    }
+   ],
+   "database": {
+    "bytes": 34838195,
+    "connections": 15,
+    "wal_archive_bytes": 503320576,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:53:51.200Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "8.80%",
+     "memory": "173.2MiB / 1.5GiB",
+     "memory_percent": "11.27%",
+     "network": "2.9GB / 15.7MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.07%",
+     "memory": "168.1MiB / 768MiB",
+     "memory_percent": "21.89%",
+     "network": "341MB / 32.8MB",
+     "block": "17.9MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "22.50%",
+     "memory": "131.2MiB / 768MiB",
+     "memory_percent": "17.09%",
+     "network": "371MB / 3.48GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "9.17%",
+     "memory": "81.23MiB / 768MiB",
+     "memory_percent": "10.58%",
+     "network": "86.3MB / 65.6MB",
+     "block": "5.28MB / 3.32MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "3.78%",
+     "memory": "8.902MiB / 256MiB",
+     "memory_percent": "3.48%",
+     "network": "3.88MB / 1.43MB",
+     "block": "13.3MB / 6.47MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.28%",
+     "memory": "54.38MiB / 512MiB",
+     "memory_percent": "10.62%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 4.05MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "32.87%",
+     "memory": "236.8MiB / 768MiB",
+     "memory_percent": "30.83%",
+     "network": "387MB / 470MB",
+     "block": "32MB / 1.52GB"
+    }
+   ],
+   "database": {
+    "bytes": 35206835,
+    "connections": 17,
+    "wal_archive_bytes": 520097792,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:54:51.480Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "9.06%",
+     "memory": "167.7MiB / 1.5GiB",
+     "memory_percent": "10.92%",
+     "network": "3.07GB / 16.6MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.07%",
+     "memory": "167.1MiB / 768MiB",
+     "memory_percent": "21.76%",
+     "network": "360MB / 33.6MB",
+     "block": "17.9MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "44.28%",
+     "memory": "128.2MiB / 768MiB",
+     "memory_percent": "16.69%",
+     "network": "387MB / 3.69GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "9.44%",
+     "memory": "81.59MiB / 768MiB",
+     "memory_percent": "10.62%",
+     "network": "90.7MB / 68.5MB",
+     "block": "5.28MB / 3.37MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.58%",
+     "memory": "8.527MiB / 256MiB",
+     "memory_percent": "3.33%",
+     "network": "4.06MB / 1.49MB",
+     "block": "13.5MB / 6.75MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.26%",
+     "memory": "54.46MiB / 512MiB",
+     "memory_percent": "10.64%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 4.21MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "59.80%",
+     "memory": "238.7MiB / 768MiB",
+     "memory_percent": "31.09%",
+     "network": "402MB / 490MB",
+     "block": "32MB / 1.56GB"
+    }
+   ],
+   "database": {
+    "bytes": 35616435,
+    "connections": 17,
+    "wal_archive_bytes": 536875008,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:55:51.356Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "8.78%",
+     "memory": "172.2MiB / 1.5GiB",
+     "memory_percent": "11.21%",
+     "network": "3.25GB / 17.6MB",
+     "block": "111kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "2.02%",
+     "memory": "169.9MiB / 768MiB",
+     "memory_percent": "22.12%",
+     "network": "379MB / 34.3MB",
+     "block": "18MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "22.67%",
+     "memory": "132.1MiB / 768MiB",
+     "memory_percent": "17.20%",
+     "network": "404MB / 3.9GB",
+     "block": "3.66MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "5.35%",
+     "memory": "81.28MiB / 768MiB",
+     "memory_percent": "10.58%",
+     "network": "95.5MB / 71.7MB",
+     "block": "5.28MB / 3.42MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "5.40%",
+     "memory": "8.816MiB / 256MiB",
+     "memory_percent": "3.44%",
+     "network": "4.23MB / 1.55MB",
+     "block": "13.7MB / 7.12MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.27%",
+     "memory": "54.57MiB / 512MiB",
+     "memory_percent": "10.66%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 4.37MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "44.24%",
+     "memory": "239.7MiB / 768MiB",
+     "memory_percent": "31.22%",
+     "network": "417MB / 510MB",
+     "block": "32MB / 1.61GB"
+    }
+   ],
+   "database": {
+    "bytes": 35796659,
+    "connections": 17,
+    "wal_archive_bytes": 553652224,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:56:51.263Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "9.17%",
+     "memory": "172.2MiB / 1.5GiB",
+     "memory_percent": "11.21%",
+     "network": "3.42GB / 18.5MB",
+     "block": "303kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "4.49%",
+     "memory": "169.5MiB / 768MiB",
+     "memory_percent": "22.07%",
+     "network": "399MB / 35.1MB",
+     "block": "18.3MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "41.75%",
+     "memory": "138.3MiB / 768MiB",
+     "memory_percent": "18.01%",
+     "network": "420MB / 4.1GB",
+     "block": "3.71MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "4.31%",
+     "memory": "81.21MiB / 768MiB",
+     "memory_percent": "10.57%",
+     "network": "100MB / 74.8MB",
+     "block": "5.28MB / 3.48MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.72%",
+     "memory": "8.762MiB / 256MiB",
+     "memory_percent": "3.42%",
+     "network": "4.43MB / 1.62MB",
+     "block": "13.8MB / 7.43MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.30%",
+     "memory": "53.94MiB / 512MiB",
+     "memory_percent": "10.54%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 4.72MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "33.03%",
+     "memory": "235.3MiB / 768MiB",
+     "memory_percent": "30.64%",
+     "network": "432MB / 530MB",
+     "block": "32MB / 1.65GB"
+    }
+   ],
+   "database": {
+    "bytes": 36279987,
+    "connections": 17,
+    "wal_archive_bytes": 570429440,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "durante",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:57:51.326Z",
+   "containers": [
+    {
+     "service": "tests-run-8ef13ff2fd2e",
+     "cpu": "9.19%",
+     "memory": "187.4MiB / 1.5GiB",
+     "memory_percent": "12.20%",
+     "network": "3.6GB / 19.5MB",
+     "block": "356kB / 0B"
+    },
+    {
+     "service": "web",
+     "cpu": "1.98%",
+     "memory": "168.8MiB / 768MiB",
+     "memory_percent": "21.99%",
+     "network": "419MB / 35.9MB",
+     "block": "18.3MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "15.81%",
+     "memory": "138MiB / 768MiB",
+     "memory_percent": "17.97%",
+     "network": "436MB / 4.31GB",
+     "block": "3.75MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.32%",
+     "memory": "81.91MiB / 768MiB",
+     "memory_percent": "10.66%",
+     "network": "105MB / 78.1MB",
+     "block": "5.28MB / 3.6MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.31%",
+     "memory": "8.438MiB / 256MiB",
+     "memory_percent": "3.30%",
+     "network": "4.66MB / 1.7MB",
+     "block": "14MB / 7.79MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.33%",
+     "memory": "54.64MiB / 512MiB",
+     "memory_percent": "10.67%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 5.1MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "24.33%",
+     "memory": "228.4MiB / 768MiB",
+     "memory_percent": "29.74%",
+     "network": "447MB / 550MB",
+     "block": "32MB / 1.69GB"
+    }
+   ],
+   "database": {
+    "bytes": 36902579,
+    "connections": 16,
+    "wal_archive_bytes": 587206656,
+    "archiver_failed": 0
+   }
+  },
+  {
+   "moment": "após a carga",
+   "project": "ecommerce-capacity-test",
+   "at": "2026-10-02T02:57:55.117Z",
+   "containers": [
+    {
+     "service": "web",
+     "cpu": "0.00%",
+     "memory": "168.8MiB / 768MiB",
+     "memory_percent": "21.99%",
+     "network": "419MB / 35.9MB",
+     "block": "18.3MB / 2.48MB"
+    },
+    {
+     "service": "api",
+     "cpu": "0.01%",
+     "memory": "138MiB / 768MiB",
+     "memory_percent": "17.97%",
+     "network": "436MB / 4.31GB",
+     "block": "3.75MB / 0B"
+    },
+    {
+     "service": "worker",
+     "cpu": "3.04%",
+     "memory": "81.94MiB / 768MiB",
+     "memory_percent": "10.67%",
+     "network": "106MB / 78.3MB",
+     "block": "5.28MB / 3.6MB"
+    },
+    {
+     "service": "redis",
+     "cpu": "0.36%",
+     "memory": "8.438MiB / 256MiB",
+     "memory_percent": "3.30%",
+     "network": "4.66MB / 1.7MB",
+     "block": "14MB / 7.8MB"
+    },
+    {
+     "service": "storage",
+     "cpu": "0.28%",
+     "memory": "55.13MiB / 512MiB",
+     "memory_percent": "10.77%",
+     "network": "7.17kB / 1.56kB",
+     "block": "81.9MB / 5.1MB"
+    },
+    {
+     "service": "postgres",
+     "cpu": "4.35%",
+     "memory": "228.7MiB / 768MiB",
+     "memory_percent": "29.77%",
+     "network": "447MB / 550MB",
+     "block": "32MB / 1.7GB"
+    }
+   ],
+   "database": {
+    "bytes": 36902579,
+    "connections": 16,
+    "wal_archive_bytes": 587206656,
+    "archiver_failed": 0
+   }
+  }
+ ],
+ "passed": true,
+ "targets": {
+  "publicReadP95Ms": {
+   "target": 500,
+   "observed": 165
+  },
+  "checkoutP95Ms": {
+   "target": 2000,
+   "observed": 93
+  },
+  "unexpectedFailurePercent": {
+   "target": 1,
+   "observed": 0
+  },
+  "invariants": {
+   "violations": 0,
+   "lastUnitWinners": 1
+  }
+ },
+ "load": {
+  "requests": 50878,
+  "dropped": 0,
+  "latency": {
+   "frio:escrita:carrinho": {
+    "n": 17,
+    "p50": 13,
+    "p95": 64,
+    "p99": 64,
+    "max": 64,
+    "ok": 17,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:escrita:checkout": {
+    "n": 17,
+    "p50": 27,
+    "p95": 90,
+    "p99": 90,
+    "max": 90,
+    "ok": 17,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:escrita:frete": {
+    "n": 17,
+    "p50": 9,
+    "p95": 25,
+    "p99": 25,
+    "max": 25,
+    "ok": 17,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:leitura:busca": {
+    "n": 228,
+    "p50": 11,
+    "p95": 355,
+    "p99": 709,
+    "max": 1172,
+    "ok": 228,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:leitura:produto": {
+    "n": 426,
+    "p50": 8,
+    "p95": 520,
+    "p99": 886,
+    "max": 1279,
+    "ok": 426,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:leitura:vitrine": {
+    "n": 463,
+    "p50": 8,
+    "p95": 308,
+    "p99": 817,
+    "max": 1120,
+    "ok": 463,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "frio:pagina:ssr": {
+    "n": 66,
+    "p50": 30,
+    "p95": 979,
+    "p99": 1590,
+    "max": 1590,
+    "ok": 66,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:escrita:carrinho": {
+    "n": 201,
+    "p50": 11,
+    "p95": 20,
+    "p99": 63,
+    "max": 324,
+    "ok": 201,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:escrita:checkout": {
+    "n": 201,
+    "p50": 28,
+    "p95": 79,
+    "p99": 102,
+    "max": 111,
+    "ok": 201,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:escrita:frete": {
+    "n": 201,
+    "p50": 9,
+    "p95": 18,
+    "p99": 65,
+    "max": 420,
+    "ok": 201,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:leitura:busca": {
+    "n": 2289,
+    "p50": 5,
+    "p95": 115,
+    "p99": 356,
+    "max": 744,
+    "ok": 2289,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:leitura:produto": {
+    "n": 4181,
+    "p50": 7,
+    "p95": 32,
+    "p99": 408,
+    "max": 1478,
+    "ok": 4181,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:leitura:vitrine": {
+    "n": 4742,
+    "p50": 7,
+    "p95": 24,
+    "p99": 392,
+    "max": 1152,
+    "ok": 4742,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "pico:pagina:ssr": {
+    "n": 587,
+    "p50": 23,
+    "p95": 79,
+    "p99": 591,
+    "max": 1422,
+    "ok": 587,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:escrita:carrinho": {
+    "n": 621,
+    "p50": 12,
+    "p95": 44,
+    "p99": 219,
+    "max": 721,
+    "ok": 621,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:escrita:checkout": {
+    "n": 621,
+    "p50": 29,
+    "p95": 93,
+    "p99": 195,
+    "max": 483,
+    "ok": 621,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:escrita:frete": {
+    "n": 621,
+    "p50": 10,
+    "p95": 21,
+    "p99": 66,
+    "max": 209,
+    "ok": 621,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:leitura:busca": {
+    "n": 7000,
+    "p50": 7,
+    "p95": 165,
+    "p99": 303,
+    "max": 992,
+    "ok": 7000,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:leitura:produto": {
+    "n": 12350,
+    "p50": 8,
+    "p95": 32,
+    "p99": 314,
+    "max": 1891,
+    "ok": 12350,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:leitura:vitrine": {
+    "n": 14248,
+    "p50": 7,
+    "p95": 26,
+    "p99": 288,
+    "max": 1884,
+    "ok": 14248,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   },
+   "sustentado:pagina:ssr": {
+    "n": 1781,
+    "p50": 25,
+    "p95": 81,
+    "p99": 296,
+    "max": 1538,
+    "ok": 1781,
+    "expected4xx": 0,
+    "error4xx": 0,
+    "error5xx": 0,
+    "network": 0
+   }
+  },
+  "phases": [
+   {
+    "phase": "frio",
+    "rps": 20,
+    "seconds": 60,
+    "startedAt": "2026-10-02T02:21:48.605Z",
+    "launched": 1200
+   },
+   {
+    "phase": "sustentado",
+    "rps": 20,
+    "seconds": 1800,
+    "startedAt": "2026-10-02T02:22:48.606Z",
+    "launched": 36000
+   },
+   {
+    "phase": "pico",
+    "rps": 40,
+    "seconds": 300,
+    "startedAt": "2026-10-02T02:52:48.606Z",
+    "launched": 12000
+   }
+  ]
+ },
+ "external": {
+  "gatewayEmissionMs": {
+   "n": 840,
+   "p50": 1945,
+   "p95": 4262,
+   "max": 38535.232
+  },
+  "note": "Tempo de emissão pelo worker inclui a latência simulada; mostrado à parte da métrica interna."
+ },
+ "orders": {
+  "created": 840,
+  "paid": 0,
+  "unpaid": 840
+ },
+ "limitations": [
+  "Ambiente não equivalente à VM alvo (8c/16 GB): Docker Desktop com ~4 GB e cliente de carga na mesma máquina.",
+  "Gateway e e-mail simulados; nenhuma API externa recebeu carga.",
+  "Pagamentos não foram aprovados durante a carga; a baixa sob aprovação é coberta por T14/T16 e pelo fluxo T27."
+ ],
+ "finishedAt": "2026-10-02T02:58:27.792Z"
+}
