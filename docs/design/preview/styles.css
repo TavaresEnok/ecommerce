@@ -8,6 +8,7 @@
 @font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/IBMPlexSans-Medium-Latin1.woff2") format("woff2"); }
 @font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/IBMPlexSans-SemiBold-Latin1.woff2") format("woff2"); }
 
+/* tokens:inicio — gerado de docs/design/tokens.json por docs/design/tokens-css.mjs; não editar à mão */
 :root {
   --color-canvas: #F5F7F8;
   --color-surface: #FFFFFF;
@@ -68,6 +69,7 @@
   --layout-gutter-max: 40px;
   --layout-form-max: 46rem;
   --layout-control-height: 2.5rem;
+  --layout-touch-target: 2.75rem;
   --store-color-bg: #FFFFFF;
   --store-color-surface: #F6F5F2;
   --store-color-text: #1D1F1E;
@@ -89,6 +91,7 @@
   --store-layout-content-max: 1200px;
   --store-layout-media-ratio: 4 / 5;
 }
+/* tokens:fim */
 
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }

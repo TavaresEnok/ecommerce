@@ -71,27 +71,32 @@ if (tokens) {
 }
 const cssName = (p) => { const [scope, ...rest] = p.split('.'); return scope === 'store' ? `--store-${rest.join('-')}` : `--${rest.join('-')}`; };
 
-// ---------- styles.css ----------
+// ---------- CSS consumidores (aplicativo e protótipo) ----------
 const cssPath = join(here, 'preview/styles.css');
 const htmlPath = join(here, 'preview/index.html');
 const css = read(cssPath), html = read(htmlPath);
-const rootBlock = (css.match(/:root\s*\{([\s\S]*?)\n\}/) || [])[1] || '';
-const defined = new Map();
-for (const m of rootBlock.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) defined.set(m[1], m[2].trim());
 const norm = (v) => v.replace(/\s+/g, ' ').replace(/\s*,\s*/g, ', ').trim().toLowerCase();
-const expected = new Set();
-for (const [p, t] of leaves) {
-  if (t.css === false) continue;
-  const name = cssName(p); expected.add(name);
-  if (!defined.has(name)) fail(`styles.css não define ${name} (token ${p})`);
-  else if (norm(defined.get(name)) !== norm(t.value)) fail(`styles.css ${name} = ${defined.get(name)} ≠ token ${t.value}`);
+for (const rel of ['apps/web/app/style.css', 'docs/design/preview/styles.css']) {
+  const text = read(join(root, rel));
+  const rootBlock = (text.match(/:root\s*\{([\s\S]*?)\n\}/) || [])[1] || '';
+  const defined = new Map();
+  for (const m of rootBlock.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) defined.set(m[1], m[2].trim());
+  const expected = new Set();
+  for (const [p, t] of leaves) {
+    if (t.css === false) continue;
+    const name = cssName(p); expected.add(name);
+    if (!defined.has(name)) fail(`${rel} não define ${name} (token ${p})`);
+    else if (norm(defined.get(name)) !== norm(t.value)) fail(`${rel} ${name} = ${defined.get(name)} ≠ token ${t.value}`);
+  }
+  for (const name of defined.keys()) if (!expected.has(name)) fail(`${rel} :root define ${name} sem token correspondente`);
+  const declared = new Set([...text.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+  const extra = rel.endsWith('styles.css') ? new Set([...html.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1])) : new Set();
+  for (const m of text.matchAll(/var\((--[\w-]+)/g)) if (!declared.has(m[1]) && !extra.has(m[1])) fail(`${rel}: var(${m[1]}) usada sem declaração`);
+  const hexOutside = [...text.replace(rootBlock, '').matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0]);
+  if (hexOutside.length) fail(`${rel} usa cores literais fora de :root: ${[...new Set(hexOutside)].join(', ')}`);
+  notes.push(`${rel}: ${expected.size} variáveis correspondem aos tokens`);
 }
-for (const name of defined.keys()) if (!expected.has(name)) fail(`styles.css :root define ${name} sem token correspondente`);
-const declaredAnywhere = new Set([...css.matchAll(/(--[\w-]+)\s*:/g), ...html.matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
-for (const m of [...css.matchAll(/var\((--[\w-]+)/g), ...html.matchAll(/var\((--[\w-]+)/g)]) if (!declaredAnywhere.has(m[1])) fail(`var(${m[1]}) usada sem declaração`);
-const hexInCss = [...css.replace(rootBlock, '').matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map((m) => m[0]);
-if (hexInCss.length) fail(`styles.css usa cores literais fora de :root: ${[...new Set(hexInCss)].join(', ')}`);
-notes.push(`${expected.size} variáveis CSS correspondem aos tokens`);
+for (const m of html.matchAll(/var\((--[\w-]+)/g)) if (!new Set([...css.matchAll(/(--[\w-]+)\s*:/g), ...html.matchAll(/(--[\w-]+)\s*:/g)].map((x) => x[1])).has(m[1])) fail(`index.html: var(${m[1]}) usada sem declaração`);
 
 // ---------- index.html ----------
 const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
