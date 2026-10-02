@@ -1,0 +1,66 @@
+{
+  "base": "http://localhost:3000",
+  "date": "2026-10-02T22:43:23.448Z",
+  "results": [
+    {
+      "id": "painel-tab-inicial",
+      "ok": true,
+      "detail": "primeiro Tab: A “Ir para o conteúdo”, contorno solid"
+    },
+    {
+      "id": "dialogo-foco-inicial",
+      "ok": true,
+      "detail": "foco dentro do diálogo: true ()"
+    },
+    {
+      "id": "dialogo-esc-retorno",
+      "ok": true,
+      "detail": "após Esc o foco volta para “Cancelar pedido…”"
+    },
+    {
+      "id": "pedido-sintese",
+      "ok": true,
+      "detail": "síntese “Pagamento recebido · devolução pendente … envio bloqueado” presente"
+    },
+    {
+      "id": "pedido-sem-reembolso-api",
+      "ok": true,
+      "detail": "botões que iniciariam devolução pela API: 0"
+    },
+    {
+      "id": "funcionario-sem-acoes-dono",
+      "ok": true,
+      "detail": "botão “Cancelar pedido…” visível para funcionário: 0"
+    },
+    {
+      "id": "variacao-setas",
+      "ok": true,
+      "detail": "seta → seleciona Verde / M: true; SKU atualizado: true"
+    },
+    {
+      "id": "alvo-toque-adicionar",
+      "ok": true,
+      "detail": "“Adicionar ao carrinho” 234×48 px"
+    },
+    {
+      "id": "adicionar-status",
+      "ok": true,
+      "detail": "role=status: “Verde / M adicionada ao carrinho. Ver carrinho”"
+    },
+    {
+      "id": "checkout-foco-etapa",
+      "ok": true,
+      "detail": "após calcular frete o foco vai para H1 “Seu carrinho”"
+    },
+    {
+      "id": "checkout-so-etapa-atual",
+      "ok": true,
+      "detail": "formulário de entrega concluído vira resumo (formulários de entrega visíveis: 0)"
+    },
+    {
+      "id": "checkout-editar-etapa",
+      "ok": true,
+      "detail": "ao alterar a entrega o endereço digitado continua: “Rua TESTE”"
+    }
+  ]
+}

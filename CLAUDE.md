@@ -10,4 +10,6 @@ Antes de qualquer mudança de interface em `apps/web` (páginas, componentes, es
 2. [docs/design/TELAS-E-FLUXOS.md](docs/design/TELAS-E-FLUXOS.md), [docs/design/ACEITE.md](docs/design/ACEITE.md) e [docs/design/IMPLEMENTACAO.md](docs/design/IMPLEMENTACAO.md) — rotas reais, critérios verificáveis e lotes.
 3. [docs/design/tokens.json](docs/design/tokens.json), o protótipo em [docs/design/preview/index.html](docs/design/preview/index.html) e o estado em [docs/design/STATUS.md](docs/design/STATUS.md).
 
+Estado da implementação, resultados e pendências: [docs/design/RELATORIO-FINAL.md](docs/design/RELATORIO-FINAL.md). Para revisar rotas reais: `docs/design/capturar-rotas.mjs`, `verificar-teclado.mjs` e `verificar-aceite.mjs` (dados sintéticos em `.local/demo-ui.json`).
+
 Esses documentos complementam `docs/especificacao.md` e não mudam regras de negócio. Rode `node docs/design/verificar.mjs` após mexer em tokens, estilos ou nesses documentos.

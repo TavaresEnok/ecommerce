@@ -1,0 +1,121 @@
+{
+  "base": "http://localhost:3000",
+  "date": "2026-10-02T22:43:19.709Z",
+  "results": [
+    {
+      "id": "A-R02-08",
+      "ok": true,
+      "detail": "toCents: “1.234,56” → 123456; “64,9” → 6490; “12,345” → null"
+    },
+    {
+      "id": "A-R01-04 390",
+      "ok": true,
+      "detail": "estado vazio “Nenhuma loja vinculada” com ação de criar loja (1)"
+    },
+    {
+      "id": "A-R01-04 768",
+      "ok": true,
+      "detail": "estado vazio “Nenhuma loja vinculada” com ação de criar loja (1)"
+    },
+    {
+      "id": "A-R01-07",
+      "ok": true,
+      "detail": "nome com 100 caracteres; rolagem horizontal 0 px"
+    },
+    {
+      "id": "A-R02-04",
+      "ok": true,
+      "detail": "vazio “Nenhum produto cadastrado” com “Cadastrar primeiro produto”"
+    },
+    {
+      "id": "A-R02-05",
+      "ok": true,
+      "detail": "vazio da busca com “Limpar busca e filtros”; escopo da busca declarado no campo"
+    },
+    {
+      "id": "A-R03-07",
+      "ok": true,
+      "detail": "campo obrigatório no diálogo: 1; menciona devolução: true"
+    },
+    {
+      "id": "A-R04-01",
+      "ok": true,
+      "detail": "filtro atual marcado com aria-pressed/aria-current (2)"
+    },
+    {
+      "id": "A-R05-02",
+      "ok": true,
+      "detail": "motivo vazio bloqueado: true; estado “Novas vendas pausadas” exibido; retomada confirmada"
+    },
+    {
+      "id": "A-R07-02",
+      "ok": true,
+      "detail": "mensagem de acesso negado + “Entrar no painel”"
+    },
+    {
+      "id": "A-R10-04",
+      "ok": true,
+      "detail": "quantidade 8 com saldo 7: bloqueada junto ao campo pela validação do navegador (max = saldo); o envio não ocorre"
+    },
+    {
+      "id": "A-R14-02",
+      "ok": true,
+      "detail": "erro exibido (“Não foi possível concluirProtocolo não autorizado. Os dados digitados ”); dados mantidos"
+    },
+    {
+      "id": "A-R01-02",
+      "ok": true,
+      "detail": "alerta “Não foi possível concluirCredenciais inválidas.”; e-mail preservado: true"
+    },
+    {
+      "id": "A-R06-02",
+      "ok": true,
+      "detail": "sem MFA: só o formulário “Confirmar MFA”, nenhuma lista"
+    },
+    {
+      "id": "A-R06-03",
+      "ok": true,
+      "detail": "bloco “Inspecionando” após consulta com motivo"
+    },
+    {
+      "id": "A-R06-04",
+      "ok": true,
+      "detail": "motivos de suspensão e reativação listados na auditoria"
+    },
+    {
+      "id": "G-09",
+      "ok": true,
+      "detail": "maior transição com movimento reduzido: 0.01 ms"
+    },
+    {
+      "id": "G-10",
+      "ok": true,
+      "detail": "IBM Plex Sans carregada: true; largura “111,11” 54.00 px vs “888,88” 54.00 px"
+    },
+    {
+      "id": "A-R13-02",
+      "ok": true,
+      "detail": "comprador vê “Pago”, “Enviado” e o código de rastreio"
+    },
+    {
+      "id": "A-R03-06",
+      "ok": true,
+      "detail": "uma ação principal por vez, por teclado, com mensagens: Separação iniciada. → Envio registrado → Entrega registrada."
+    },
+    {
+      "id": "A-R12-05",
+      "ok": true,
+      "detail": "duplo clique em “Confirmar compra”: pedidos 8 → 9"
+    },
+    {
+      "id": "A-R12-04",
+      "ok": true,
+      "detail": "409 vira alerta e volta à entrega com endereço mantido; nenhum pedido criado; novo total R$ 45,90 exibido antes de confirmar"
+    },
+    {
+      "id": "A-R12-06",
+      "ok": true,
+      "detail": "alerta “O pedido não foi criadoO Dono precisa conectar a conta SIMULADA. Métodos reais desabilitados. Tentar de novo não gera co”; continua no carrinho"
+    }
+  ]
+}

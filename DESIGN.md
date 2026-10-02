@@ -290,7 +290,7 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 - Contraste: texto ≥ 4,5:1; texto grande e componentes/estados/foco ≥ 3:1 (verificador).
 - Teclado: toda ação alcançável por Tab, ordem lógica, sem armadilha; diálogo prende foco e devolve ao fechar.
 - Foco visível: contorno 2 px `focus`, afastamento 2 px, não encoberto por cabeçalho fixo (`scroll-padding-top`).
-- Alvos: mínimo 24×24 px; padrão 40 px.
+- Alvos de toque: **ações principais com no mínimo 44×44 px** (`layout.touch-target` = 2,75 rem) em telas < 768 px ou ponteiro grosso — botões não compactos, opções de variação, rádios de entrega/pagamento, links de navegação da loja e categorias, miniaturas da galeria, campos. Ações secundárias compactas dentro de linhas (`btn-sm`: Editar, Remover, Copiar) ficam com 40 px nessas telas e 32 px no desktop; nada fica abaixo de 24×24 px (WCAG 2.2, 2.5.8). Padrão de controle no desktop: 40 px.
 - Formulários: rótulos, instruções, erros identificados em texto e associados; dados preservados após erro; sem pedir de novo o que já foi informado no mesmo fluxo.
 - Mensagens de estado anunciadas (`role="status"`/`alert`) sem mover foco.
 - Redimensionamento: 200% de zoom e 320 px CSS sem perda de conteúdo.
@@ -298,10 +298,10 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 
 ## 14. Manutenção
 
-1. **Mudar um token:** editar `tokens.json` → refletir em `styles.css` (protótipo) e `apps/web/app/style.css` → `node docs/design/verificar.mjs` → registrar decisão na §15.
+1. **Mudar um token:** editar `tokens.json` → `node docs/design/tokens-css.mjs` (regenera o bloco `:root` entre `/* tokens:inicio */` e `/* tokens:fim */` em `apps/web/app/style.css` e no `styles.css` do protótipo; `--check` só confere) → `node docs/design/verificar.mjs` → registrar decisão na §15.
 2. **Novo componente:** especificar nesta seção 6 (estados e acessibilidade) → acrescentar à prancha do protótipo se for reutilizado em mais de uma tela → linha no ACEITE.
 3. **Nova tela/rota:** inventário em TELAS-E-FLUXOS.md (código Rnn), cenário no ACEITE.md, lote no IMPLEMENTACAO.md — o verificador cruza os três.
-4. **Revisão visual:** `node docs/design/capturar-preview.mjs` (protótipo) e capturas Playwright das rotas reais em 390/768/1440. Ler o HTML não substitui olhar as capturas.
+4. **Revisão visual:** `node docs/design/capturar-preview.mjs` (protótipo); `node docs/design/capturar-rotas.mjs <rótulo>` (rotas reais em 390/768/1440; `--widths=320` para reflow; `--widths=1280 --zoom=2` para zoom de 200%; `--only=R10,R12-dados` filtra) e `node docs/design/verificar-teclado.mjs` (foco, diálogo, variação por setas, etapas do checkout). Ambos usam os dados sintéticos de `.local/demo-ui.json` (fora do git). Ler o HTML não substitui olhar as capturas.
 5. Não alterar a stack, não adicionar biblioteca de UI/ícones/animação sem problema concreto e solicitação explícita.
 6. Toda tela nova preserva os seletores usados pelos testes ou atualiza os testes no mesmo commit (lista em IMPLEMENTACAO.md).
 
@@ -319,3 +319,10 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 | D-08 | Link “Painel” sai do menu público da vitrine | Separação de contextos; o painel tem endereço próprio |
 | D-09 | Edição de produto dentro de `/painel/[tenantId]` (parâmetro `?produto=<id>` proposto) | Sem nova rota de servidor; permite link direto e preserva contexto |
 | D-10 | Ícones SVG mínimos próprios, sem biblioteca | Não há família instalada; regra de não adicionar dependência ornamental |
+| D-11 | Isolamento por superfície: `.surface-panel` (painel, acesso, plataforma) e `.surface-store` (vitrine) definem apelidos `--_bg`, `--_text`, `--_primary-*`, `--_link`… e as regras de elemento usam `:where()` (especificidade zero) | Componentes (`.btn`, `.field`, `.badge`) servem às duas superfícies sem que a cor de uma vaze para a outra; classes vencem regras de elemento sem `!important` |
+| D-12 | `tokens.json` gera o `:root` do CSS (`docs/design/tokens-css.mjs`) | Uma fonte só; o verificador falha se o CSS divergir |
+| D-13 | Estado de tela na URL: `?aba=` (catálogo, vitrine, frete), `?produto=<id>`, `?novo=1`, `?pedido=<id>` + filtros, `?protocolo=<id>`, `?filtro=` | Link direto, botão Voltar e recarga preservam contexto sem novas rotas de servidor |
+| D-14 | Número do pedido e protocolo viram **links** (antes botões); testes passaram a usar `getByRole('link', …)` com a mesma asserção | Abrem um endereço; leitor de tela anuncia o papel correto |
+| D-15 | Alvo de toque de 44 px para ações principais (token `layout.touch-target`) | Pedido do responsável; substitui a meta “≥ 24 px” como padrão de projeto — 24 px continua sendo o piso absoluto |
+| D-16 | Na vitrine, a moldura da galeria segue `store.layout.media-ratio` (4:5) com `object-fit: contain`; no desktop a moldura cabe na altura da tela | Foto nunca é cortada nem distorcida; fotos fora da proporção ganham faixas neutras (recomendar ao lojista enviar na proporção do tema) |
+| D-17 | Checkout no celular: etapas concluídas viram resumos com “Alterar”; itens recolhem depois do frete; na revisão o resumo lateral repetido sai | Só o estado pertinente fica aberto; editar uma etapa mantém os dados das outras |
