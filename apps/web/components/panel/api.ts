@@ -6,7 +6,8 @@ export class ApiError extends Error { constructor(readonly status: number, messa
 export function messageOf(status: number, data: unknown): string {
   const d = data as { error?: unknown; message?: unknown } | null;
   const e = d?.error as { message?: unknown } | string | undefined;
-  if (status === 401) return 'Sua sessão expirou ou não foi iniciada. Entre novamente para continuar.';
+  // 401 com motivo próprio do servidor (ex.: “Credenciais inválidas.” no login) é mostrado como veio; sem motivo, é sessão.
+  if (status === 401) return e && typeof e === 'object' && typeof e.message === 'string' && e.message !== 'Unauthorized' ? e.message : 'Sua sessão expirou ou não foi iniciada. Entre novamente para continuar.';
   if (typeof e === 'string') return e;
   if (e && Array.isArray(e.message)) return e.message.join('; ');
   if (e && typeof e.message === 'string') return e.message;

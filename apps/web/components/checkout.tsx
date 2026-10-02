@@ -24,7 +24,9 @@ async function call(slug: string, path: string, body?: unknown, extra: Record<st
 // randomUUID exige contexto seguro; getRandomValues funciona também em previews HTTP.
 const uid = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
 // Uma chave por intenção confirmada: recarregar ou clicar duas vezes repete a mesma operação em vez de comprar de novo.
-function intentKey(quote: string) { const name = `checkout-${quote}`; let key = ''; try { key = sessionStorage.getItem(name) || ''; } catch { /* sem storage */ } if (!key) { key = uid(); try { sessionStorage.setItem(name, key); } catch { /* sem storage */ } } return key; }
+// A chave cobre a cotação e os dados enviados: repetir a mesma intenção reaproveita a chave; corrigir dados gera outra.
+const digest = (text: string) => { let h = 5381; for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) >>> 0; return h.toString(36); };
+function intentKey(quote: string, content: unknown) { const name = `checkout-${quote}-${digest(JSON.stringify(content))}`; let key = ''; try { key = sessionStorage.getItem(name) || ''; } catch { /* sem storage */ } if (!key) { key = uid(); try { sessionStorage.setItem(name, key); } catch { /* sem storage */ } } return key; }
 
 type Step = 'delivery' | 'buyer' | 'review';
 export function CartFlow({ slug }: { slug: string }) {
@@ -50,10 +52,11 @@ export function CartFlow({ slug }: { slug: string }) {
   async function confirm() {
     if (!quote || !address) return;
     setBusy(true); setErrors({});
-    try { const order = await call(slug, 'cart/checkout', { key: intentKey(quote.id), quote_id: quote.id, address, buyer: { name: buyer.name, email: buyer.email }, method: buyer.method, total_cents: quote.total_cents }); location.assign(`/lojas/${slug}/pedidos/${order.id}`); }
+    try { const body = { quote_id: quote.id, address, buyer: { name: buyer.name, email: buyer.email }, method: buyer.method, total_cents: quote.total_cents }; const order = await call(slug, 'cart/checkout', { key: intentKey(quote.id, body), ...body }); location.assign(`/lojas/${slug}/pedidos/${order.id}`); }
     catch (e) {
       const m = (e as Error).message;
-      if (e instanceof StoreError && e.status === 409) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ delivery: `${m} Preço, disponibilidade ou frete mudaram: calcule a entrega de novo e revise o novo total antes de confirmar. Seus dados foram mantidos.` }); }
+      // Só o 409 de preço/frete/disponibilidade pede nova cotação; os demais (loja sem conta de pagamento, vendas pausadas) ficam na revisão.
+      if (e instanceof StoreError && e.status === 409 && /pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ delivery: `${m} Preço, disponibilidade ou frete mudaram: calcule a entrega de novo e revise o novo total antes de confirmar. Seus dados foram mantidos.` }); }
       else setErrors({ confirm: m });
       setBusy(false);
     }
