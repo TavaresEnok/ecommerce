@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Protótipo de design — Plataforma</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!-- Proposta visual autoral do projeto. Não é captura de nenhum site de referência. Todos os dados são fictícios. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-search" viewBox="0 0 20 20"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.6 12.6 17 17"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><path d="M10 3 18 17H2z"/><path d="M10 8v4"/><path d="M10 14.6v.1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="m6.6 10.2 2.3 2.3 4.6-4.7"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 20 20"><path d="m4.5 10.5 3.5 3.5 7.5-8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M10 6v4l2.6 1.8"/></symbol>
+  <symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5"/><path d="M10 6.4v.1"/></symbol>
+  <symbol id="i-x" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15"/></symbol>
+  <symbol id="i-image-off" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="m3 13 4-4 3 3"/><path d="M3 3l14 14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 20 20"><path d="M10 13V4M6.5 7.5 10 4l3.5 3.5M4 13v3h12v-3"/></symbol>
+  <symbol id="i-box" viewBox="0 0 20 20"><path d="M3 6.5 10 3l7 3.5v7L10 17l-7-3.5z"/><path d="m3 6.5 7 3.5 7-3.5M10 10v7"/></symbol>
+  <symbol id="i-brush" viewBox="0 0 20 20"><path d="M4 16c3 0 4-1.5 4-3.5L15.5 5a1.4 1.4 0 0 0-2-2L6 10.5C4 10.5 4 13 4 16z"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 20 20"><path d="M5 3h10v14l-2-1.2-1.6 1.2-1.4-1.2-1.4 1.2L7 15.8 5 17z"/><path d="M8 7h4M8 10h4"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 20 20"><path d="M3.5 4h13v9H8l-4.5 3.5z"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 20 20"><path d="M3 14a7 7 0 1 1 14 0"/><path d="m10 14 3-4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 20 20"><path d="M2 10s3-5.5 8-5.5 8 5.5 8 5.5-3 5.5-8 5.5S2 10 2 10z"/><circle cx="10" cy="10" r="2.2"/></symbol>
+  <symbol id="i-store" viewBox="0 0 20 20"><path d="M3 8 4.5 4h11L17 8zM4 8v8h12V8M8 16v-4h4v4"/></symbol>
+  <symbol id="i-back" viewBox="0 0 20 20"><path d="m12 5-5 5 5 5"/></symbol>
+  <symbol id="ill-mug" viewBox="0 0 200 250"><ellipse cx="96" cy="190" rx="66" ry="9" fill="#000" opacity=".07"/><path d="M146 110h8a22 22 0 0 1 0 44h-8" fill="none" stroke="currentColor" stroke-width="11"/><path d="M48 92h98v80a18 18 0 0 1-18 18H66a18 18 0 0 1-18-18z" fill="currentColor"/><ellipse cx="97" cy="92" rx="49" ry="8" fill="#fff" opacity=".35"/><path d="M60 104v64" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/></symbol>
+  <symbol id="ill-saucer" viewBox="0 0 200 250"><ellipse cx="100" cy="160" rx="74" ry="14" fill="#000" opacity=".07"/><ellipse cx="100" cy="148" rx="74" ry="24" fill="currentColor"/><ellipse cx="100" cy="144" rx="38" ry="10" fill="#fff" opacity=".3"/></symbol>
+  <symbol id="ill-plate" viewBox="0 0 200 250"><ellipse cx="100" cy="158" rx="84" ry="16" fill="#000" opacity=".07"/><ellipse cx="100" cy="140" rx="84" ry="32" fill="currentColor"/><ellipse cx="100" cy="138" rx="56" ry="20" fill="#fff" opacity=".3"/></symbol>
+  <symbol id="ill-bowl" viewBox="0 0 200 250"><ellipse cx="100" cy="182" rx="56" ry="9" fill="#000" opacity=".07"/><path d="M36 112h128a64 64 0 0 1-128 0z" fill="currentColor"/><ellipse cx="100" cy="112" rx="64" ry="11" fill="#fff" opacity=".35"/></symbol>
+  <symbol id="ill-vase" viewBox="0 0 200 250"><ellipse cx="100" cy="200" rx="44" ry="8" fill="#000" opacity=".07"/><path d="M68 62h64v124a10 10 0 0 1-10 10H78a10 10 0 0 1-10-10z" fill="currentColor"/><ellipse cx="100" cy="62" rx="32" ry="6" fill="#fff" opacity=".35"/></symbol>
+  <symbol id="ill-tray" viewBox="0 0 200 250"><ellipse cx="100" cy="176" rx="88" ry="8" fill="#000" opacity=".07"/><path d="M34 128h132l18 40H16z" fill="currentColor"/><path d="M46 134h108l10 26H36z" fill="#fff" opacity=".25"/></symbol>
+</svg>
+
+<header class="proto-bar">
+  <div class="proto-bar-inner">
+    <strong>Protótipo de design · proposta autoral · dados fictícios</strong>
+    <nav aria-label="Seções do protótipo">
+      <ul>
+        <li><a href="#fundamentos">Fundamentos</a></li>
+        <li><a href="#componentes">Componentes</a></li>
+        <li><a href="#c1">1 Produtos</a></li>
+        <li><a href="#c2">2 Editar produto</a></li>
+        <li><a href="#c3">3 Pedido</a></li>
+        <li><a href="#c4">4 Produto na vitrine</a></li>
+        <li><a href="#c5">5 Checkout</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="proto-intro stack-sm">
+  <p class="caption">Plataforma (nome provisório) · Direção: comércio claro, identidade discreta e execução cuidadosa</p>
+  <h1>Prancha de componentes e composições de tela</h1>
+  <p>Referência visual original deste projeto para o redesign do painel, da vitrine e do checkout. Não é captura de outro produto. Lojas, pessoas, endereços, e-mails, pedidos e valores são <strong>fictícios</strong>; imagens de produto são <strong>ilustrações demonstrativas em SVG</strong>, não fotografias comerciais. Nenhum botão cria pedido, cobra, cancela ou salva dados.</p>
+  <p class="muted small">Especificação: <code>DESIGN.md</code> e <code>docs/design/</code>. Tokens: <code>docs/design/tokens.json</code>. Verificação: <code>node docs/design/verificar.mjs</code>.</p>
+</div>
+
+<!-- =================== FUNDAMENTOS =================== -->
+<section class="frame" id="fundamentos" aria-labelledby="fundamentos-t">
+  <div class="frame-head"><p class="caption">Prancha</p><h2 id="fundamentos-t">Fundamentos</h2><p>Cores com função, uma família tipográfica, escala de espaço de 4 px. O contraste exibido é calculado a partir dos tokens pelo verificador.</p></div>
+  <div class="board">
+    <section class="stack-sm" aria-labelledby="f-cores-p">
+      <h3 id="f-cores-p">Cores da plataforma (painel e administração)</h3>
+      <div class="board-grid">
+        <div class="swatch"><div class="chip" style="background:var(--color-canvas)"></div><div class="meta"><strong>canvas</strong><code>#F5F7F8</code><span>Fundo do painel · texto <span data-ratio="platform.color.text|platform.color.canvas">13,63:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-surface)"></div><div class="meta"><strong>surface</strong><code>#FFFFFF</code><span>Área de trabalho · texto <span data-ratio="platform.color.text|platform.color.surface">14,65:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-surface-subtle)"></div><div class="meta"><strong>surface-subtle</strong><code>#EEF2F3</code><span>Agrupamentos · secundário <span data-ratio="platform.color.text-muted|platform.color.surface-subtle">5,55:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-text)"></div><div class="meta"><strong>text</strong><code>#172B35</code><span>Texto principal</span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-text-muted)"></div><div class="meta"><strong>text-muted</strong><code>#52636B</code><span>Ajuda · sobre surface <span data-ratio="platform.color.text-muted|platform.color.surface">6,26:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-border)"></div><div class="meta"><strong>border</strong><code>#D8E1E5</code><span>Só separador decorativo · <span data-ratio="platform.color.border|platform.color.surface">1,33:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-control-border)"></div><div class="meta"><strong>control-border</strong><code>#71838D</code><span>Limite de campo · <span data-ratio="platform.color.control-border|platform.color.surface">3,94:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-action)"></div><div class="meta"><strong>action</strong><code>#006B60</code><span>Ação principal · texto branco <span data-ratio="platform.color.on-action|platform.color.action">6,42:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-action-hover)"></div><div class="meta"><strong>action-hover</strong><code>#00574E</code><span>Hover · texto branco <span data-ratio="platform.color.on-action|platform.color.action-hover">8,49:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-selection);box-shadow:inset 3px 0 0 var(--color-action)"></div><div class="meta"><strong>selection</strong><code>#E5F3EF</code><span>Selecionado + marcador · texto <span data-ratio="platform.color.text|platform.color.selection">12,84:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-focus)"></div><div class="meta"><strong>focus</strong><code>#2459C4</code><span>Contorno de foco · <span data-ratio="platform.color.focus|platform.color.surface">6,36:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-danger)"></div><div class="meta"><strong>danger</strong><code>#B42318</code><span>Erro e destrutivo · <span data-ratio="platform.color.danger|platform.color.surface">6,57:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-warning)"></div><div class="meta"><strong>warning</strong><code>#8A4B08</code><span>Pendente · sobre subtle <span data-ratio="platform.color.warning|platform.color.warning-subtle">6,14:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-success)"></div><div class="meta"><strong>success</strong><code>#166534</code><span>Confirmado · sobre subtle <span data-ratio="platform.color.success|platform.color.success-subtle">6,30:1</span></span></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--color-context-global)"></div><div class="meta"><strong>context-global</strong><code>#172B35</code><span>Faixa da plataforma · secundário <span data-ratio="platform.color.on-context-global-muted|platform.color.context-global">9,86:1</span></span></div></div>
+      </div>
+    </section>
+
+    <section class="stack-sm" aria-labelledby="f-cores-l">
+      <h3 id="f-cores-l">Cores da vitrine: base neutra e marca da loja</h3>
+      <p class="small muted">A vitrine não usa a cor da plataforma. A cor do tema (<code>theme.color</code>) passa pelo algoritmo de marca: a escolha do lojista é preservada e só o uso é corrigido quando falta contraste.</p>
+      <div class="brand-row">
+        <div class="brand-sample" style="--store-color-accent-fill:#9A3B26;--store-color-on-accent:#FFFFFF;--store-color-accent-border:#9A3B26;--store-color-accent-text:#9A3B26;--store-color-accent-tint:#F5EBE9">
+          <strong>Ateliê Ipê · <code>#9A3B26</code></strong>
+          <span class="small">Sem ajuste: botão, link e seleção usam a cor da marca.</span>
+          <div class="cluster"><button class="btn btn-store" type="button">Adicionar ao carrinho</button><a href="#c4">Link da loja</a></div>
+        </div>
+        <div class="brand-sample" style="--store-color-accent-fill:#F2C94C;--store-color-on-accent:#1D1F1E;--store-color-accent-border:#1D1F1E;--store-color-accent-text:#856F2A;--store-color-accent-tint:#F3F1EA">
+          <strong>Marca clara · <code>#F2C94C</code></strong>
+          <span class="small">Botão mantém o amarelo com texto e contorno escuros; links usam <code>#856F2A</code>.</span>
+          <div class="cluster"><button class="btn btn-store" type="button">Adicionar ao carrinho</button><a href="#c4">Link da loja</a></div>
+        </div>
+        <div class="brand-sample" style="--store-color-accent-fill:#CA3E6F;--store-color-on-accent:#FFFFFF;--store-color-accent-border:#CA3E6F;--store-color-accent-text:#CA3E6F;--store-color-accent-tint:#FAECF1">
+          <strong>Marca intermediária · <code>#E0457B</code></strong>
+          <span class="small">Nem branco nem tinta alcançam 4,5:1; o preenchimento escurece para <code>#CA3E6F</code>.</span>
+          <div class="cluster"><button class="btn btn-store" type="button">Adicionar ao carrinho</button><a href="#c4">Link da loja</a></div>
+        </div>
+      </div>
+      <p class="small muted">Base da vitrine: texto <span data-ratio="store.color.text|store.color.bg">16,57:1</span> · secundário <span data-ratio="store.color.text-muted|store.color.bg">6,51:1</span> · limite de campo <span data-ratio="store.color.control-border|store.color.bg">4,31:1</span>.</p>
+    </section>
+
+    <div class="board-grid">
+      <section class="specimen" aria-labelledby="f-tipo">
+        <h3 id="f-tipo">Tipografia</h3>
+        <p class="small muted">IBM Plex Sans 400/500/600 (OFL, hospedada no projeto, subconjunto Latin-1). Fallback: <code>system-ui</code>.</p>
+        <div class="type-row"><span class="caption">32 / 600</span><span style="font-size:var(--font-size-32);font-weight:600;line-height:1.25">Produtos</span></div>
+        <div class="type-row"><span class="caption">24 / 600</span><span style="font-size:var(--font-size-24);font-weight:600;line-height:1.25">Pedido nº 1042</span></div>
+        <div class="type-row"><span class="caption">20 / 600</span><span style="font-size:var(--font-size-20);font-weight:600">Pagamentos</span></div>
+        <div class="type-row"><span class="caption">16 / 400</span><span>Campos e texto corrido</span></div>
+        <div class="type-row"><span class="caption">14 / 400</span><span class="small">Tabelas, ajuda e navegação</span></div>
+        <div class="type-row"><span class="caption">12 / 500</span><span class="caption">Legenda funcional</span></div>
+        <div class="type-row"><span class="caption">Tabular</span><span class="money">R$ 1.111,10<br>R$ 9.808,90</span></div>
+      </section>
+      <section class="specimen" aria-labelledby="f-esp">
+        <h3 id="f-esp">Espaço, raio e movimento</h3>
+        <div class="space-row"><span style="width:var(--space-4)"></span>4</div>
+        <div class="space-row"><span style="width:var(--space-8)"></span>8</div>
+        <div class="space-row"><span style="width:var(--space-12)"></span>12</div>
+        <div class="space-row"><span style="width:var(--space-16)"></span>16</div>
+        <div class="space-row"><span style="width:var(--space-24)"></span>24</div>
+        <div class="space-row"><span style="width:var(--space-32)"></span>32</div>
+        <div class="space-row"><span style="width:var(--space-48)"></span>48</div>
+        <div class="space-row"><span style="width:var(--space-64)"></span>64</div>
+        <p class="small">Raios: 6 px controles · 8 px superfícies · 12 px diálogos · pílula só em filtro e estado.</p>
+        <p class="small">Movimento: 120 ms (hover/foco) e 180 ms (diálogo), curva única; desligado com <code>prefers-reduced-motion</code>.</p>
+      </section>
+    </div>
+  </div>
+</section>
+
+<!-- =================== COMPONENTES =================== -->
+<section class="frame" id="componentes" aria-labelledby="componentes-t">
+  <div class="frame-head"><p class="caption">Prancha</p><h2 id="componentes-t">Componentes</h2><p>Cada componente mostra estados reais do produto. Estado sempre tem texto; cor e forma reforçam.</p></div>
+  <div class="board">
+    <div class="board-grid">
+      <section class="specimen" aria-labelledby="k-btn">
+        <h3 id="k-btn">Botões</h3>
+        <div class="cluster">
+          <button class="btn btn-primary" type="button">Salvar informações</button>
+          <button class="btn btn-secondary" type="button">Cancelar</button>
+        </div>
+        <div class="cluster">
+          <button class="btn btn-danger" type="button">Cancelar pedido</button>
+          <button class="btn btn-quiet" type="button">Ver histórico</button>
+          <button class="btn btn-secondary btn-sm" type="button">Editar</button>
+        </div>
+        <div class="stack-sm">
+          <button class="btn btn-primary" type="button" disabled aria-describedby="k-btn-why">Iniciar separação</button>
+          <p class="action-note" id="k-btn-why">Indisponível: pagamento excedente aguardando devolução.</p>
+        </div>
+        <p class="small muted">Uma ação principal por área. Botão desabilitado sempre explica o motivo ao lado.</p>
+      </section>
+
+      <section class="specimen" aria-labelledby="k-fld">
+        <h3 id="k-fld">Campos</h3>
+        <div class="field"><label for="k-nome">Nome do produto</label><input class="input" id="k-nome" value="Caneca esmaltada Ipê 350 ml"></div>
+        <div class="field"><label for="k-preco">Preço</label><div class="input-affix"><span>R$</span><input class="input" id="k-preco" inputmode="decimal" value="64,90" aria-describedby="k-preco-h"></div><p class="hint" id="k-preco-h">Use vírgula para centavos. O total da compra é sempre calculado no servidor.</p></div>
+        <div class="field is-invalid"><label for="k-sku">SKU</label><input class="input" id="k-sku" value="CAN-IPE-AZ" aria-invalid="true" aria-describedby="k-sku-e"><p class="error-text" id="k-sku-e"><svg class="icon icon-16" aria-hidden="true"><use href="#i-alert"/></svg>Este SKU já está em uso nesta loja. Use outro código.</p></div>
+        <div class="field"><label for="k-ro">Identificador da loja <span class="optional">(somente leitura)</span></label><input class="input" id="k-ro" value="atelie-ipe" readonly></div>
+      </section>
+
+      <section class="specimen" aria-labelledby="k-sel">
+        <h3 id="k-sel">Seleção e filtros</h3>
+        <fieldset><legend>Status do produto</legend>
+          <div class="segmented" role="group" aria-label="Filtrar por status (exemplo)"><button type="button" aria-pressed="true">Todos <span class="count">8</span></button><button type="button" aria-pressed="false">Ativos <span class="count">5</span></button><button type="button" aria-pressed="false">Rascunhos <span class="count">2</span></button></div>
+        </fieldset>
+        <label class="check"><input type="checkbox" checked> Somente pedidos com pendências</label>
+        <fieldset><legend>Resultado do protocolo</legend>
+          <label class="check"><input type="radio" name="k-r" checked> Informado/atendido</label>
+          <label class="check"><input type="radio" name="k-r"> Recusado com justificativa</label>
+        </fieldset>
+      </section>
+    </div>
+
+    <section class="specimen" aria-labelledby="k-badges">
+      <h3 id="k-badges">Selos de estado (pedido, pagamento, entrega, disputa e catálogo)</h3>
+      <div class="cluster">
+        <span class="badge badge-success">Pago</span><span class="badge badge-success">Concluído</span><span class="badge badge-success">Entregue</span><span class="badge badge-success">Ativo</span>
+        <span class="badge badge-warning">Aguardando confirmação</span><span class="badge badge-warning">Parcialmente devolvido</span><span class="badge badge-warning">Verificação pendente</span>
+        <span class="badge badge-danger">Ação financeira pendente</span><span class="badge badge-danger">Disputa aberta</span><span class="badge badge-danger">Contestado</span>
+        <span class="badge badge-neutral">Aberto</span><span class="badge badge-neutral">Não enviado</span><span class="badge badge-neutral">Em separação</span><span class="badge badge-neutral">Enviado</span><span class="badge badge-neutral">Cancelado</span><span class="badge badge-neutral">Rascunho</span><span class="badge badge-neutral">Arquivado</span>
+      </div>
+      <p class="small muted">Forma do marcador: círculo cheio = confirmado; anel = pendente; losango = exige ação; traço = informativo. “Aguardando confirmação” nunca usa a cor de sucesso.</p>
+    </section>
+
+    <div class="board-grid">
+      <div class="alert alert-info" role="note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><div><p class="alert-title">Ambiente de teste</p><p>Pagamentos simulados: nenhum valor real é cobrado.</p></div></div>
+      <div class="alert alert-success" role="status"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><div><p class="alert-title">Informações salvas</p><p>Produto atualizado às 14:32.</p></div></div>
+      <div class="alert alert-warning" role="note"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><div><p class="alert-title">Pagamento aguardando confirmação</p><p>O retorno do navegador não confirma pagamento.</p></div></div>
+      <div class="alert alert-danger" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><div><p class="alert-title">Não foi possível salvar</p><p>Corrija os campos indicados e tente de novo.</p></div></div>
+    </div>
+
+    <div class="board-grid">
+      <section class="specimen" aria-labelledby="k-empty">
+        <h3 id="k-empty">Vazio</h3>
+        <div class="empty"><svg class="icon" aria-hidden="true"><use href="#i-receipt"/></svg><p class="empty-title">Nenhum pedido ainda</p><p class="small muted">Pedidos aparecem aqui quando a vitrine estiver publicada e um comprador concluir a compra.</p><a class="btn btn-secondary btn-sm" href="#c4">Ver vitrine</a></div>
+      </section>
+      <section class="specimen" aria-labelledby="k-load" aria-busy="true">
+        <h3 id="k-load">Carregando</h3>
+        <p class="small" role="status">Carregando pedidos autorizados…</p>
+        <div class="stack-sm" aria-hidden="true"><div class="skeleton" style="width:70%"></div><div class="skeleton" style="width:90%"></div><div class="skeleton" style="width:55%"></div></div>
+        <p class="small muted">Texto sempre presente; animação desligada com movimento reduzido.</p>
+      </section>
+      <section class="specimen" aria-labelledby="k-dlg">
+        <h3 id="k-dlg">Diálogo</h3>
+        <p class="small">Foco inicial no primeiro campo, Esc fecha, foco volta ao botão que abriu, título e descrição associados.</p>
+        <button class="btn btn-danger" type="button" data-dialog="c3-cancel-dialog">Cancelar pedido…</button>
+      </section>
+    </div>
+
+    <section class="specimen" aria-labelledby="k-ctx">
+      <h3 id="k-ctx">Contexto: loja, plataforma, preview e ambiente</h3>
+      <div class="store-switch" style="flex-direction:row"><div><span class="name">Ateliê Ipê</span> <span class="role">· Dono</span></div><a class="small" href="#c1">Trocar loja</a></div>
+      <div class="context-global" role="region" aria-label="Contexto global">
+        <strong>Administração da plataforma</strong><span class="muted">Acesso global · MFA confirmado · toda ação exige motivo e é auditada</span><a href="#k-ctx">Sair da administração</a>
+      </div>
+      <div class="context-inspect" role="region" aria-label="Loja inspecionada"><span><strong>Inspecionando:</strong> Ateliê Ipê (<code>atelie-ipe</code>) · Ativa</span><span class="muted small">Consulta auditada às 14:40 · motivo: “Chamado de suporte nº 77 (fictício)”</span></div>
+      <div class="alert alert-warning" role="note"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg><div><p class="alert-title">Preview privado do rascunho</p><p>Não publicado, não indexado. Carrinho desabilitado no preview.</p></div></div>
+    </section>
+  </div>
+</section>
+
+<!-- =================== C1 LISTAGEM DE PRODUTOS =================== -->
+<section class="frame" id="c1" aria-labelledby="c1-t">
+  <div class="frame-head"><p class="caption">Composição 1 · Painel · Rota real <code>/painel/[tenantId]</code> · Lote 1</p><h2 id="c1-t">Listagem de produtos</h2><p>Busca e filtro atuam sobre os produtos já carregados (a API do painel devolve até 100 e ainda não pagina nem filtra). Experimente buscar “xyz” para ver o estado vazio.</p></div>
+  <div class="screen">
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegação do painel">
+        <div class="store-switch"><div><div class="name">Ateliê Ipê</div><div class="role">Dono · loja fictícia</div></div><a class="small" href="#c1">Trocar loja</a></div>
+        <nav aria-label="Áreas da loja">
+          <ul class="nav">
+            <li class="nav-group-label caption" aria-hidden="true">Loja</li>
+            <li><a href="#c1" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-box"/></svg>Catálogo</a></li>
+            <li><a href="#c1"><svg class="icon" aria-hidden="true"><use href="#i-brush"/></svg>Vitrine e frete</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Vendas</li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-receipt"/></svg>Pedidos</a></li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Atendimento</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Conta</li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg>Operação</a></li>
+          </ul>
+        </nav>
+        <div class="sidebar-foot"><a href="#c4">Abrir vitrine</a><a href="#c4">Preview do rascunho</a><a href="#c1">Sair</a></div>
+      </aside>
+      <div class="main">
+        <div class="topbar">
+          <ol class="crumbs" aria-label="Você está em"><li>Ateliê Ipê</li><li aria-current="page">Catálogo</li></ol>
+          <div class="cluster small"><span class="env-tag"><svg class="icon icon-16" aria-hidden="true"><use href="#i-info"/></svg>Pagamentos simulados</span><span class="badge badge-success">Recebendo pedidos</span><span class="muted">dono@atelie-ipe.exemplo.test</span></div>
+        </div>
+        <div class="content">
+          <div class="page-head">
+            <div><p class="caption">Catálogo</p><h1>Produtos</h1><p class="meta" id="c1-count">8 produtos</p></div>
+            <div class="cluster"><a class="btn btn-secondary" href="#c2">Ajustar estoque</a><a class="btn btn-primary" href="#c2"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Novo produto</a></div>
+          </div>
+          <ul class="subnav" aria-label="Seções do catálogo">
+            <li><a href="#c1" aria-current="page">Produtos</a></li><li><a href="#c2">Estoque</a></li><li><a href="#c2">Mídia</a></li><li><a href="#c1">Categorias e locais</a></li>
+          </ul>
+          <div class="table-wrap">
+            <div class="toolbar" role="search" aria-label="Filtrar produtos">
+              <div class="field"><label for="c1-q">Buscar por nome ou SKU</label><input class="input" id="c1-q" type="search" autocomplete="off"></div>
+              <fieldset class="field narrow" style="flex:2 1 20rem"><legend>Status</legend>
+                <div class="segmented" role="group" aria-label="Status do produto">
+                  <button type="button" data-filter="all" aria-pressed="true">Todos <span class="count">8</span></button>
+                  <button type="button" data-filter="ACTIVE" aria-pressed="false">Ativos <span class="count">5</span></button>
+                  <button type="button" data-filter="DRAFT" aria-pressed="false">Rascunhos <span class="count">2</span></button>
+                  <button type="button" data-filter="ARCHIVED" aria-pressed="false">Arquivados <span class="count">1</span></button>
+                </div>
+              </fieldset>
+            </div>
+            <table class="data stack" id="c1-table">
+              <caption>Valores em reais; disponível = em estoque − reservado, somando as variações ativas.</caption>
+              <thead><tr><th scope="col">Produto</th><th scope="col">Status</th><th scope="col" class="num">Variações</th><th scope="col" class="num">Disponível</th><th scope="col" class="num">Preço</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
+              <tbody>
+                <tr data-status="ACTIVE" data-search="caneca esmaltada ipê 350 ml can-ipe-az can-ipe-vd can-ipe-ar">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#2F5D8A" aria-hidden="true"><use href="#ill-mug"/></svg></span><span><a href="#c4">Caneca esmaltada Ipê 350 ml</a><span class="slug">caneca-esmaltada-ipe-350ml</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-success">Ativo</span></td>
+                  <td class="num" data-label="Variações">3</td>
+                  <td class="num" data-label="Disponível"><span>30 <span class="muted">· 1 esgotada</span></span></td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="6490">R$ 64,90</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="ACTIVE" data-search="pires de apoio 14 cm pir-14">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#E3DCCF" aria-hidden="true"><use href="#ill-saucer"/></svg></span><span><a href="#c2">Pires de apoio 14 cm</a><span class="slug">pires-de-apoio-14cm</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-success">Ativo</span></td>
+                  <td class="num" data-label="Variações">1</td>
+                  <td class="num" data-label="Disponível">30</td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="3800">R$ 38,00</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="ACTIVE" data-search="prato raso 26 cm pra-26-br pra-26-az">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#D9D3C7" aria-hidden="true"><use href="#ill-plate"/></svg></span><span><a href="#c2">Prato raso 26 cm</a><span class="slug">prato-raso-26cm</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-success">Ativo</span></td>
+                  <td class="num" data-label="Variações">2</td>
+                  <td class="num" data-label="Disponível">16</td>
+                  <td class="num" data-label="Preço"><span><span class="money" data-cents="7200">R$ 72,00</span> a <span class="money" data-cents="7900">R$ 79,00</span></span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="ACTIVE" data-search="tigela funda 600 ml tig-600-br tig-600-vd">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#4E7A5A" aria-hidden="true"><use href="#ill-bowl"/></svg></span><span><a href="#c2">Tigela funda 600 ml</a><span class="slug">tigela-funda-600ml</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-success">Ativo</span></td>
+                  <td class="num" data-label="Variações">2</td>
+                  <td class="num" data-label="Disponível"><span class="badge badge-warning">Sem saldo</span></td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="5400">R$ 54,00</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="ACTIVE" data-search="jogo de 4 xícaras de café com pires edição esmaltada artesanal xic-4">
+                  <td class="primary"><div class="cell-product"><span class="thumb no-photo" title="Sem foto"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg><span class="sr-only">Sem foto</span></span><span><a href="#c2">Jogo de 4 xícaras de café com pires — edição esmaltada artesanal</a><span class="slug">jogo-4-xicaras-cafe · sem foto</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-success">Ativo</span></td>
+                  <td class="num" data-label="Variações">1</td>
+                  <td class="num" data-label="Disponível">7</td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="11990">R$ 119,90</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="DRAFT" class="is-selected" data-search="travessa oval esmaltada trv-oval">
+                  <td class="primary"><div class="cell-product"><span class="thumb no-photo" title="Sem foto"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg><span class="sr-only">Sem foto</span></span><span><a href="#c2" aria-current="true">Travessa oval esmaltada</a><span class="slug">travessa-oval-esmaltada · sem foto</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-neutral">Rascunho</span></td>
+                  <td class="num" data-label="Variações">1</td>
+                  <td class="num" data-label="Disponível">0</td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="14900">R$ 149,00</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="DRAFT" data-search="vaso cilíndrico 18 cm vas-18-nt vas-18-gf">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#B8AE9C" aria-hidden="true"><use href="#ill-vase"/></svg></span><span><a href="#c2">Vaso cilíndrico 18 cm</a><span class="slug">vaso-cilindrico-18cm</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-neutral">Rascunho</span></td>
+                  <td class="num" data-label="Variações">2</td>
+                  <td class="num" data-label="Disponível">5</td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="8900">R$ 89,00</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+                <tr data-status="ARCHIVED" data-search="bandeja de madeira e cerâmica ban-01">
+                  <td class="primary"><div class="cell-product"><span class="thumb"><svg viewBox="0 0 200 250" style="color:#8C6A4A" aria-hidden="true"><use href="#ill-tray"/></svg></span><span><a href="#c2">Bandeja de madeira e cerâmica</a><span class="slug">bandeja-madeira-ceramica</span></span></div></td>
+                  <td data-label="Status"><span class="badge badge-neutral">Arquivado</span></td>
+                  <td class="num" data-label="Variações">1</td>
+                  <td class="num" data-label="Disponível">0</td>
+                  <td class="num" data-label="Preço"><span class="money" data-cents="13200">R$ 132,00</span></td>
+                  <td data-label="Ações"><a class="btn btn-secondary btn-sm" href="#c2">Editar</a></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="empty" id="c1-empty" hidden style="margin:var(--space-16)"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><p class="empty-title">Nenhum produto corresponde à busca</p><p class="small muted">Confira a grafia ou procure pelo SKU. A busca considera somente os produtos carregados nesta página.</p><button class="btn btn-secondary btn-sm" type="button" id="c1-clear">Limpar busca e filtros</button></div>
+            <div class="table-foot"><span role="status" id="c1-status">Mostrando 8 de 8 produtos</span><span>Limite atual da listagem do painel: 100 produtos</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== C2 EDIÇÃO DE PRODUTO =================== -->
+<section class="frame" id="c2" aria-labelledby="c2-t">
+  <div class="frame-head"><p class="caption">Composição 2 · Painel · Rota real <code>/painel/[tenantId]</code> (edição dentro da mesma rota) · Lote 1</p><h2 id="c2-t">Edição de produto</h2><p>Produto em rascunho e sem foto. Mostra erro de formulário após resposta do servidor (SKU duplicado, HTTP 409) e estados vazios de imagem e de movimentação. Cada seção salva por conta própria porque a API grava cada operação separadamente.</p></div>
+  <div class="screen">
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegação do painel (edição)">
+        <div class="store-switch"><div><div class="name">Ateliê Ipê</div><div class="role">Dono · loja fictícia</div></div><a class="small" href="#c1">Trocar loja</a></div>
+        <nav aria-label="Áreas da loja (edição)">
+          <ul class="nav">
+            <li class="nav-group-label caption" aria-hidden="true">Loja</li>
+            <li><a href="#c1" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-box"/></svg>Catálogo</a></li>
+            <li><a href="#c1"><svg class="icon" aria-hidden="true"><use href="#i-brush"/></svg>Vitrine e frete</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Vendas</li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-receipt"/></svg>Pedidos</a></li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Atendimento</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Conta</li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg>Operação</a></li>
+          </ul>
+        </nav>
+        <div class="sidebar-foot"><a href="#c4">Abrir vitrine</a><a href="#c4">Preview do rascunho</a><a href="#c1">Sair</a></div>
+      </aside>
+      <div class="main">
+        <div class="topbar">
+          <ol class="crumbs" aria-label="Você está em (edição)"><li>Ateliê Ipê</li><li><a href="#c1">Produtos</a></li><li aria-current="page">Travessa oval esmaltada</li></ol>
+          <div class="cluster small"><span class="env-tag"><svg class="icon icon-16" aria-hidden="true"><use href="#i-info"/></svg>Pagamentos simulados</span><span class="muted">dono@atelie-ipe.exemplo.test</span></div>
+        </div>
+        <div class="content">
+          <div class="page-head">
+            <div><p class="caption"><a href="#c1">← Produtos</a></p><h1>Travessa oval esmaltada</h1><p class="meta"><span class="badge badge-neutral">Rascunho</span> · não aparece na vitrine · atualizado em 02/10/2026 às 14:05</p></div>
+            <div class="cluster"><a class="btn btn-secondary" href="#c4"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg>Preview</a><button class="btn btn-primary" type="submit" form="c2-info">Salvar informações</button></div>
+          </div>
+
+          <div class="two-col form-layout">
+            <div class="surface">
+              <form class="section form" id="c2-info" aria-labelledby="c2-info-t" data-demo-form="c2-info-status">
+                <div class="section-head"><h2 id="c2-info-t">Informações</h2><p>Salvas com “Salvar informações”.</p></div>
+                <div class="field"><label for="c2-name">Nome</label><input class="input" id="c2-name" value="Travessa oval esmaltada" maxlength="200" required></div>
+                <div class="field"><label for="c2-slug">Endereço na vitrine (slug)</label><input class="input" id="c2-slug" value="travessa-oval-esmaltada" pattern="[a-z0-9]+(-[a-z0-9]+)*" required aria-describedby="c2-slug-h"><p class="hint" id="c2-slug-h">/produtos/travessa-oval-esmaltada · letras minúsculas, números e hífens. Ao mudar, o endereço antigo redireciona para o novo.</p></div>
+                <div class="field"><label for="c2-desc">Descrição e cuidados</label><textarea class="textarea" id="c2-desc" maxlength="8000" aria-describedby="c2-desc-h">Travessa oval em cerâmica esmaltada, 34 × 22 cm. Pode ir ao micro-ondas e à lava-louças. Não usar no forno convencional.</textarea><p class="hint" id="c2-desc-h">Texto simples (HTML não é aceito), até 8.000 caracteres.</p></div>
+                <p class="small" role="status" id="c2-info-status"></p>
+              </form>
+
+              <section class="section" aria-labelledby="c2-var-t">
+                <div class="section-head"><h2 id="c2-var-t">Variações</h2><p>Carrinho, pedido e estoque usam sempre a variação.</p></div>
+                <div class="table-wrap">
+                  <table class="data stack">
+                    <thead><tr><th scope="col">SKU</th><th scope="col">Opções</th><th scope="col" class="num">Preço</th><th scope="col" class="num">Disponível</th><th scope="col">Situação</th></tr></thead>
+                    <tbody><tr><td class="primary"><code>TRV-OVAL</code></td><td data-label="Opções">Padrão (sem opções)</td><td class="num" data-label="Preço"><span class="money" data-cents="14900">R$ 149,00</span></td><td class="num" data-label="Disponível">0</td><td data-label="Situação"><span class="badge badge-success">Ativa</span></td></tr></tbody>
+                  </table>
+                </div>
+                <form class="variant-new form" style="margin-top:var(--space-16)" aria-labelledby="c2-nv-t" novalidate>
+                  <h3 id="c2-nv-t">Adicionar variação</h3>
+                  <div class="alert alert-danger error-summary" role="alert" tabindex="-1" id="c2-err"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><div><p class="alert-title">A variação não foi adicionada</p><p>Corrija 1 campo: <a href="#c2-sku">SKU já está em uso</a>. Os demais dados foram mantidos.</p></div></div>
+                  <p class="hint">A primeira variação explícita desativa a variação padrão; o histórico de pedidos é preservado.</p>
+                  <div class="form-grid">
+                    <div class="field is-invalid"><label for="c2-sku">SKU</label><input class="input" id="c2-sku" value="CAN-IPE-AZ" maxlength="80" aria-invalid="true" aria-describedby="c2-sku-e"><p class="error-text" id="c2-sku-e"><svg class="icon icon-16" aria-hidden="true"><use href="#i-alert"/></svg>Este SKU já está em uso nesta loja (Caneca esmaltada Ipê 350 ml). Use outro código.</p></div>
+                    <div class="field"><label for="c2-vprice">Preço</label><div class="input-affix"><span>R$</span><input class="input" id="c2-vprice" inputmode="decimal" value="149,00"></div></div>
+                  </div>
+                  <fieldset><legend>Opções (até 5)</legend>
+                    <div class="attr-row"><div class="field"><label for="c2-a1n">Nome da opção</label><input class="input" id="c2-a1n" value="Cor"></div><div class="field"><label for="c2-a1v">Valor</label><input class="input" id="c2-a1v" value="Azul"></div></div>
+                    <button class="btn btn-quiet btn-sm" type="button" style="margin-top:var(--space-8)"><svg class="icon icon-16" aria-hidden="true"><use href="#i-plus"/></svg>Adicionar opção</button>
+                  </fieldset>
+                  <fieldset><legend>Peso e dimensões <span class="optional">(necessários para cotação de transportadora)</span></legend>
+                    <div class="form-grid"><div class="field"><label for="c2-w">Peso (g)</label><input class="input" id="c2-w" inputmode="numeric" value="1350"></div><div class="field"><label for="c2-l">Comprimento (mm)</label><input class="input" id="c2-l" inputmode="numeric" value="340"></div><div class="field"><label for="c2-wd">Largura (mm)</label><input class="input" id="c2-wd" inputmode="numeric" value="220"></div><div class="field"><label for="c2-h">Altura (mm)</label><input class="input" id="c2-h" inputmode="numeric" value="45"></div></div>
+                  </fieldset>
+                  <div class="cluster"><button class="btn btn-secondary" type="button" data-demo="c2-var-status" data-msg="Protótipo: nenhuma variação foi criada.">Adicionar variação</button><span class="small" role="status" id="c2-var-status"></span></div>
+                </form>
+              </section>
+
+              <section class="section" aria-labelledby="c2-img-t">
+                <div class="section-head"><h2 id="c2-img-t">Imagens</h2><p>Até 10 por produto.</p></div>
+                <div class="empty"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg><p class="empty-title">Este produto ainda não tem imagens</p><p class="small muted">JPEG, PNG ou WebP estático, até 10 MB e 40 megapixels. O processamento gera WebP; a imagem só pode ser vinculada depois de pronta. No máximo 2 envios em andamento por loja.</p><div class="cluster"><button class="btn btn-secondary" type="button" data-demo="c2-img-status" data-msg="Protótipo: nenhum arquivo foi enviado."><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>Enviar imagem</button><span class="small" role="status" id="c2-img-status"></span></div></div>
+              </section>
+
+              <section class="section" aria-labelledby="c2-stk-t">
+                <div class="section-head"><h2 id="c2-stk-t">Estoque</h2><p>Disponível = em estoque − reservado.</p></div>
+                <dl class="summary"><dt>Em estoque</dt><dd class="num">0</dd><dt>Reservado</dt><dd class="num">0</dd><dt>Disponível</dt><dd class="num"><strong>0</strong></dd></dl>
+                <form class="form" style="margin-top:var(--space-16)" aria-label="Ajustar estoque da Travessa oval esmaltada">
+                  <div class="form-grid"><div class="field"><label for="c2-loc">Local</label><select class="select" id="c2-loc"><option>Ateliê — Vila Madalena</option></select></div><div class="field"><label for="c2-delta">Quantidade</label><input class="input" id="c2-delta" type="number" value="12" aria-describedby="c2-delta-h"><p class="hint" id="c2-delta-h">Positivo para entrada, negativo para saída.</p></div></div>
+                  <div class="field"><label for="c2-reason">Motivo</label><input class="input" id="c2-reason" value="Primeira fornada recebida" maxlength="500"></div>
+                  <div class="cluster"><button class="btn btn-secondary" type="button" data-demo="c2-stk-status" data-msg="Protótipo: nenhum ajuste foi registrado.">Registrar ajuste</button><span class="small" role="status" id="c2-stk-status"></span></div>
+                </form>
+                <div class="empty" style="margin-top:var(--space-16)"><p class="empty-title">Nenhuma movimentação registrada</p><p class="small muted">Cada ajuste aparece aqui com autor, motivo e saldo resultante.</p></div>
+              </section>
+            </div>
+
+            <aside class="surface section side-list" aria-label="Publicação e organização">
+              <div class="stack-sm">
+                <h2>Publicação</h2>
+                <div class="field"><label for="c2-status">Status</label><select class="select" id="c2-status" form="c2-info"><option selected>Rascunho</option><option>Ativo</option><option>Arquivado</option></select></div>
+                <p class="hint">Ativo exige ao menos uma variação vendável com preço. Arquivar bloqueia novas compras e preserva pedidos.</p>
+              </div>
+              <div class="stack-sm">
+                <h2>Organização</h2>
+                <div class="field"><label for="c2-cat">Categoria</label><select class="select" id="c2-cat" form="c2-info"><option>Travessas e saladeiras</option><option>Canecas</option><option>Sem categoria</option></select></div>
+              </div>
+              <div class="stack-sm">
+                <h2>Descrição com IA</h2>
+                <p class="small muted">Recurso desligado pela plataforma. O cadastro manual continua disponível.</p>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== C3 DETALHE DE PEDIDO =================== -->
+<section class="frame" id="c3" aria-labelledby="c3-t">
+  <div class="frame-head"><p class="caption">Composição 3 · Painel · Rota real <code>/painel/[tenantId]/pedidos</code> · Lote 2</p><h2 id="c3-t">Detalhe de pedido com ação financeira pendente</h2><p>Pagamento confirmado e um segundo recebimento excedente: o resumo “Pago” não esconde o valor a devolver, e a expedição fica bloqueada com o motivo à vista. Piloto: a devolução é feita pelo Dono no Mercado Pago e só a confirmação do gateway encerra a pendência.</p></div>
+  <div class="screen">
+    <div class="app">
+      <aside class="sidebar" aria-label="Navegação do painel (pedido)">
+        <div class="store-switch"><div><div class="name">Ateliê Ipê</div><div class="role">Dono · loja fictícia</div></div><a class="small" href="#c1">Trocar loja</a></div>
+        <nav aria-label="Áreas da loja (pedido)">
+          <ul class="nav">
+            <li class="nav-group-label caption" aria-hidden="true">Loja</li>
+            <li><a href="#c1"><svg class="icon" aria-hidden="true"><use href="#i-box"/></svg>Catálogo</a></li>
+            <li><a href="#c1"><svg class="icon" aria-hidden="true"><use href="#i-brush"/></svg>Vitrine e frete</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Vendas</li>
+            <li><a href="#c3" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-receipt"/></svg>Pedidos</a></li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Atendimento</a></li>
+            <li class="nav-group-label caption" aria-hidden="true">Conta</li>
+            <li><a href="#c3"><svg class="icon" aria-hidden="true"><use href="#i-gauge"/></svg>Operação</a></li>
+          </ul>
+        </nav>
+        <div class="sidebar-foot"><a href="#c4">Abrir vitrine</a><a href="#c4">Preview do rascunho</a><a href="#c1">Sair</a></div>
+      </aside>
+      <div class="main">
+        <div class="topbar">
+          <ol class="crumbs" aria-label="Você está em (pedido)"><li>Ateliê Ipê</li><li><a href="#c3">Pedidos</a></li><li aria-current="page">Nº 1042</li></ol>
+          <div class="cluster small"><span class="env-tag"><svg class="icon icon-16" aria-hidden="true"><use href="#i-info"/></svg>Pagamentos simulados</span><span class="muted">dono@atelie-ipe.exemplo.test</span></div>
+        </div>
+        <div class="content">
+          <div class="page-head">
+            <div><p class="caption"><a href="#c3">← Pedidos</a></p><h1>Pedido nº 1042</h1><p class="meta">Criado em 02/10/2026 às 14:12 (horário de Brasília) · Entrega SP — tabela de CEP</p></div>
+            <div class="cluster"><button class="btn btn-secondary" type="button" data-demo="c3-rec-status" data-msg="Protótipo: nenhuma consulta foi agendada.">Solicitar nova consulta ao gateway</button></div>
+          </div>
+          <p class="small" role="status" id="c3-rec-status"></p>
+
+          <div class="status-strip" aria-label="Situação do pedido">
+            <div><span class="caption">Pedido</span><span class="badge badge-neutral">Aberto</span></div>
+            <div><span class="caption">Pagamento</span><span class="badge badge-success">Pago</span></div>
+            <div><span class="caption">Entrega</span><span class="badge badge-neutral">Não enviado</span></div>
+            <div><span class="caption">Disputa</span><span class="badge badge-neutral">Sem disputa</span></div>
+            <div><span class="caption">Pendências</span><span class="badge badge-danger">1 ação financeira</span></div>
+          </div>
+
+          <div class="alert alert-danger" role="note" aria-labelledby="c3-fin-t">
+            <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+            <div>
+              <p class="alert-title" id="c3-fin-t">Pagamento excedente: devolver <span class="money" data-cents="18780">R$ 187,80</span></p>
+              <p>O pedido foi pago duas vezes. O primeiro recebimento quita o pedido; o segundo precisa ser devolvido ao comprador.</p>
+              <ol>
+                <li>Localize o recebimento <code>SIM-PIX-7Q2K</code> no painel do Mercado Pago.</li>
+                <li>Execute a devolução de <span class="money" data-cents="18780">R$ 187,80</span> por lá.</li>
+                <li>Anote a referência da devolução abaixo e solicite nova consulta ao gateway.</li>
+              </ol>
+              <p class="small">A anotação não confirma a devolução: só a leitura do gateway encerra a pendência. Expedição bloqueada até lá.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="surface">
+              <section class="section" aria-labelledby="c3-items-t">
+                <div class="section-head"><h2 id="c3-items-t">Itens</h2><p>Valores congelados na compra.</p></div>
+                <div class="table-wrap">
+                  <table class="data stack">
+                    <thead><tr><th scope="col">Item</th><th scope="col" class="num">Qtd.</th><th scope="col" class="num">Unitário</th><th scope="col" class="num">Total</th></tr></thead>
+                    <tbody>
+                      <tr><td class="primary">Caneca esmaltada Ipê 350 ml — Azul <span class="slug muted small">· <code>CAN-IPE-AZ</code></span></td><td class="num" data-label="Qtd.">2</td><td class="num" data-label="Unitário"><span class="money" data-cents="6490">R$ 64,90</span></td><td class="num" data-label="Total"><span class="money" data-cents="12980" data-qty="2" data-unit="6490" data-part="o1042 o1042s">R$ 129,80</span></td></tr>
+                      <tr><td class="primary">Pires de apoio 14 cm <span class="slug muted small">· <code>PIR-14</code></span></td><td class="num" data-label="Qtd.">1</td><td class="num" data-label="Unitário"><span class="money" data-cents="3800">R$ 38,00</span></td><td class="num" data-label="Total"><span class="money" data-cents="3800" data-qty="1" data-unit="3800" data-part="o1042 o1042s">R$ 38,00</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <dl class="totals" style="margin-top:var(--space-16);max-width:22rem;margin-left:auto">
+                  <div><dt>Subtotal</dt><dd class="money" data-cents="16780" data-sum="o1042s">R$ 167,80</dd></div>
+                  <div><dt>Frete (Entrega SP)</dt><dd class="money" data-cents="2000" data-part="o1042">R$ 20,00</dd></div>
+                  <div class="grand"><dt>Total do pedido</dt><dd class="money" data-cents="18780" data-sum="o1042">R$ 187,80</dd></div>
+                </dl>
+              </section>
+
+              <section class="section" aria-labelledby="c3-pay-t">
+                <div class="section-head"><h2 id="c3-pay-t">Pagamentos</h2><p>Todos os recebimentos ficam registrados, inclusive excedentes.</p></div>
+                <div class="table-wrap">
+                  <table class="data stack">
+                    <thead><tr><th scope="col">Recebimento</th><th scope="col">Classificação</th><th scope="col" class="num">Recebido</th><th scope="col" class="num">Devolvido</th><th scope="col">ID externo</th></tr></thead>
+                    <tbody>
+                      <tr><td class="primary">Cartão · tentativa 2 · 14:18</td><td data-label="Classificação"><span class="badge badge-success">Principal</span></td><td class="num" data-label="Recebido"><span class="money" data-cents="18780" data-part="rcv">R$ 187,80</span></td><td class="num" data-label="Devolvido"><span class="money" data-cents="0" data-part="ret">R$ 0,00</span></td><td data-label="ID externo"><code>SIM-CARD-3H8M</code></td></tr>
+                      <tr><td class="primary">Pix · tentativa 1 · 14:26</td><td data-label="Classificação"><span class="badge badge-danger">Excedente</span></td><td class="num" data-label="Recebido"><span class="money" data-cents="18780" data-part="rcv due">R$ 187,80</span></td><td class="num" data-label="Devolvido"><span class="money" data-cents="0" data-part="ret due:-">R$ 0,00</span></td><td data-label="ID externo"><code>SIM-PIX-7Q2K</code></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <dl class="totals" style="margin-top:var(--space-16);max-width:22rem;margin-left:auto">
+                  <div><dt>Total recebido</dt><dd class="money" data-cents="37560" data-sum="rcv">R$ 375,60</dd></div>
+                  <div><dt>Devoluções confirmadas</dt><dd class="money" data-cents="0" data-sum="ret">R$ 0,00</dd></div>
+                  <div class="grand"><dt>A devolver</dt><dd class="money" data-cents="18780" data-sum="due">R$ 187,80</dd></div>
+                </dl>
+                <form class="form" style="margin-top:var(--space-16)" aria-label="Anotar referência do incidente EXCESS_PAYMENT">
+                  <div class="field"><label for="c3-note">Referência externa da devolução <span class="optional">(EXCESS_PAYMENT)</span></label><input class="input" id="c3-note" maxlength="1000" aria-describedby="c3-note-h"><p class="hint" id="c3-note-h">Ajuda a investigar; não marca o valor como devolvido.</p></div>
+                  <div class="cluster"><button class="btn btn-secondary" type="button" data-demo="c3-note-status" data-msg="Protótipo: nenhuma anotação foi registrada.">Anotar referência</button><span class="small" role="status" id="c3-note-status"></span></div>
+                </form>
+              </section>
+
+              <section class="section" aria-labelledby="c3-ship-t">
+                <div class="section-head"><h2 id="c3-ship-t">Expedição</h2></div>
+                <div class="blocked">
+                  <div class="cluster"><button class="btn btn-primary" type="button" disabled aria-describedby="c3-block">Iniciar separação</button></div>
+                  <div id="c3-block"><p class="small"><strong>Bloqueado.</strong> Motivos informados pelo servidor:</p><ul><li>Pagamento excedente aguardando devolução confirmada (EXCESS_PAYMENT).</li></ul></div>
+                </div>
+              </section>
+
+              <section class="section" aria-labelledby="c3-hist-t">
+                <div class="section-head"><h2 id="c3-hist-t">Histórico</h2></div>
+                <ol class="timeline">
+                  <li><time datetime="2026-10-02T17:12:00Z">02/10 14:12</time><span>Pedido criado: intenção confirmada e estoque reservado integralmente.</span></li>
+                  <li><time datetime="2026-10-02T17:13:00Z">02/10 14:13</time><span>Pix emitido (tentativa 1).</span></li>
+                  <li><time datetime="2026-10-02T17:17:00Z">02/10 14:17</time><span>Tentativa 2 (cartão) iniciada após consulta: Pix ainda sem pagamento.</span></li>
+                  <li><time datetime="2026-10-02T17:18:00Z">02/10 14:18</time><span>Pagamento confirmado pelo gateway (cartão). Reserva consumida.</span></li>
+                  <li><time datetime="2026-10-02T17:26:00Z">02/10 14:26</time><span>Segundo recebimento confirmado (Pix). Classificado como excedente; incidente EXCESS_PAYMENT aberto e expedição bloqueada.</span></li>
+                </ol>
+              </section>
+            </div>
+
+            <aside class="surface section side-list" aria-label="Comprador, entrega e registros">
+              <div><h2>Comprador</h2><p>Marina Albuquerque <span class="muted">(fictícia)</span></p><p class="small"><a href="#c3">marina.a@exemplo.test</a></p></div>
+              <div><h2>Entrega</h2><p class="small">Entrega SP — tabela de CEP · 3 dias úteis</p><p class="small">Rua das Acácias, 120, ap. 42 — São Paulo/SP · CEP 01001-000</p></div>
+              <div><h2>Notificações ao comprador</h2><p class="small">Pedido recebido · <span class="badge badge-neutral">Simulado</span></p><p class="small">Pagamento confirmado · <span class="badge badge-neutral">Simulado</span></p></div>
+              <div><h2>Protocolos do consumidor</h2><p class="small muted">Nenhum protocolo para este pedido.</p></div>
+              <div><h2>Documento fiscal externo</h2><p class="small muted">Nenhuma referência registrada.</p><button class="btn btn-quiet btn-sm" type="button" data-demo="c3-fiscal-status" data-msg="Protótipo: formulário de referência fiscal.">Registrar referência</button><span class="small" role="status" id="c3-fiscal-status"></span></div>
+              <div><h2>Ações do Dono</h2><div class="cluster"><button class="btn btn-secondary btn-sm" type="button" data-demo="c3-addr-status" data-msg="Protótipo: correção auditada abriria aqui.">Corrigir endereço</button><button class="btn btn-secondary btn-sm" type="button" data-demo="c3-addr-status" data-msg="Protótipo: nenhuma exportação foi gerada.">Exportar dados do comprador</button><button class="btn btn-danger btn-sm" type="button" data-dialog="c3-cancel-dialog">Cancelar pedido…</button></div><p class="small" role="status" id="c3-addr-status"></p></div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <dialog class="dialog" id="c3-cancel-dialog" aria-labelledby="c3-dlg-t" aria-describedby="c3-dlg-d">
+    <form method="dialog">
+      <div class="dialog-body">
+        <h2 id="c3-dlg-t">Cancelar o pedido nº 1042?</h2>
+        <p id="c3-dlg-d">O envio fica impedido imediatamente. Os valores recebidos continuam pendentes de devolução até a confirmação do gateway; cancelar não devolve dinheiro automaticamente.</p>
+        <div class="field"><label for="c3-dlg-reason">Motivo do cancelamento</label><input class="input" id="c3-dlg-reason" maxlength="500" required autofocus></div>
+      </div>
+      <div class="dialog-actions"><button class="btn btn-secondary" value="cancel" formnovalidate>Voltar</button><button class="btn btn-danger" value="confirm">Cancelar pedido</button></div>
+    </form>
+  </dialog>
+</section>
+
+<!-- =================== C4 PRODUTO NA VITRINE =================== -->
+<section class="frame" id="c4" aria-labelledby="c4-t">
+  <div class="frame-head"><p class="caption">Composição 4 · Vitrine · Rota real <code>/lojas/[slug]/produtos/[produto]</code> · Lote 3</p><h2 id="c4-t">Produto na vitrine</h2><p>A loja usa a própria cor (<code>#9A3B26</code>) e o tipo de título escolhido no tema; a plataforma some. Ilustrações SVG demonstrativas no lugar de fotografias; um produto relacionado mostra o estado sem foto.</p></div>
+  <div class="screen">
+    <div class="store" style="--store-color-accent:#9A3B26;--store-color-accent-fill:#9A3B26;--store-color-on-accent:#FFFFFF;--store-color-accent-border:#9A3B26;--store-color-accent-text:#9A3B26;--store-color-accent-tint:#F5EBE9;--store-font-family-display:var(--store-font-family-display-serif)">
+      <div class="store-notice"><div class="store-wrap">Loja fictícia de demonstração — contatos e políticas fictícios; não realiza vendas.</div></div>
+      <header class="store-header">
+        <div class="store-wrap">
+          <a class="store-name display" href="#c4">Ateliê Ipê</a>
+          <nav class="store-nav" aria-label="Navegação da loja"><ul><li><a href="#c4">Catálogo</a></li><li><a href="#c4" aria-current="page">Canecas</a></li><li><a href="#c4">Pratos e travessas</a></li><li><a href="#c4">Sobre</a></li><li><a href="#c4">Atendimento</a></li></ul></nav>
+          <form class="store-search" role="search" aria-label="Buscar na loja"><label class="sr-only" for="c4-q">Buscar produto ou SKU</label><input class="input" id="c4-q" type="search" placeholder="Buscar produto ou SKU" maxlength="100"><button class="btn btn-store-secondary" type="button" aria-label="Pesquisar"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></button></form>
+          <a class="store-cart btn btn-store-secondary" href="#c5">Carrinho</a>
+        </div>
+      </header>
+      <div class="store-wrap">
+        <ol class="store-crumbs" aria-label="Você está em (vitrine)"><li><a href="#c4">Catálogo</a></li><li><a href="#c4">Canecas</a></li><li aria-current="page">Caneca esmaltada Ipê 350 ml</li></ol>
+        <div class="pdp">
+          <div class="gallery">
+            <figure class="media" style="margin:0" id="c4-main">
+              <svg class="ill" viewBox="0 0 200 250" role="img" aria-label="Ilustração demonstrativa: caneca esmaltada azul" id="c4-main-svg" style="color:#2F5D8A"><use href="#ill-mug"/></svg>
+            </figure>
+            <p class="media-note">Ilustração demonstrativa — não é fotografia do produto.</p>
+            <ul class="thumbs" aria-label="Imagens do produto">
+              <li><button type="button" aria-current="true" aria-label="Ver cor Azul" data-color="#2F5D8A" data-name="azul"><svg viewBox="0 0 200 250" style="color:#2F5D8A" aria-hidden="true"><use href="#ill-mug"/></svg></button></li>
+              <li><button type="button" aria-current="false" aria-label="Ver cor Verde" data-color="#4E7A5A" data-name="verde"><svg viewBox="0 0 200 250" style="color:#4E7A5A" aria-hidden="true"><use href="#ill-mug"/></svg></button></li>
+              <li><button type="button" aria-current="false" aria-label="Ver cor Areia" data-color="#C9B28F" data-name="areia"><svg viewBox="0 0 200 250" style="color:#C9B28F" aria-hidden="true"><use href="#ill-mug"/></svg></button></li>
+            </ul>
+          </div>
+          <div class="buy">
+            <div class="stack-sm">
+              <h1>Caneca esmaltada Ipê 350 ml</h1>
+              <p class="price" data-cents="6490">R$ 64,90</p>
+              <p class="small muted">Preço por unidade. Frete calculado no carrinho pelo CEP.</p>
+            </div>
+            <form class="stack-sm" aria-label="Adicionar Caneca esmaltada Ipê 350 ml">
+              <fieldset><legend>Cor: <span id="c4-color-name">Azul</span></legend>
+                <div class="options">
+                  <div class="option"><input type="radio" name="c4-v" id="c4-v1" value="CAN-IPE-AZ" checked data-name="Azul" data-color="#2F5D8A" data-stock="18 disponíveis"><label for="c4-v1"><span class="swatch-dot" style="background:#2F5D8A"></span>Azul<svg class="icon tick" aria-hidden="true"><use href="#i-tick"/></svg></label></div>
+                  <div class="option"><input type="radio" name="c4-v" id="c4-v2" value="CAN-IPE-VD" data-name="Verde" data-color="#4E7A5A" data-stock="12 disponíveis"><label for="c4-v2"><span class="swatch-dot" style="background:#4E7A5A"></span>Verde<svg class="icon tick" aria-hidden="true"><use href="#i-tick"/></svg></label></div>
+                  <div class="option"><input type="radio" name="c4-v" id="c4-v3" value="CAN-IPE-AR" disabled aria-describedby="c4-v3-why"><label for="c4-v3"><span class="swatch-dot" style="background:#C9B28F"></span>Areia · esgotada</label></div>
+                </div>
+                <p class="hint" id="c4-v3-why">Areia está esgotada no momento.</p>
+              </fieldset>
+              <p class="stock"><span id="c4-stock">18 disponíveis</span> · SKU <span id="c4-sku">CAN-IPE-AZ</span></p>
+              <div class="qty-row">
+                <div class="field"><label for="c4-qty">Quantidade</label><input class="input" id="c4-qty" type="number" min="1" max="18" value="1" inputmode="numeric"></div>
+                <button class="btn btn-store" type="button" data-demo="c4-add-status" data-msg="Protótipo: nada foi adicionado ao carrinho.">Adicionar ao carrinho</button>
+              </div>
+              <p class="small" role="status" id="c4-add-status"></p>
+            </form>
+            <div class="info-list">
+              <section aria-labelledby="c4-d1"><h2 id="c4-d1">Descrição</h2><p class="small">Caneca torneada à mão, esmalte brilhante por dentro e por fora. Capacidade de 350 ml, alça larga. Cada peça tem pequenas variações de cor do esmalte.</p></section>
+              <section aria-labelledby="c4-d2"><h2 id="c4-d2">Cuidados</h2><p class="small">Pode ir ao micro-ondas e à lava-louças. Evite choque térmico (água fervente em peça gelada).</p></section>
+              <section aria-labelledby="c4-d3"><h2 id="c4-d3">Entrega e trocas</h2><p class="small">Entrega por tabela de CEP na Grande São Paulo ou retirada no ateliê. Arrependimento em até 7 dias do recebimento, pelo acompanhamento do pedido.</p></section>
+            </div>
+          </div>
+        </div>
+        <section class="stack-sm" aria-labelledby="c4-more" style="padding-bottom:var(--space-48)">
+          <h2 id="c4-more" class="display" style="font-size:var(--font-size-20)">Mais do ateliê</h2>
+          <ul class="tiles">
+            <li class="tile"><div class="media"><svg class="ill" viewBox="0 0 200 250" role="img" aria-label="Ilustração demonstrativa: pires" style="color:#E3DCCF"><use href="#ill-saucer"/></svg></div><a href="#c4">Pires de apoio 14 cm</a><span class="price-sm" data-cents="3800">R$ 38,00</span></li>
+            <li class="tile"><div class="media"><svg class="ill" viewBox="0 0 200 250" role="img" aria-label="Ilustração demonstrativa: prato raso" style="color:#D9D3C7"><use href="#ill-plate"/></svg></div><a href="#c4">Prato raso 26 cm</a><span class="price-sm">a partir de <span data-cents="7200">R$ 72,00</span></span></li>
+            <li class="tile"><div class="media"><svg class="ill" viewBox="0 0 200 250" role="img" aria-label="Ilustração demonstrativa: tigela verde" style="color:#4E7A5A"><use href="#ill-bowl"/></svg></div><a href="#c4">Tigela funda 600 ml</a><span class="price-sm"><span data-cents="5400">R$ 54,00</span> · <span class="muted">esgotada</span></span></li>
+            <li class="tile"><div class="media no-photo-media"><svg class="icon" aria-hidden="true"><use href="#i-image-off"/></svg><span>Sem foto</span></div><a href="#c4">Jogo de 4 xícaras de café com pires — edição esmaltada artesanal</a><span class="price-sm" data-cents="11990">R$ 119,90</span></li>
+          </ul>
+        </section>
+      </div>
+      <footer class="store-footer">
+        <div class="store-wrap cols">
+          <section aria-labelledby="c4-f1"><h2 id="c4-f1">Fornecedor e atendimento</h2><p>Ateliê Ipê Cerâmica (fictício)</p><p>Documento: não informado — loja de demonstração</p><p>Rua Exemplo, 100 — Vila Madalena, São Paulo/SP (endereço fictício)</p><p><a href="#c4">contato@atelie-ipe.exemplo.test</a></p></section>
+          <section aria-labelledby="c4-f2"><h2 id="c4-f2">Entrega e restrições</h2><p>Tabela de CEP da Grande São Paulo e retirada no ateliê. Sem envio para outras regiões nesta demonstração.</p></section>
+          <section aria-labelledby="c4-f3"><h2 id="c4-f3">Políticas</h2><p><a href="#c4">Trocas e arrependimento</a></p><p><a href="#c4">Privacidade</a></p><p><a href="#c4">Fale com a loja</a></p></section>
+        </div>
+      </footer>
+    </div>
+  </div>
+</section>
+
+<!-- =================== C5 CHECKOUT =================== -->
+<section class="frame" id="c5" aria-labelledby="c5-t">
+  <div class="frame-head"><p class="caption">Composição 5 · Vitrine · Rota real <code>/lojas/[slug]/carrinho</code> (checkout dentro do carrinho) · Lote 3</p><h2 id="c5-t">Checkout — revisão antes de confirmar</h2><p>Etapas concluídas viram resumos editáveis; custos sempre visíveis. Abaixo, dois outros estados da mesma tela: CEP sem entrega (erro de formulário) e pedido aguardando pagamento (estado financeiro pendente). O botão de confirmar não cria pedido.</p></div>
+  <div class="screen">
+    <div class="store" style="--store-color-accent:#9A3B26;--store-color-accent-fill:#9A3B26;--store-color-on-accent:#FFFFFF;--store-color-accent-border:#9A3B26;--store-color-accent-text:#9A3B26;--store-color-accent-tint:#F5EBE9;--store-font-family-display:var(--store-font-family-display-serif)">
+      <div class="store-notice"><div class="store-wrap">Pagamento em ambiente SIMULADO — nenhum valor real é cobrado.</div></div>
+      <header class="checkout-head">
+        <div class="store-wrap">
+          <a class="store-name display" href="#c4">Ateliê Ipê</a>
+          <a class="small" href="#c4"><span aria-hidden="true">← </span>Continuar comprando</a>
+        </div>
+      </header>
+      <div class="store-wrap">
+        <ol class="steps" aria-label="Etapas da compra">
+          <li class="done"><span class="n">1</span>Carrinho</li>
+          <li class="done"><span class="n">2</span>Entrega</li>
+          <li class="done"><span class="n">3</span>Seus dados</li>
+          <li aria-current="step"><span class="n">4</span>Revisão</li>
+        </ol>
+        <div class="checkout">
+          <section class="order-summary" aria-labelledby="c5-sum-t">
+            <h2 id="c5-sum-t">Resumo do pedido</h2>
+            <ul class="line-items">
+              <li><span class="thumb"><svg viewBox="0 0 200 250" style="color:#4E7A5A" aria-hidden="true"><use href="#ill-mug"/></svg></span><span>Caneca esmaltada Ipê 350 ml<br><span class="muted">Verde · 1 × R$ 64,90</span></span><span class="money" data-cents="6490" data-qty="1" data-unit="6490" data-part="chk chks">R$ 64,90</span></li>
+              <li><span class="thumb"><svg viewBox="0 0 200 250" style="color:#D9D3C7" aria-hidden="true"><use href="#ill-plate"/></svg></span><span>Prato raso 26 cm<br><span class="muted">Branco · 1 × R$ 72,00</span></span><span class="money" data-cents="7200" data-qty="1" data-unit="7200" data-part="chk chks">R$ 72,00</span></li>
+            </ul>
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd class="money" data-cents="13690" data-sum="chks">R$ 136,90</dd></div>
+              <div><dt>Frete · Entrega SP</dt><dd class="money" data-cents="2000" data-part="chk">R$ 20,00</dd></div>
+              <div class="grand"><dt>Total</dt><dd class="money" data-cents="15690" data-sum="chk">R$ 156,90</dd></div>
+            </dl>
+            <p class="small muted">Valores recalculados pela loja. Cotação de frete válida até 14:27; depois disso o total é recalculado antes de confirmar.</p>
+          </section>
+
+          <div class="checkout-main">
+            <section class="step-block is-done" aria-labelledby="c5-s2">
+              <header><h2 id="c5-s2">Entrega</h2><button class="btn btn-store-secondary btn-sm" type="button">Alterar entrega</button></header>
+              <dl class="summary"><dt>Endereço</dt><dd>Avenida Paulista, 1000, conj. 12 — São Paulo/SP · CEP 01310-100</dd><dt>Método</dt><dd>Entrega SP — tabela de CEP · até 3 dias úteis · <span class="money" data-cents="2000">R$ 20,00</span></dd></dl>
+            </section>
+            <section class="step-block is-done" aria-labelledby="c5-s3">
+              <header><h2 id="c5-s3">Seus dados</h2><button class="btn btn-store-secondary btn-sm" type="button">Corrigir dados</button></header>
+              <dl class="summary"><dt>Nome</dt><dd>Rafael Moreira <span class="muted">(fictício)</span></dd><dt>E-mail para comprovante</dt><dd>rafael.m@exemplo.test</dd></dl>
+            </section>
+            <section class="step-block" aria-labelledby="c5-s4">
+              <header><h2 id="c5-s4">Pagamento</h2></header>
+              <fieldset class="pay-options"><legend class="sr-only">Forma de pagamento</legend>
+                <label class="pay-option"><input type="radio" name="c5-pay" checked><span><strong>Pix</strong><br><span class="small muted">O código vale 30 minutos. O pedido só é confirmado quando a loja recebe a confirmação do pagamento.</span></span></label>
+                <label class="pay-option"><input type="radio" name="c5-pay"><span><strong>Cartão de crédito</strong><br><span class="small muted">Os dados do cartão são digitados no formulário do meio de pagamento, não nesta loja.</span></span></label>
+              </fieldset>
+            </section>
+            <section class="confirm" aria-labelledby="c5-conf-t">
+              <h2 id="c5-conf-t" class="sr-only">Confirmação</h2>
+              <p class="small">Ao confirmar, você aceita as <a href="#c4">políticas do fornecedor</a>. Os itens ficam reservados por até 40 minutos aguardando o pagamento.</p>
+              <button class="btn btn-store" type="button" data-demo="c5-conf-status" data-msg="Protótipo: nenhum pedido foi criado e nada foi cobrado.">Confirmar compra de R$ 156,90</button>
+              <p class="small" role="status" id="c5-conf-status"></p>
+            </section>
+          </div>
+        </div>
+
+        <div class="states">
+          <section class="state-card" aria-labelledby="c5-e-t">
+            <span class="state-label">Outro estado · erro de formulário</span>
+            <h3 id="c5-e-t">Entrega — CEP sem atendimento</h3>
+            <form class="form" novalidate aria-label="Calcular frete (estado de erro)">
+              <div class="field is-invalid"><label for="c5-cep">CEP</label><input class="input" id="c5-cep" value="99999-999" inputmode="numeric" autocomplete="postal-code" aria-invalid="true" aria-describedby="c5-cep-e"><p class="error-text" id="c5-cep-e"><svg class="icon icon-16" aria-hidden="true"><use href="#i-alert"/></svg>A loja não entrega neste CEP pela tabela de frete. Informe outro CEP ou escolha retirada no ateliê.</p></div>
+              <div class="form-grid"><div class="field"><label for="c5-rua">Rua</label><input class="input" id="c5-rua" value="Rua Fictícia" autocomplete="address-line1"></div><div class="field"><label for="c5-num">Número</label><input class="input" id="c5-num" value="45"></div></div>
+              <div class="form-grid"><div class="field"><label for="c5-cid">Cidade</label><input class="input" id="c5-cid" value="Cidade Exemplo" autocomplete="address-level2"></div><div class="field"><label for="c5-uf">UF</label><input class="input" id="c5-uf" value="SP" maxlength="2" autocomplete="address-level1"></div></div>
+              <div class="cluster"><button class="btn btn-store" type="button">Calcular frete</button><button class="btn btn-store-secondary" type="button">Retirar no ateliê</button></div>
+              <p class="small muted">Os dados digitados são mantidos. Nenhum frete é inventado quando não há regra para o CEP.</p>
+            </form>
+          </section>
+          <section class="state-card" aria-labelledby="c5-p-t">
+            <span class="state-label">Outro estado · pagamento pendente</span>
+            <p class="caption">Acompanhamento · <code>/lojas/[slug]/pedidos/[id]</code></p>
+            <h3 id="c5-p-t">Pedido nº 1043</h3>
+            <div class="alert alert-warning" role="status"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><div><p class="alert-title">Aguardando confirmação do pagamento</p><p>O Pix vence às 14:51. Voltar do aplicativo do banco não confirma o pagamento; esta página atualiza sozinha quando a loja receber a confirmação.</p></div></div>
+            <dl class="summary"><dt>Pedido</dt><dd><span class="badge badge-neutral">Aberto</span></dd><dt>Pagamento</dt><dd><span class="badge badge-warning">Aguardando confirmação</span></dd><dt>Entrega</dt><dd><span class="badge badge-neutral">Não enviado</span></dd><dt>Total</dt><dd class="money" data-cents="15690">R$ 156,90</dd><dt>Reserva</dt><dd>Itens reservados até 15:00</dd></dl>
+            <p class="small muted">Realizado em 02/10/2026 às 14:20. Guarde o link recebido por e-mail para acompanhar o pedido.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+// Comportamento mínimo do protótipo. Nenhuma chamada de rede; nada é salvo.
+(function () {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  // Mensagens de demonstração: deixam claro que nada aconteceu de verdade.
+  $$('[data-demo]').forEach((b) => b.addEventListener('click', () => { const t = document.getElementById(b.dataset.demo); if (t) t.textContent = b.dataset.msg; }));
+  $$('form[data-demo-form]').forEach((f) => f.addEventListener('submit', (e) => { e.preventDefault(); document.getElementById(f.dataset.demoForm).textContent = 'Protótipo: nenhuma informação foi salva.'; }));
+  // Diálogo nativo: foco inicial (autofocus), Esc fecha, foco retorna ao botão de origem.
+  $$('[data-dialog]').forEach((b) => b.addEventListener('click', () => { const d = document.getElementById(b.dataset.dialog); d.returnTarget = b; d.showModal(); }));
+  $$('dialog').forEach((d) => d.addEventListener('close', () => { if (d.returnValue === 'confirm') { const s = $('#c3-addr-status'); if (s) s.textContent = 'Protótipo: nenhum pedido foi cancelado.'; } d.returnTarget?.focus(); }));
+  // Filtro local da listagem de produtos.
+  const q = $('#c1-q'), rows = $$('#c1-table tbody tr'), empty = $('#c1-empty'), status = $('#c1-status'), count = $('#c1-count');
+  let filter = 'all';
+  const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  function apply() {
+    const term = norm(q.value.trim()); let shown = 0;
+    rows.forEach((r) => { const ok = (filter === 'all' || r.dataset.status === filter) && (!term || norm(r.dataset.search).includes(term)); r.hidden = !ok; if (ok) shown++; });
+    $('#c1-table').hidden = shown === 0; empty.hidden = shown !== 0;
+    status.textContent = `Mostrando ${shown} de ${rows.length} produtos`; count.textContent = `${rows.length} produtos`;
+  }
+  q.addEventListener('input', apply);
+  $$('[data-filter]').forEach((b) => b.addEventListener('click', () => { filter = b.dataset.filter; $$('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); apply(); }));
+  $('#c1-clear').addEventListener('click', () => { q.value = ''; filter = 'all'; $$('[data-filter]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.filter === 'all'))); apply(); q.focus(); });
+  // Variação e galeria da vitrine.
+  const main = $('#c4-main-svg');
+  const show = (color, name) => { main.style.color = color; main.setAttribute('aria-label', `Ilustração demonstrativa: caneca esmaltada ${name}`); $$('.thumbs button').forEach((t) => t.setAttribute('aria-current', String(t.dataset.color === color))); };
+  $$('input[name="c4-v"]').forEach((i) => i.addEventListener('change', () => { $('#c4-color-name').textContent = i.dataset.name; $('#c4-stock').textContent = i.dataset.stock; $('#c4-sku').textContent = i.value; $('#c4-qty').max = parseInt(i.dataset.stock, 10); show(i.dataset.color, i.dataset.name.toLowerCase()); }));
+  $$('.thumbs button').forEach((t) => t.addEventListener('click', () => show(t.dataset.color, t.dataset.name)));
+})();
+</script>
+</body>
+</html>
