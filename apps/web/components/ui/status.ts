@@ -40,3 +40,9 @@ export const INCIDENT: Record<string, { title: string; next: string; financial: 
   REFUND_FAILED: { title: 'Devolução falhou', next: 'Verifique o saldo no Mercado Pago e tente a devolução por lá.', financial: true },
 };
 export const incident = (code: string) => INCIDENT[code] ?? { title: 'Pendência operacional', next: 'Revise o pedido.', financial: false };
+
+// Alertas operacionais (operations/status e platform/alerts): título legível; o código continua disponível como detalhe.
+export const ALERT_TITLE: Record<string, string> = { FINANCIAL_INCIDENT_OPEN: 'Pendência financeira aberta', PAYMENT_UNCERTAIN: 'Pagamento sem resultado conclusivo', FINANCIAL_COMMUNICATION_PENDING: 'Comunicação ao meio de pagamento pendente', SUPPORT_OVERDUE: 'Protocolos com prazo vencido', NOTIFICATION_BACKLOG: 'E-mails pendentes há mais de 15 minutos', NOTIFICATION_FAILED: 'E-mails que falharam', OUTBOX_BACKLOG: 'Eventos internos atrasados', OUTBOX_FAILED: 'Eventos internos com falha', INBOX_BACKLOG: 'Notificações do meio de pagamento não processadas' };
+// Textos do servidor (ex.: motivos de bloqueio) podem citar códigos internos; a apresentação troca pelo título do incidente.
+export const humanize = (text: string) => text.replace(/\b[A-Z][A-Z_]{5,}\b/g, (code) => (INCIDENT[code] ? `“${INCIDENT[code]!.title}”` : code));
+export const INTERVAL: Record<string, string> = { MONTH: 'mensal', YEAR: 'anual', NONE: 'sem cobrança' };

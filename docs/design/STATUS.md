@@ -8,8 +8,8 @@
 | Lote | Situação | Verificação |
 |---|---|---|
 | A — fundamentos, acesso e painel | **Concluído** (tokens gerados em `apps/web/app/style.css`, fonte em `apps/web/app/fonts/`, componentes `components/ui/`, casca `components/panel/Shell.tsx` + `app/painel/[tenantId]/layout.tsx`, R01 e R02) | typecheck/build ok; `foundation.test.mjs` aprovado; `storefront.test.mjs` aprovado exceto T23 (falha preexistente do proxy do Next com upload de 10 MB rejeitado — reproduzida na web da base `831d9a2`); capturas em 390/768/1440 examinadas |
-| B — operação e administração | Em andamento (R03, R04, R05 reescritas; R06 a fazer) | — |
-| C — vitrine e compra | Pendente | — |
+| B — operação e administração | **Concluído** (R03 com filtros na URL e síntese do estado, R04, R05 com `commercial.tsx`/`ai-draft.tsx`, R06 com contexto global) | typecheck/build ok; `purchase-worker`, `pilot-flow` e `commercial-ui` aprovados (seletores de número do pedido e protocolo passaram de botão para link); capturas em 390/768/1440 examinadas |
+| C — vitrine e compra | Em andamento | — |
 
 Ambiente usado: Postgres 17.9/Redis/SeaweedFS do `compose.yaml` em contêiner; API, worker e web no host com Node 24.21.0; suítes de UI no contêiner oficial `mcr.microsoft.com/playwright:v1.63.0-noble` com `--network host --add-host web:127.0.0.1`. Detalhes no relatório final.
 

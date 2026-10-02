@@ -8,7 +8,7 @@ import { call, fields, useAction } from '../../../../components/panel/api';
 import { usePanel } from '../../../../components/panel/Shell';
 import { Alert, Badge, ConfirmDialog, CopyButton, EmptyState, Feedback, Field, Loading, PageHeader, StatusBadge, useTitle } from '../../../../components/ui/kit';
 import { Icon } from '../../../../components/ui/icons';
-import { ACCOUNT_STATUS, ATTEMPT_STATUS, DISPUTE_STATUS, FULFILLMENT_STATUS, HISTORY_EVENT, incident, NOTIFICATION, NOTIFICATION_TEMPLATE, ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS, SUPPORT_KIND, SUPPORT_STATUS, TRANSACTION_CLASS, label } from '../../../../components/ui/status';
+import { ACCOUNT_STATUS, ATTEMPT_STATUS, DISPUTE_STATUS, FULFILLMENT_STATUS, HISTORY_EVENT, incident, NOTIFICATION, NOTIFICATION_TEMPLATE, ORDER_STATUS, PAYMENT_METHOD, PAYMENT_STATUS, SUPPORT_KIND, SUPPORT_STATUS, TRANSACTION_CLASS, humanize, label } from '../../../../components/ui/status';
 import { formatDateTime, money, zoneNote } from '../../../../components/ui/format';
 
 type Row = { id: string; number: string; order_status: string; payment_status: string; fulfillment_status: string; dispute_status: string; total_cents: string; created_at: string; delivery_kind: string; open_incidents: number; refund_due_cents: string; open_requests: number };
@@ -159,7 +159,7 @@ function OrderDetail({ id, back }: { id: string; back: string }) {
         <section className="section" aria-labelledby="t-ship"><div className="section-head"><h2 id="t-ship">Expedição</h2></div>
           <div className="stack-sm">
             {shipped && <p>{shipped.kind === 'PICKUP' ? (shipped.delivered_at ? `Retirado em ${formatDateTime(shipped.delivered_at, p.timezone)}.` : shipped.ready_at ? 'Pronto para retirada; o comprador foi avisado.' : 'Retirada na loja.') : `Enviado por ${shipped.carrier}${shipped.tracking_code ? ` · rastreio ${shipped.tracking_code}` : ''}${shipped.delivered_at ? ` · entregue em ${formatDateTime(shipped.delivered_at, p.timezone)}` : ''}.`}</p>}
-            {blocked && <div id="why-blocked" className="blocked"><p className="small"><strong>Envio bloqueado.</strong> Motivos informados pelo servidor:</p><ul>{blocks.map((b) => <li key={b}>{b}</li>)}</ul></div>}
+            {blocked && <div id="why-blocked" className="blocked"><p className="small"><strong>Envio bloqueado.</strong> Motivos informados pelo servidor:</p><ul>{blocks.map((b) => <li key={b}>{humanize(b)}</li>)}</ul></div>}
             {next ?? (d.order_status === 'CANCELLED' ? <p className="small muted">Pedido cancelado: nenhum envio pode ser criado.</p> : d.fulfillment_status === 'DELIVERED' ? <p className="small muted">Entrega concluída.</p> : null)}
             {['SHIPPED', 'DELIVERED'].includes(d.fulfillment_status) && <details className="disclosure"><summary>Registrar devolução física</summary><form className="form form-col" aria-label="Registrar devolução física" onSubmit={form((b) => t(o('return'), 'POST', b), 'Devolução física registrada; o estoque não foi reposto automaticamente.')}><Field label="Conferência da devolução">{(a) => <input className="input" name="note" required maxLength={500} {...a} />}</Field><div><button className="btn btn-secondary" disabled={busy}>Registrar devolução física</button></div></form></details>}
           </div>

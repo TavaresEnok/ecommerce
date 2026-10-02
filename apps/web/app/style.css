@@ -340,7 +340,9 @@ table.data tr.is-selected td:first-child { box-shadow: inset 3px 0 0 var(--_sele
   table.stack tr { padding: var(--space-12) var(--space-16); border-bottom: 1px solid var(--_border); }
   table.stack tbody tr:last-child { border-bottom: 0; }
   table.stack td { display: flex; justify-content: space-between; gap: var(--space-16); padding: var(--space-4) 0; border: 0; text-align: right; }
-  table.stack td::before { content: attr(data-label); color: var(--_muted); text-align: left; font-weight: var(--font-weight-medium); }
+  table.stack td::before { content: attr(data-label); color: var(--_muted); text-align: left; font-weight: var(--font-weight-medium); flex: none; max-width: 45%; }
+  table.stack td > * { min-width: 0; }
+  table.stack td code { overflow-wrap: anywhere; word-break: break-all; }
   table.stack td.primary { text-align: left; padding-bottom: var(--space-8); }
   table.stack td.primary::before { display: none; }
   table.stack tr.is-selected { background: var(--_selected-bg); box-shadow: inset 3px 0 0 var(--_selected-mark); }
