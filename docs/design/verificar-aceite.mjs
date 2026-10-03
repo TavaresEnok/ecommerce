@@ -19,6 +19,10 @@ const out = join(here, 'evidencias', 'depois'); mkdirSync(out, { recursive: true
 const results = [];
 const check = (id, ok, detail) => { results.push({ id, ok, detail }); console.log(`${ok ? 'ok   ' : 'FALHA'} ${id} — ${detail}`); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Conexão keep-alive fechada pelo servidor enquanto o teste espera (ex.: reinício do worker): repete a requisição uma vez.
+// Só para falhas de soquete antes da resposta; a confirmação de compra leva chave de idempotência.
+const rawFetch = globalThis.fetch;
+globalThis.fetch = async (url, init) => { try { return await rawFetch(url, init); } catch (e) { if (!['UND_ERR_SOCKET', 'ECONNRESET'].includes(e?.cause?.code)) throw e; return rawFetch(url, init); } };
 
 // --- API (mesmos endpoints da interface) ---
 async function api(path, { method = 'GET', body, actor } = {}) {
@@ -38,7 +42,7 @@ async function open(width, actor, opts = {}) { const ctx = await browser.newCont
 const shot = (page, id) => page.screenshot({ path: join(out, `aceite-${id}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
 const overflow = (page) => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
 const only = ((process.argv.find((a) => a.startsWith('--only=')) || '').slice(7)).split(',').filter(Boolean);
-async function step(id, fn) { if (only.length && !only.includes(id)) return; try { await fn(); } catch (e) { check(id, false, `erro: ${e.message.split('\n').slice(0, 3).join(' ').slice(0, 300)}`); if (last && !last.isClosed()) await last.screenshot({ path: join(out, `aceite-falha-${id.replace(/\W+/g, '-')}.jpg`), type: 'jpeg', quality: 50, fullPage: true }).catch(() => {}); } }
+async function step(id, fn) { if (only.length && !only.includes(id)) return; try { await fn(); } catch (e) { check(id, false, `erro: ${e.message.split('\n').slice(0, 3).join(' ').slice(0, 300)}${e.cause?.code ? ` (${e.cause.code})` : ''}`); if (last && !last.isClosed()) await last.screenshot({ path: join(out, `aceite-falha-${id.replace(/\W+/g, '-')}.jpg`), type: 'jpeg', quality: 50, fullPage: true }).catch(() => {}); } }
 
 // G-09 movimento reduzido · G-10 fonte e números tabulares
 await step('G-09/G-10', async () => {
@@ -191,7 +195,8 @@ const compose = (args, env = {}) => { const r = spawnSync('docker', [...composeA
 const dbName = (readFileSync(join(repo, '.local/test.env'), 'utf8').match(/^MIGRATION_DATABASE_URL=.*\/([^/?\s]+)/m) || [])[1];
 // SQL só para simular passagem de tempo em dado sintético do projeto isolado (nunca em outro projeto).
 const psql = (sql) => compose(['exec', '-T', 'postgres', 'psql', '-U', 'postgres', '-d', dbName, '-v', 'ON_ERROR_STOP=1', '-c', sql]);
-const latestOrder = async () => (await api(`tenants/${A.id}/purchase/orders`, { actor: owner })).body[0];
+// purchase/orders ordena por number::text (texto: “9” vem antes de “21”; defeito preexistente da API, fora do redesign): o mais recente é o de maior número.
+const latestOrder = async () => (await api(`tenants/${A.id}/purchase/orders`, { actor: owner })).body.reduce((a, b) => (BigInt(b.number) > BigInt(a.number) ? b : a));
 const addr = { cep: '01001000', street: 'Rua das Acácias', number: '120', city: 'São Paulo', state: 'SP', complement: '' };
 async function publicOrder(slug, { product = 'caneca-cafe', kind = 'TABLE', address = addr, buyer = { name: 'Aceite TESTE', email: 'aceite@example.test' } } = {}) {
   const v = (await api(`public/stores/${slug}/products/${product}`)).body.variants.find((x) => x.available > 0).id;
@@ -233,7 +238,7 @@ await step('CK-01', async () => {
   await shot(page, 'CK-01-390');
   await page.getByRole('button', { name: 'Verificar compra' }).dblclick(); await page.waitForURL(orderUrl); await page.getByRole('heading', { name: /^Pedido nº/ }).waitFor(); await sleep(800);
   const id = page.url().split('/').at(-1), after = await orderCount();
-  check('CK-01', denies === 0 && mid === before + 1 && after === before + 1 && id === created && locked, `resposta perdida após a criação: alerta “Não sabemos se a compra foi registrada”, nenhuma frase de inexistência (${denies}); itens, entrega e dados travados: ${locked}; “Verificar compra” (duplo clique) abriu o pedido já criado: ${id === created}; pedidos ${before} → ${mid} → ${after}`);
+  check('CK-01', denies === 0 && mid === before + 1 && after === before + 1 && id === created && locked, `resposta perdida após a criação: alerta “Não sabemos se a compra foi registrada”, nenhuma frase de inexistência (${denies}); itens, entrega e dados travados: ${locked}; “Verificar compra” (duplo clique) abriu o pedido já criado: ${id === created} (${id.slice(0, 13)} / ${created.slice(0, 13)}); pedidos ${before} → ${mid} → ${after}`);
   await ctx.close();
 });
 // CK-02 recarga com a confirmação sem resposta: a intenção salva reaparece e é verificada com a mesma chave.
@@ -245,7 +250,7 @@ await step('CK-02', async () => {
   await shot(page, 'CK-02-1440');
   await page.getByRole('button', { name: 'Verificar compra' }).click(); await page.waitForURL(orderUrl); await sleep(800);
   const id = page.url().split('/').at(-1), after = await orderCount(), stored = await page.evaluate(() => Object.keys(sessionStorage).filter((k) => k.startsWith('checkout-pendente')).length);
-  check('CK-02', after === before + 1 && id === created && locked && stored === 0, `após recarregar: aviso de confirmação sem resposta, carrinho e entrega travados (${locked}); verificação abriu o pedido já criado (${id === created}); pedidos ${before} → ${after}; intenção pendente removida após o sucesso (${stored === 0})`);
+  check('CK-02', after === before + 1 && id === created && locked && stored === 0, `após recarregar: aviso de confirmação sem resposta, carrinho e entrega travados (${locked}); verificação abriu o pedido já criado (${id === created}: ${id.slice(0, 13)} / ${created.slice(0, 13)}); pedidos ${before} → ${after}; intenção pendente removida após o sucesso (${stored === 0})`);
   await ctx.close();
 });
 // CK-03 rejeição conclusiva (400 de conteúdo) → correção dos dados → um único pedido.

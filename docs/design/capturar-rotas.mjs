@@ -5,8 +5,9 @@
 // docs/design/ambiente/gerar-dados.mjs; Chromium via docs/design/ambiente/navegador.mjs (não instala nada).
 // --zoom=N SIMULA o zoom de N×: viewport CSS = largura/N com deviceScaleFactor N (o mesmo reflow de CSS que o zoom
 // produz; o zoom da interface do navegador não é acionado — Playwright não o expõe em modo headless).
-// --texto=P aplica font-size P% na raiz (como a configuração “tamanho da fonte” do navegador): textos, espaços e
-// controles em rem crescem na mesma largura. Saída: docs/design/evidencias/<rótulo>/*.jpg e resultado.json.
+// --texto=P muda o tamanho de fonte padrão do navegador para P% (CDP Page.setFontSizes — a mesma preferência
+// “tamanho da fonte” das configurações do Chrome): textos, espaços e controles em rem crescem e os pontos de quebra
+// em em (48em/64em) passam a valer na largura proporcional, como para quem usa fonte grande. Saída: docs/design/evidencias/<rótulo>/*.jpg e resultado.json.
 import { createHmac } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -127,6 +128,7 @@ for (const s of scenarios) {
     const context = await browser.newContext({ viewport: { width: Math.round(width / zoom), height: Math.round(900 / zoom) }, deviceScaleFactor: zoom });
     if (cookies[s.persona].length) await context.addCookies(cookies[s.persona]);
     const page = await context.newPage();
+    if (texto !== 100) { const cdp = await context.newCDPSession(page); await cdp.send('Page.setFontSizes', { fontSizes: { standard: Math.round(16 * texto / 100), fixed: Math.round(13 * texto / 100) } }); }
     const errors = [];
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
     page.on('pageerror', (e) => errors.push(`pageerror: ${e.message.slice(0, 200)}`));
@@ -137,7 +139,6 @@ for (const s of scenarios) {
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {}); await page.waitForTimeout(600);
       if (s.legacy && process.argv.includes('--legacy')) await s.legacy(page);
       if (s.act && !process.argv.includes('--legacy')) await s.act(page);
-      if (texto !== 100) { await page.addStyleTag({ content: `html { font-size: ${texto}% !important; }` }); await page.waitForTimeout(400); }
       await page.evaluate(() => document.fonts.ready);
       const report = await page.evaluate(() => {
         const overflow = document.documentElement.scrollWidth - window.innerWidth;
@@ -149,9 +150,12 @@ for (const s of scenarios) {
         const small = [...document.querySelectorAll('main button, main a.btn, main [role=button], main input[type=radio]+label, main input[type=checkbox]')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 24 || r.width < 24); }).length;
         // Ações principais de toque abaixo de 44×44 px em telas estreitas (meta layout.touch-target).
         const small44 = window.innerWidth < 768 ? [...document.querySelectorAll('main .btn:not(.btn-sm), main input[type=radio]+label, .store-nav a, .category-nav a, .thumbs button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 43.5 || r.width < 43.5); }).map((e) => (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30)) : [];
-        return { overflow, unnamed, small, small44, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
+        return { overflow, unnamed, small, small44, fonteRaiz: getComputedStyle(document.documentElement).fontSize, layoutLargo: matchMedia('(min-width: 64em)').matches, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
       });
-      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}${texto !== 100 ? `-t${texto}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
+      // fullPage do Playwright redefine as preferências de fonte durante a captura (a imagem sairia com 16 px):
+      // com --texto, a página inteira é capturada aumentando a altura da janela.
+      if (texto !== 100) await page.setViewportSize({ width, height: Math.min(16000, await page.evaluate(() => document.documentElement.scrollHeight)) });
+      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}${texto !== 100 ? `-t${texto}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: texto === 100 });
       results.push({ ...s, legacy: undefined, act: undefined, width, zoom, texto, status, ...report, errors });
       console.log(`${s.id} ${width}px · HTTP ${status} · overflow ${report.overflow}px · sem nome ${report.unnamed} · alvos<24 ${report.small} · <44 ${report.small44.length} · erros ${errors.length} · h1 "${report.h1.slice(0, 50)}"`);
     } catch (e) {

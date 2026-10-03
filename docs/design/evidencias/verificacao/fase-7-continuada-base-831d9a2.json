@@ -1,89 +1,90 @@
 {
   "phase": 7,
   "specification": "1.1",
-  "startedAt": "2026-10-03T01:54:49.812Z",
+  "startedAt": "2026-10-03T01:48:01.431Z",
   "environment": "ecommerce-phase7-test",
   "steps": [
     {
       "name": "Preparação isolada",
       "result": "passed",
-      "durationMs": 2521
+      "durationMs": 123
     },
     {
       "name": "Build em Node LTS",
       "result": "passed",
-      "durationMs": 119434
+      "durationMs": 114764
     },
     {
       "name": "Migrations, S3 privado e saúde",
       "result": "passed",
-      "durationMs": 18131
+      "durationMs": 16759
     },
     {
       "name": "Tipos",
       "result": "passed",
-      "durationMs": 19591
+      "durationMs": 18491
     },
     {
       "name": "Fase 3+4: núcleo transacional e operação do piloto com worker parado",
       "result": "passed",
-      "durationMs": 27161
+      "durationMs": 28551
     },
     {
       "name": "Worker real: T21, interface e T27 em duas lojas",
       "result": "failed",
-      "durationMs": 86103,
+      "durationMs": 86166,
       "error": "Falha em docker (código 1). "
     },
     {
       "name": "Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel",
-      "result": "passed",
-      "durationMs": 10194
+      "result": "failed",
+      "durationMs": 8482,
+      "error": "Falha em docker (código 1). "
     },
     {
       "name": "Regressões T01/T02, acesso, worker e UI da fundação",
       "result": "passed",
-      "durationMs": 10786
+      "durationMs": 10151
     },
     {
       "name": "Logs sanitizados",
       "result": "passed",
-      "durationMs": 234
+      "durationMs": 219
     },
     {
       "name": "Persistência S3 após reinício local",
       "result": "passed",
-      "durationMs": 17815
+      "durationMs": 28144
     },
     {
       "name": "CLI do operador: status e alertas por loja",
       "result": "passed",
-      "durationMs": 1962
+      "durationMs": 2000
     },
     {
       "name": "Backup PostgreSQL 17",
       "result": "passed",
-      "durationMs": 370
+      "durationMs": 359
     },
     {
       "name": "Fatos após o backup: pagamentos/devolução e eliminação com ledger externo",
       "result": "passed",
-      "durationMs": 15005
+      "durationMs": 6659
     },
     {
       "name": "Restore separado",
       "result": "passed",
-      "durationMs": 950
+      "durationMs": 1041
     },
     {
       "name": "Conferências após restore",
       "result": "passed",
-      "durationMs": 4154
+      "durationMs": 4122
     },
     {
       "name": "PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO)",
       "result": "passed",
-      "durationMs": 70341
+      "durationMs": 70428
     }
   ],
   "exitCode": 1,
@@ -101,9 +102,11 @@
     "PENDENTE_EXTERNA: decisões comerciais (D03 domínio/borda, D07 preço/recorrência/fiscal, D09 frete) e homologação dos provedores não registradas.",
     "PENDENTE_EXTERNA: homologação do provedor de IA real (chave, orçamento autorizado e chamada paga controlada) não registrada."
   ],
-  "sourceDigest": "33230c3b2aa736e79f0756d708ea5f5f6c63e3533bb5865a138f92be0ef80b27",
+  "sourceDigest": "735b4282c2c07c93427c069956dacaa7ebea9bcf8ef8b1266db4f411fc34be96",
   "continuedAfter": [
     "Worker real: T21, interface e T27 em duas lojas",
+    "Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel",
+    "storefront.json reprovado",
     "pilot-flow.json reprovado"
   ],
   "opsStatus": {
@@ -138,11 +141,11 @@
       "Rate limiting e sanitização de campos sensíveis",
       "EXPLAIN ANALYZE das consultas mínimas sem índices especulativos"
     ],
-    "completedAt": "2026-10-03T01:59:43.772Z"
+    "completedAt": "2026-10-03T01:52:44.807Z"
   },
   "restore": {
     "passed": true,
-    "completedAt": "2026-10-03T02:00:23.419Z",
+    "completedAt": "2026-10-03T01:53:26.516Z",
     "sourceDatabase": "ecommerce",
     "restoredDatabase": "ecommerce_restore",
     "postgresMajor": 17,
@@ -156,11 +159,11 @@
       "negação sem contexto",
       "ENABLE/FORCE RLS"
     ],
-    "checkDurationMs": 60,
+    "checkDurationMs": 59,
     "financialReconciliation": "Não aplicável: domínio de pagamentos ausente na Fase 1."
   },
   "storefront": {
-    "passed": true,
+    "passed": false,
     "criteria": [
       "T01",
       "T02",
@@ -190,7 +193,7 @@
       },
       {
         "name": "T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado",
-        "result": "passed"
+        "result": "failed"
       },
       {
         "name": "Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento",
@@ -259,11 +262,11 @@
               "Total Cost": 6.56,
               "Plan Rows": 1,
               "Plan Width": 31,
-              "Actual Startup Time": 0.229,
-              "Actual Total Time": 0.238,
+              "Actual Startup Time": 0.08,
+              "Actual Total Time": 0.086,
               "Actual Rows": 1,
               "Actual Loops": 1,
-              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff7c-d1c2-7084-a112-2fdd89d3d80c'::uuid)",
+              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff76-76f4-718f-9666-6e8f4c7679f3'::uuid)",
               "Shared Hit Blocks": 3,
               "Shared Read Blocks": 0,
               "Shared Dirtied Blocks": 0,
@@ -288,11 +291,11 @@
                   "Total Cost": 6.56,
                   "Plan Rows": 1,
                   "Plan Width": 31,
-                  "Actual Startup Time": 0.224,
-                  "Actual Total Time": 0.233,
+                  "Actual Startup Time": 0.076,
+                  "Actual Total Time": 0.082,
                   "Actual Rows": 1,
                   "Actual Loops": 1,
-                  "Index Cond": "(tenant_id = '01a0ff7c-d1c2-7084-a112-2fdd89d3d80c'::uuid)",
+                  "Index Cond": "(tenant_id = '01a0ff76-76f4-718f-9666-6e8f4c7679f3'::uuid)",
                   "Rows Removed by Index Recheck": 0,
                   "Filter": "((status = 'ACTIVE'::text) AND (search_document @@ websearch_to_tsquery('portuguese'::regconfig, shop.search_text('cafes'::text))))",
                   "Rows Removed by Filter": 1,
@@ -321,9 +324,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0
             },
-            "Planning Time": 3.261,
+            "Planning Time": 2.43,
             "Triggers": [],
-            "Execution Time": 0.283
+            "Execution Time": 0.121
           }
         ]
       }
@@ -331,21 +334,21 @@
     "indexDecision": "GIN parcial de tsvector português após EXPLAIN ANALYZE registrado antes da migration. UNIQUE por tenant cobre escopo. Fixture pequena não é ensaio de capacidade.",
     "stores": [
       {
-        "tenantId": "01a0ff7c-d1c2-7084-a112-2fdd89d3d80c",
-        "slug": "aurora-7f0a59bf3e",
-        "canonical": "http://aurora-7f0a59bf3e.localhost:3000"
+        "tenantId": "01a0ff76-76f4-718f-9666-6e8f4c7679f3",
+        "slug": "aurora-ab0d51d5d9",
+        "canonical": "http://aurora-ab0d51d5d9.localhost:3000"
       },
       {
-        "tenantId": "01a0ff7c-d49a-754b-836f-9635f353075c",
-        "slug": "brisa-7f0a59bf3e",
-        "canonical": "http://brisa-7f0a59bf3e.localhost:3000"
+        "tenantId": "01a0ff76-7956-720c-88f2-685323a18597",
+        "slug": "brisa-ab0d51d5d9",
+        "canonical": "http://brisa-ab0d51d5d9.localhost:3000"
       }
     ],
-    "completedAt": "2026-10-03T01:59:32.902Z"
+    "completedAt": "2026-10-03T01:52:34.622Z"
   },
   "storefront-restore": {
     "passed": true,
-    "completedAt": "2026-10-03T02:00:24.284Z",
+    "completedAt": "2026-10-03T01:53:27.385Z",
     "tenants": 2,
     "checks": [
       "catálogo",
@@ -485,8 +488,8 @@
               "Total Cost": 2.78,
               "Plan Rows": 4,
               "Plan Width": 24,
-              "Actual Startup Time": 0.037,
-              "Actual Total Time": 0.038,
+              "Actual Startup Time": 0.057,
+              "Actual Total Time": 0.058,
               "Actual Rows": 3,
               "Actual Loops": 1,
               "Plans": [
@@ -499,8 +502,8 @@
                   "Total Cost": 2.78,
                   "Plan Rows": 4,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.036,
-                  "Actual Total Time": 0.037,
+                  "Actual Startup Time": 0.056,
+                  "Actual Total Time": 0.057,
                   "Actual Rows": 3,
                   "Actual Loops": 1,
                   "Sort Key": [
@@ -519,11 +522,11 @@
                       "Total Cost": 2.73,
                       "Plan Rows": 4,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.012,
-                      "Actual Total Time": 0.019,
+                      "Actual Startup Time": 0.016,
+                      "Actual Total Time": 0.021,
                       "Actual Rows": 3,
                       "Actual Loops": 1,
-                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid)",
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid)",
                       "Plans": [
                         {
                           "Node Type": "Seq Scan",
@@ -536,11 +539,11 @@
                           "Total Cost": 2.73,
                           "Plan Rows": 4,
                           "Plan Width": 24,
-                          "Actual Startup Time": 0.009,
-                          "Actual Total Time": 0.015,
+                          "Actual Startup Time": 0.012,
+                          "Actual Total Time": 0.016,
                           "Actual Rows": 3,
                           "Actual Loops": 1,
-                          "Filter": "((tenant_id = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid) AND (next_check_at <= now()))",
+                          "Filter": "((tenant_id = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid) AND (next_check_at <= now()))",
                           "Rows Removed by Filter": 41
                         }
                       ]
@@ -549,9 +552,9 @@
                 }
               ]
             },
-            "Planning Time": 0.227,
+            "Planning Time": 0.137,
             "Triggers": [],
-            "Execution Time": 0.052
+            "Execution Time": 0.072
           }
         ]
       },
@@ -562,12 +565,12 @@
               "Node Type": "Limit",
               "Parallel Aware": false,
               "Async Capable": false,
-              "Startup Cost": 6.23,
-              "Total Cost": 6.29,
+              "Startup Cost": 6.28,
+              "Total Cost": 6.34,
               "Plan Rows": 25,
               "Plan Width": 24,
-              "Actual Startup Time": 0.039,
-              "Actual Total Time": 0.042,
+              "Actual Startup Time": 0.046,
+              "Actual Total Time": 0.049,
               "Actual Rows": 25,
               "Actual Loops": 1,
               "Plans": [
@@ -576,12 +579,12 @@
                   "Parent Relationship": "Outer",
                   "Parallel Aware": false,
                   "Async Capable": false,
-                  "Startup Cost": 6.23,
-                  "Total Cost": 6.33,
-                  "Plan Rows": 41,
+                  "Startup Cost": 6.28,
+                  "Total Cost": 6.38,
+                  "Plan Rows": 42,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.039,
-                  "Actual Total Time": 0.04,
+                  "Actual Startup Time": 0.045,
+                  "Actual Total Time": 0.046,
                   "Actual Rows": 25,
                   "Actual Loops": 1,
                   "Sort Key": [
@@ -597,14 +600,14 @@
                       "Parallel Aware": false,
                       "Async Capable": false,
                       "Startup Cost": 0.01,
-                      "Total Cost": 5.13,
-                      "Plan Rows": 41,
+                      "Total Cost": 5.15,
+                      "Plan Rows": 42,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.019,
-                      "Actual Total Time": 0.03,
+                      "Actual Startup Time": 0.024,
+                      "Actual Total Time": 0.036,
                       "Actual Rows": 48,
                       "Actual Loops": 1,
-                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid)",
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid)",
                       "Plans": [
                         {
                           "Node Type": "Seq Scan",
@@ -614,14 +617,14 @@
                           "Relation Name": "purchase_outbox",
                           "Alias": "purchase_outbox",
                           "Startup Cost": 0.01,
-                          "Total Cost": 5.13,
-                          "Plan Rows": 41,
+                          "Total Cost": 5.15,
+                          "Plan Rows": 42,
                           "Plan Width": 24,
-                          "Actual Startup Time": 0.015,
-                          "Actual Total Time": 0.023,
+                          "Actual Startup Time": 0.02,
+                          "Actual Total Time": 0.028,
                           "Actual Rows": 48,
                           "Actual Loops": 1,
-                          "Filter": "((executed_at IS NULL) AND (tenant_id = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid) AND (next_run_at <= now()))",
+                          "Filter": "((executed_at IS NULL) AND (tenant_id = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid) AND (next_run_at <= now()))",
                           "Rows Removed by Filter": 82
                         }
                       ]
@@ -630,9 +633,9 @@
                 }
               ]
             },
-            "Planning Time": 0.105,
+            "Planning Time": 0.206,
             "Triggers": [],
-            "Execution Time": 0.057
+            "Execution Time": 0.067
           }
         ]
       },
@@ -648,7 +651,7 @@
               "Plan Rows": 1,
               "Plan Width": 24,
               "Actual Startup Time": 0.028,
-              "Actual Total Time": 0.029,
+              "Actual Total Time": 0.028,
               "Actual Rows": 0,
               "Actual Loops": 1,
               "Plans": [
@@ -661,7 +664,7 @@
                   "Total Cost": 1.53,
                   "Plan Rows": 1,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.028,
+                  "Actual Startup Time": 0.027,
                   "Actual Total Time": 0.028,
                   "Actual Rows": 0,
                   "Actual Loops": 1,
@@ -681,11 +684,11 @@
                       "Total Cost": 1.51,
                       "Plan Rows": 1,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.026,
-                      "Actual Total Time": 0.026,
+                      "Actual Startup Time": 0.025,
+                      "Actual Total Time": 0.025,
                       "Actual Rows": 0,
                       "Actual Loops": 1,
-                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid)",
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid)",
                       "Plans": [
                         {
                           "Node Type": "Seq Scan",
@@ -698,11 +701,11 @@
                           "Total Cost": 1.51,
                           "Plan Rows": 1,
                           "Plan Width": 24,
-                          "Actual Startup Time": 0.023,
-                          "Actual Total Time": 0.023,
+                          "Actual Startup Time": 0.022,
+                          "Actual Total Time": 0.022,
                           "Actual Rows": 0,
                           "Actual Loops": 1,
-                          "Filter": "((processed_at IS NULL) AND (tenant_id = '01a0ff7b-61ae-74fc-9cd0-e1779b419361'::uuid))",
+                          "Filter": "((processed_at IS NULL) AND (tenant_id = '01a0ff75-0507-76ff-a4f2-3c5b5e8b2368'::uuid))",
                           "Rows Removed by Filter": 44
                         }
                       ]
@@ -711,9 +714,9 @@
                 }
               ]
             },
-            "Planning Time": 0.241,
+            "Planning Time": 0.233,
             "Triggers": [],
-            "Execution Time": 0.038
+            "Execution Time": 0.039
           }
         ]
       }
@@ -721,15 +724,15 @@
     "indexDecision": "Índices parciais de pendências por tenant (0006) cobrem as consultas periódicas; fixture pequena, sem ensaio de capacidade.",
     "stores": [
       {
-        "tenantId": "01a0ff7b-61ae-74fc-9cd0-e1779b419361",
-        "slug": "aurora-p3d7856641"
+        "tenantId": "01a0ff75-0507-76ff-a4f2-3c5b5e8b2368",
+        "slug": "aurora-p3a132b0d6"
       },
       {
-        "tenantId": "01a0ff7b-648b-72cb-8848-2b117dff9e03",
-        "slug": "brisa-p3d7856641"
+        "tenantId": "01a0ff75-081e-75b9-9402-d2cc7946a698",
+        "slug": "brisa-p3a132b0d6"
       }
     ],
-    "completedAt": "2026-10-03T01:57:56.660Z"
+    "completedAt": "2026-10-03T01:51:00.027Z"
   },
   "purchase-worker": {
     "passed": true,
@@ -786,11 +789,11 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:59:22.751Z"
+    "completedAt": "2026-10-03T01:52:26.122Z"
   },
   "purchase-restore": {
     "passed": true,
-    "completedAt": "2026-10-03T02:00:21.626Z",
+    "completedAt": "2026-10-03T01:53:24.670Z",
     "counts": {
       "transactions": 12,
       "incidents": 20,
@@ -859,7 +862,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:57:47.672Z"
+    "completedAt": "2026-10-03T01:50:50.411Z"
   },
   "pilot-flow": {
     "passed": false,
@@ -871,7 +874,7 @@
     ],
     "stores": [
       {
-        "store": "aurora-f4bc88b70e",
+        "store": "aurora-f4f1ef540e",
         "order": "1",
         "total_cents": "7480",
         "seller": "conta SIMULADA da própria loja",
@@ -883,7 +886,7 @@
         ]
       },
       {
-        "store": "brisa-f4bc88b70e",
+        "store": "brisa-f4f1ef540e",
         "order": "1",
         "total_cents": "7480",
         "seller": "conta SIMULADA da própria loja",
@@ -920,7 +923,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:58:57.520Z"
+    "completedAt": "2026-10-03T01:52:01.447Z"
   },
   "post-backup": {
     "passed": true,
@@ -928,14 +931,14 @@
       "APPROVED x2 e devolução parcial após o backup (provedor SIMULADO)",
       "eliminação com ledger externo no S3"
     ],
-    "completedAt": "2026-10-03T02:00:19.160Z"
+    "completedAt": "2026-10-03T01:53:22.239Z"
   },
   "recovery": {
     "passed": true,
     "steps": [
       {
         "step": "backup antigo contém dado eliminado depois",
-        "elapsedMs": 55
+        "elapsedMs": 50
       },
       {
         "step": "eliminações reaplicadas a partir do ledger externo",
@@ -943,15 +946,15 @@
       },
       {
         "step": "pós-restauração: vendas pausadas, PREPARED→UNKNOWN, e-mails retidos",
-        "elapsedMs": 118
+        "elapsedMs": 116
       },
       {
         "step": "estado do provedor SIMULADO reproduzido (equivale a consultar o gateway)",
-        "elapsedMs": 147
+        "elapsedMs": 144
       },
       {
         "step": "pagamentos e devolução posteriores conciliados",
-        "elapsedMs": 217
+        "elapsedMs": 220
       },
       {
         "step": "e-mails anteriores retidos para revisão; somente fatos novos enviados",
@@ -970,27 +973,27 @@
       "applied": 1
     },
     "limitation": "Ensaio com pg_dump lógico em ambiente isolado; o provedor é SIMULADO. RPO real depende de WAL/PITR (ver pitr.json) e backup externo (D04).",
-    "completedAt": "2026-10-03T02:00:22.740Z"
+    "completedAt": "2026-10-03T01:53:25.805Z"
   },
   "pitr": {
     "passed": true,
     "environment": "ecommerce-phase7-test",
-    "startedAt": "2026-10-03T02:00:24.513Z",
+    "startedAt": "2026-10-03T01:53:27.636Z",
     "method": "pg_basebackup (tar) + archive_command em volume local + recovery_target_time",
     "steps": [
       {
         "step": "base backup físico",
-        "at": "2026-10-03T02:00:26.299Z"
+        "at": "2026-10-03T01:53:29.394Z"
       },
       {
         "step": "marcadores antes/depois do alvo e WAL arquivado",
         "segment": "000000010000000000000005"
       }
     ],
-    "rpoObservedSeconds": 59.9,
+    "rpoObservedSeconds": 59.8,
     "archiveTimeoutSeconds": 60,
-    "target": "2026-10-03 02:01:29.113320+00",
-    "rtoDrillSeconds": 2.7,
+    "target": "2026-10-03 01:54:32.505994+00",
+    "rtoDrillSeconds": 2.6,
     "restored": {
       "markers": [
         "rpo-probe",
@@ -1004,7 +1007,7 @@
       "RTO medido apenas para banco sintético pequeno; não inclui provisionamento de host, mídia, segredos nem conciliação.",
       "Ferramenta mantida (pgBackRest/WAL-G) com destino externo continua recomendada para produção."
     ],
-    "finishedAt": "2026-10-03T02:01:34.798Z"
+    "finishedAt": "2026-10-03T01:54:38.012Z"
   },
   "pilot-observation": {
     "passed": true,
@@ -1021,7 +1024,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:57:49.947Z"
+    "completedAt": "2026-10-03T01:50:52.949Z"
   },
   "commercial": {
     "passed": true,
@@ -1084,7 +1087,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:57:41.242Z"
+    "completedAt": "2026-10-03T01:50:44.117Z"
   },
   "commercial-ui": {
     "passed": true,
@@ -1112,7 +1115,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:58:14.921Z"
+    "completedAt": "2026-10-03T01:51:17.738Z"
   },
   "ai": {
     "passed": true,
@@ -1160,7 +1163,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-03T01:57:34.457Z"
+    "completedAt": "2026-10-03T01:50:36.828Z"
   },
   "capacity": {
     "passed": true,
@@ -1184,6 +1187,6 @@
       }
     }
   },
-  "error": "Etapas reprovadas (execução continuada): Worker real: T21, interface e T27 em duas lojas; pilot-flow.json reprovado",
-  "finishedAt": "2026-10-03T02:01:34.951Z"
+  "error": "Etapas reprovadas (execução continuada): Worker real: T21, interface e T27 em duas lojas; Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel; storefront.json reprovado; pilot-flow.json reprovado",
+  "finishedAt": "2026-10-03T01:54:38.047Z"
 }

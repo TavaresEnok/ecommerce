@@ -111,7 +111,7 @@ A vitrine **não** usa `action` da plataforma. Base neutra: `bg` #FFFFFF, `surfa
 ## 4. Tokens: como usar
 
 1. A fonte é [`docs/design/tokens.json`](docs/design/tokens.json). Cada folha tem `type`, `value`, `description`.
-2. Nome da variável CSS: `platform.color.text-muted` → `--color-text-muted`; `platform.font.size.14` → `--font-size-14`; `store.color.accent-text` → `--store-color-accent-text`. Tokens com `"css": false` (breakpoints) não viram variável (CSS não aceita variável em media query): use os valores literais 768px e 1024px.
+2. Nome da variável CSS: `platform.color.text-muted` → `--color-text-muted`; `platform.font.size.14` → `--font-size-14`; `store.color.accent-text` → `--store-color-accent-text`. Tokens com `"css": false` (breakpoints) não viram variável (CSS não aceita variável em media query): use os valores equivalentes em `em` (48em e 64em; D-22).
 3. O bloco `:root` do CSS contém **somente** variáveis geradas dos tokens, com o mesmo valor. Fora de `:root`, nenhuma cor literal. O verificador (`node docs/design/verificar.mjs`) falha se houver divergência — no prompt 2 ele deve ser estendido para `apps/web/app/style.css`.
 4. Variáveis locais de componente, se necessárias, começam com `--_` e não são tokens.
 5. Tokens da loja (`--store-*`) são redefinidos por loja no elemento raiz da vitrine (`<main data-store>`), com valores calculados no servidor a partir de `theme.color` e `theme.font`.
@@ -167,7 +167,7 @@ A vitrine **não** usa `action` da plataforma. Base neutra: `bg` #FFFFFF, `surfa
 | 768–1023 px | Navegação em faixa superior; tabelas completas (rolagem horizontal **dentro** da tabela só como último recurso); colunas laterais descem |
 | < 768 px | Coluna única; tabelas viram lista empilhada (`data-label` por célula); botões de ação quebram linha; nada essencial escondido |
 
-Testar 390, 768 e 1440 px. Zoom de 200% e reflow de 320 px CSS não podem cortar conteúdo nem exigir rolagem horizontal da página.
+Testar 390, 768 e 1440 px. Zoom de 200% e reflow de 320 px CSS não podem cortar conteúdo nem exigir rolagem horizontal da página. No CSS os pontos de quebra são escritos em `em` (48em = 768 px e 64em = 1024 px com a fonte padrão de 16 px) para que quem aumenta a fonte do navegador receba o layout mais estreito em vez de colunas espremidas (D-22). A lista de pedidos do painel, com seis colunas de texto, empilha até 1279 px.
 
 ## 6. Componentes
 
@@ -206,7 +206,7 @@ Implementar como componentes React em `apps/web/components/ui/` (ver IMPLEMENTAC
 | Sem permissão | Funcionário vê controles de Dono desabilitados com “Somente o Dono…” ou não os vê; nunca erro técnico |
 | Sucesso | `role="status"` perto da ação (“Alteração persistida.”), sem toast que some sozinho antes de ser lido |
 | Bloqueado | Botão desabilitado + lista de motivos vinda do servidor (`impediments`) |
-| Conteúdo longo | Nomes longos quebram linha (`overflow-wrap:anywhere`), IDs/códigos quebram, tabelas não estouram a página |
+| Conteúdo longo | Nomes longos quebram linha (`overflow-wrap: break-word` no corpo: quebra no meio da palavra só quando ela não cabe, sem reduzir a largura mínima das colunas); IDs/códigos quebram em qualquer ponto (`anywhere`); tabelas não estouram a página |
 
 ## 8. Conteúdo e linguagem
 
@@ -330,3 +330,4 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 | D-19 | Preview privado navegável em `/preview/[tenantId]/…` para início, páginas do rascunho e produtos; categoria, busca, carrinho, atendimento e pedidos aparecem como texto “(indisponível no preview)” ou página “Não disponível no preview” com volta ao início do preview | Nenhum link do preview leva a 404 nem à loja pública; cada página pede o rascunho à API com a sessão de quem abre (autorização e noindex preservados) |
 | D-20 | Revisão visual reproduzível: projeto Compose isolado `ecommerce-design-demo` e gerador de dados versionados em `docs/design/ambiente/` | Capturas e verificações não dependem de preparação manual de uma sessão anterior |
 | D-21 | Pedido anonimizado mostra “Dados pessoais anonimizados”/“endereço anonimizado” no painel e no comprovante, sem os marcadores técnicos da API nem link de e-mail fictício | Linguagem do usuário; o dado anonimizado não é apresentado como se fosse real |
+| D-22 | Pontos de quebra em `em`; corpo com `overflow-wrap: break-word` (não `anywhere`); lista de pedidos do painel empilhada até 1279 px; topo do painel com altura mínima, não fixa | Com fonte do navegador em 200% o checkout e o menu da loja quebravam uma letra por linha e o topo do painel sobrepunha textos; em 768 px a data da lista de pedidos quebrava por caractere e a coluna de pendências ficava cortada |

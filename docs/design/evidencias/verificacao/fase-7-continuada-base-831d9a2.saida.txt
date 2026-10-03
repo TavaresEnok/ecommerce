@@ -1,0 +1,627 @@
+
+=== Preparação isolada ===
+
+=== Build em Node LTS ===
+ Image ecommerce-foundation:local Building 
+ Image ecommerce-postgres:17.9 Building 
+ Image ecommerce-foundation-tests:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 5.02kB done
+#1 DONE 0.0s
+
+#2 [tests internal] load build definition from Dockerfile
+#2 transferring dockerfile:
+#2 transferring dockerfile: 1.29kB done
+#2 DONE 0.0s
+
+#3 [postgres internal] load build definition from Dockerfile
+#3 transferring dockerfile: 400B done
+#3 DONE 0.0s
+
+#4 [api context ca] load .dockerignore
+#4 transferring ca: 2B done
+#4 DONE 0.0s
+
+#5 [tests internal] load metadata for mcr.microsoft.com/playwright:v1.63.0-noble
+#5 DONE 0.0s
+
+#6 [tests internal] load metadata for docker.io/library/node:24.21.0-bookworm-slim
+#6 DONE 0.5s
+
+#7 [tests internal] load .dockerignore
+#7 transferring context: 188B done
+#7 DONE 0.0s
+
+#8 [tests dependencies  1/11] FROM docker.io/library/node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#8 resolve docker.io/library/node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6 0.0s done
+#8 CACHED
+
+#9 [api context ca] load from client
+#9 transferring ca: 197.24kB done
+#9 DONE 0.0s
+
+#10 [tests internal] load build context
+#10 transferring context: 8.57MB 0.1s done
+#10 DONE 0.1s
+
+#11 [api dependencies  2/11] COPY --from=ca ca.crt /usr/local/share/ca-certificates/override-ca.crt
+#11 DONE 0.0s
+
+#12 [api dependencies  3/11] WORKDIR /app
+#12 DONE 0.0s
+
+#13 [tests browsers 1/3] FROM mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+#13 resolve mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27 0.0s done
+#13 DONE 0.2s
+
+#14 [tests browsers 2/3] WORKDIR /app
+#14 DONE 0.0s
+
+#15 [tests dependencies  4/11] COPY package.json package-lock.json tsconfig.base.json ./
+#15 DONE 0.0s
+
+#16 [api dependencies  5/11] COPY apps/api/package.json apps/api/package.json
+#16 DONE 0.0s
+
+#17 [api dependencies  6/11] COPY apps/web/package.json apps/web/package.json
+#17 DONE 0.0s
+
+#18 [tests dependencies  7/11] COPY apps/worker/package.json apps/worker/package.json
+#18 DONE 0.0s
+
+#19 [api dependencies  8/11] COPY packages/database/package.json packages/database/package.json
+#19 DONE 0.0s
+
+#20 [api dependencies  9/11] COPY packages/media/package.json packages/media/package.json
+#20 DONE 0.0s
+
+#21 [tests dependencies 10/11] COPY packages/purchase/package.json packages/purchase/package.json
+#21 DONE 0.0s
+
+#22 [api dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#22 ...
+
+#23 [postgres internal] load metadata for docker.io/library/postgres:17.9-bookworm
+#23 DONE 1.1s
+
+#7 [postgres internal] load .dockerignore
+#7 transferring context: 188B done
+#7 DONE 0.0s
+
+#24 [postgres 1/3] FROM docker.io/library/postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+#24 resolve docker.io/library/postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641 0.1s done
+#24 ...
+
+#25 [postgres internal] load build context
+#25 transferring context: 1.12kB done
+#25 DONE 0.0s
+
+#26 [tests browsers 3/3] RUN chmod -R a+rX /ms-playwright
+#26 ...
+
+#24 [postgres 1/3] FROM docker.io/library/postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+#24 DONE 0.5s
+
+#27 [postgres 2/3] COPY infra/postgres/init.sh /docker-entrypoint-initdb.d/01-roles.sh
+#27 DONE 0.2s
+
+#22 [api dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#22 ...
+
+#28 [postgres 3/3] RUN sed -i 's/\r$//' /docker-entrypoint-initdb.d/01-roles.sh && chmod 755 /docker-entrypoint-initdb.d/01-roles.sh  && mkdir -p /var/lib/postgresql/wal-archive && chown postgres:postgres /var/lib/postgresql/wal-archive && chmod 700 /var/lib/postgresql/wal-archive
+#28 DONE 0.3s
+
+#29 [postgres] exporting to image
+#29 exporting layers 0.1s done
+#29 exporting manifest sha256:a5212644f7e40c677dff22f4bf5e09e7001f34ddb9e658164c9100c0506f5620 done
+#29 exporting config sha256:c3bc16a6f763ab689514396eb32adf2126436d6711751cec435a406ac71832d8
+#29 exporting config sha256:c3bc16a6f763ab689514396eb32adf2126436d6711751cec435a406ac71832d8 done
+#29 exporting attestation manifest sha256:d7af0a2f89634a17ae3777b76c5a648713af9edf3f69cb68ce9eb4f126b097f9 0.0s done
+#29 exporting manifest list sha256:7360a4b46339beb5b965ce9c9121f3d5c82a0f9bb06ad63af5dadeb9a0d26e42 done
+#29 naming to docker.io/library/ecommerce-postgres:17.9 done
+#29 unpacking to docker.io/library/ecommerce-postgres:17.9 0.0s done
+#29 DONE 0.4s
+
+#22 [api dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#22 ...
+
+#30 [postgres] resolving provenance for metadata file
+#30 DONE 0.0s
+
+#22 [api dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#22 ...
+
+#26 [tests browsers 3/3] RUN chmod -R a+rX /ms-playwright
+#26 DONE 2.6s
+
+#22 [api dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#22 6.721 
+#22 6.721 removed 3 packages, and changed 93 packages in 6s
+#22 8.856 npm warn deprecated cron-parser@4.9.0: v4 is no longer maintained, upgrade to v5
+#22 23.14 
+#22 23.14 added 189 packages in 16s
+#22 23.14 npm notice
+#22 23.14 npm notice New major version of npm available! 11.6.2 -> 12.2.0
+#22 23.14 npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+#22 23.14 npm notice To update run: npm install -g npm@12.2.0
+#22 23.14 npm notice
+#22 DONE 24.3s
+
+#31 [api app 1/2] COPY . .
+#31 DONE 0.3s
+
+#32 [api app 2/2] RUN npm run build
+#32 0.320 
+#32 0.320 > ecommerce-foundation@0.1.0 build
+#32 0.320 > npm run build -w @ecommerce/database && npm run build -w @ecommerce/media && npm run build -w @ecommerce/purchase && npm run build -w @ecommerce/api && npm run build -w @ecommerce/worker && npm run build -w @ecommerce/web
+#32 0.320 
+#32 0.456 
+#32 0.456 > @ecommerce/database@0.1.0 build
+#32 0.456 > tsc -p tsconfig.json
+#32 0.456 
+#32 2.488 
+#32 2.488 > @ecommerce/media@0.1.0 build
+#32 2.488 > tsc -p tsconfig.json
+#32 2.488 
+#32 4.451 
+#32 4.451 > @ecommerce/purchase@0.1.0 build
+#32 4.451 > tsc -p tsconfig.json
+#32 4.451 
+#32 7.050 
+#32 7.050 > @ecommerce/api@0.1.0 build
+#32 7.050 > tsc -p tsconfig.json
+#32 7.050 
+#32 11.43 
+#32 11.43 > @ecommerce/worker@0.1.0 build
+#32 11.43 > tsc -p tsconfig.json
+#32 11.43 
+#32 13.72 
+#32 13.72 > @ecommerce/web@0.1.0 build
+#32 13.72 > next build --webpack
+#32 13.72 
+#32 14.17 ▲ Next.js 16.3.8 (webpack)
+#32 14.19 ✓ Running next.config.mjs took 21ms
+#32 14.23   Downloading swc package @next/swc-linux-x64-gnu... to /root/.cache/next-swc
+#32 15.47   Downloading swc package @next/swc-linux-x64-musl... to /root/.cache/next-swc
+#32 16.69 
+#32 16.72   Creating an optimized production build ...
+#32 25.84 ✓ Compiled successfully in 6.6s
+#32 25.85   Running TypeScript ...
+#32 29.37   Finished TypeScript in 3.5s ...
+#32 29.37   Collecting page data using 3 workers ...
+#32 30.46   Generating static pages using 3 workers (0/5) ...
+#32 30.93   Generating static pages using 3 workers (1/5) 
+#32 30.93   Generating static pages using 3 workers (2/5) 
+#32 30.93   Generating static pages using 3 workers (3/5) 
+#32 30.93 ✓ Generating static pages using 3 workers (5/5) in 467ms
+#32 31.35   Finalizing page optimization ...
+#32 31.35   Collecting build traces ...
+#32 41.38 
+#32 41.38 Route (app)
+#32 41.38 ┌ ○ /
+#32 41.38 ├ ○ /_not-found
+#32 41.38 ├ ƒ /lojas/[slug]/[[...path]]
+#32 41.38 ├ ƒ /lojas/[slug]/robots.txt
+#32 41.38 ├ ƒ /lojas/-/sitemap.xml
+#32 41.38 ├ ƒ /painel/[tenantId]
+#32 41.38 ├ ƒ /painel/[tenantId]/atendimento
+#32 41.38 ├ ƒ /painel/[tenantId]/operacao
+#32 41.38 ├ ƒ /painel/[tenantId]/pedidos
+#32 41.38 ├ ○ /plataforma
+#32 41.38 └ ƒ /preview/[tenantId]
+#32 41.38 
+#32 41.38 
+#32 41.38 ƒ Proxy (Middleware)
+#32 41.38 
+#32 41.38 ○  (Static)   prerendered as static content
+#32 41.38 ƒ  (Dynamic)  server-rendered on demand
+#32 41.38 
+#32 DONE 42.0s
+
+#33 [api] exporting to image
+#33 exporting layers
+#33 ...
+
+#34 [tests tests 1/1] COPY --from=app /app /app
+#34 DONE 4.0s
+
+#35 [tests] exporting to image
+#35 exporting layers
+#35 ...
+
+#33 [api] exporting to image
+#33 exporting layers 23.2s done
+#33 exporting manifest sha256:0523fa009ba81f4ae49b64dc528ed6102c7dc5d7ab084e770e87285d0feef6f8 done
+#33 exporting config sha256:08c812b9582e4516e20dbda2bdad3bbabfe36081377f3a57925391b776ba3404 done
+#33 exporting attestation manifest sha256:0852874f853a843566846eab3794724de7efabb2cfd68ea60e6b756077b0c5f4 done
+#33 exporting manifest list sha256:d9382250056599f769e572676ac1c8aecae83d790545f9590c4854e20913c8d2 done
+#33 naming to docker.io/library/ecommerce-foundation:local done
+#33 unpacking to docker.io/library/ecommerce-foundation:local
+#33 unpacking to docker.io/library/ecommerce-foundation:local 10.3s done
+#33 DONE 33.7s
+
+#36 [api] resolving provenance for metadata file
+#36 DONE 0.0s
+
+#35 [tests] exporting to image
+#35 exporting layers 28.8s done
+#35 exporting manifest sha256:e3638020ae5ec651d5a7674057b0124858bad77f74eaa44a838f255f45af3df2 done
+#35 exporting config sha256:4274ee8a1271e36be9006efb2373367a65d80810d9b715bf685e2e2ae76f53ab done
+#35 exporting attestation manifest sha256:c2c88aebb9089ff91509bf54fc71b28b94670da33141c8baa4fa712c0108d756 0.0s done
+#35 exporting manifest list sha256:3f05549613def31992630209a0608f9a6ec3a0a09d85db7126b53aff0bbdd7e5 done
+#35 naming to docker.io/library/ecommerce-foundation-tests:local done
+#35 unpacking to docker.io/library/ecommerce-foundation-tests:local
+#35 unpacking to docker.io/library/ecommerce-foundation-tests:local 9.5s done
+#35 DONE 38.3s
+
+#37 [tests] resolving provenance for metadata file
+#37 DONE 0.0s
+ Image ecommerce-foundation-tests:local Built 
+ Image ecommerce-foundation:local Built 
+ Image ecommerce-postgres:17.9 Built 
+
+=== Migrations, S3 privado e saúde ===
+ Network ecommerce-phase7-test_default Creating 
+ Network ecommerce-phase7-test_default Created 
+ Volume ecommerce-phase7-test_redis-data Creating 
+ Volume ecommerce-phase7-test_redis-data Created 
+ Volume ecommerce-phase7-test_postgres-data Creating 
+ Volume ecommerce-phase7-test_postgres-data Created 
+ Volume ecommerce-phase7-test_pg-wal-archive Creating 
+ Volume ecommerce-phase7-test_pg-wal-archive Created 
+ Volume ecommerce-phase7-test_storage-data Creating 
+ Volume ecommerce-phase7-test_storage-data Created 
+ Container ecommerce-phase7-test-postgres-1 Creating 
+ Container ecommerce-phase7-test-storage-1 Creating 
+ Container ecommerce-phase7-test-redis-1 Creating 
+ Container ecommerce-phase7-test-postgres-1 Created 
+ Container ecommerce-phase7-test-migrate-1 Creating 
+ Container ecommerce-phase7-test-storage-1 Created 
+ Container ecommerce-phase7-test-storage-init-1 Creating 
+ Container ecommerce-phase7-test-redis-1 Created 
+ Container ecommerce-phase7-test-migrate-1 Created 
+ Container ecommerce-phase7-test-worker-1 Creating 
+ Container ecommerce-phase7-test-storage-init-1 Created 
+ Container ecommerce-phase7-test-api-1 Creating 
+ Container ecommerce-phase7-test-worker-1 Created 
+ Container ecommerce-phase7-test-api-1 Created 
+ Container ecommerce-phase7-test-web-1 Creating 
+ Container ecommerce-phase7-test-web-1 Created 
+ Container ecommerce-phase7-test-redis-1 Starting 
+ Container ecommerce-phase7-test-storage-1 Starting 
+ Container ecommerce-phase7-test-postgres-1 Starting 
+ Container ecommerce-phase7-test-redis-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Started 
+ Container ecommerce-phase7-test-storage-init-1 Starting 
+ Container ecommerce-phase7-test-storage-init-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Starting 
+ Container ecommerce-phase7-test-migrate-1 Started 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-worker-1 Starting 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-api-1 Starting 
+ Container ecommerce-phase7-test-api-1 Started 
+ Container ecommerce-phase7-test-api-1 Waiting 
+ Container ecommerce-phase7-test-worker-1 Started 
+ Container ecommerce-phase7-test-api-1 Healthy 
+ Container ecommerce-phase7-test-web-1 Starting 
+ Container ecommerce-phase7-test-web-1 Started 
+ Container ecommerce-phase7-test-worker-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-web-1 Waiting 
+ Container ecommerce-phase7-test-api-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-storage-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-storage-init-1 Exited 
+ Container ecommerce-phase7-test-api-1 Healthy 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Healthy 
+ Container ecommerce-phase7-test-web-1 Healthy 
+
+=== Tipos ===
+ Container ecommerce-phase7-test-tests-run-61137559f167 Creating 
+ Container ecommerce-phase7-test-tests-run-61137559f167 Created 
+
+> ecommerce-foundation@0.1.0 typecheck
+> npm run typecheck --workspaces --if-present
+
+
+> @ecommerce/api@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/web@0.1.0 typecheck
+> tsc --noEmit --incremental false
+
+
+> @ecommerce/worker@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/database@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/media@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/purchase@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+=== Fase 3+4: núcleo transacional e operação do piloto com worker parado ===
+ Container ecommerce-phase7-test-worker-1 Stopping 
+ Container ecommerce-phase7-test-worker-1 Stopped 
+ Container ecommerce-phase7-test-tests-run-9dbae2a191df Creating 
+ Container ecommerce-phase7-test-tests-run-9dbae2a191df Created 
+▶ Fase 7: rascunho de descrição com IA sob orçamento
+  ✔ Desligado por padrão e sem provedor: geração recusada, cadastro manual e compra seguem (74.860894ms)
+  ✔ Autorização: só o Dono liga na loja; funcionário gera; outra loja não lê a geração (103.294ms)
+  ✔ Reserva antes da chamada, custo conciliado, idempotência e salvamento explícito sem publicar (86.864446ms)
+  ✔ Edição concorrente: produto alterado depois da geração não é sobrescrito (59.673912ms)
+  ✔ Sanitização: HTML/script removidos; instrução no conteúdo do produto é tratada como dado (72.555584ms)
+  ✔ T34: concorrência na mesma loja limitada e orçamento nunca ultrapassado (491.785905ms)
+  ✔ T34: timeout mantém reserva (UNKNOWN) até expiração controlada; saída excessiva limitada por max_tokens (118.501935ms)
+  ✔ Teto global entre lojas e desligamento global/loja preservam cadastro e venda (184.877353ms)
+✔ Fase 7: rascunho de descrição com IA sob orçamento (3491.697209ms)
+▶ Fase 6: comercialização preparada sem terceiros
+  ✔ MFA (TOTP): ativação, códigos de recuperação, nova sessão exige verificação, replay recusado (398.458873ms)
+  ✔ Administração da plataforma: papel concedido só pelo operador, MFA obrigatório, motivo e auditoria (644.430824ms)
+  ✔ Planos versionados: pago só ativa com preço; PILOT não se aposenta; versão é imutável (118.976567ms)
+  ✔ T29: contratação, cobrança simulada, webhook assinado/deduplicado, renovação sem fatura duplicada (186.940962ms)
+  ✔ T29: falha de cobrança → PAST_DUE com 7 dias de tolerância → SUSPENDED bloqueia só vendas novas; pagamento reabre (407.427591ms)
+  ✔ T29: troca de plano no próximo ciclo, cancelamento ao fim do período; sem MFA/funcionário recusados (423.927792ms)
+  ✔ Cotas do plano: produtos/variações/equipe no servidor, concorrência na última vaga, downgrade preserva dados (75.744086ms)
+  ✔ T38: cota rigorosa de mídia com reserva atômica, concorrência, expiração e conciliação dos contadores (489.707066ms)
+  ✔ T18: devolução pela plataforma — MFA, idempotência, saldo serializado, recusa, resposta perdida e retomada sem duplicar (1082.629459ms)
+  ✔ T28/T37: domínio próprio — prova TXT, rota HTTPS para a loja certa, canônico com 301, remoção e nova prova para outra loja (573.276668ms)
+  ✔ T31: frete por provedor — cotação válida, mudança de regra/expiração invalidam, falha não gera frete grátis (397.355797ms)
+✔ Fase 6: comercialização preparada sem terceiros (6465.559273ms)
+▶ Fase 4: operação do piloto com PostgreSQL real e provedores SIMULADOS
+  ✔ Expedição por transportadora: funcionário separa, envia e entrega; pedido concluído e notificações enfileiradas (365.484976ms)
+  ✔ Retirada comprovada sem transportadora; bloqueios revalidados no backend (907.165227ms)
+  ✔ T35/T05: revisão não financeira só pelo Dono; devolução pendente só encerra com confirmação do gateway (474.977391ms)
+  ✔ T36: atendimento vinculado — protocolo, resposta, comunicação financeira antes do aceite, horário original preservado (375.165126ms)
+  ✔ T36: contato geral sem compra — protocolo e código; acesso somente com o código e na loja certa (82.580562ms)
+  ✔ Notificações: falha do provedor não apaga protocolo; esgota em FAILED, reenvio pelo Dono; link de acesso por fragmento (300.192138ms)
+  ✔ T25: suspensão e pausa bloqueiam novas vendas; pedidos, pagamentos, devoluções e atendimento anteriores continuam (568.17199ms)
+  ✔ T32 (parte 1): exportação privada com expiração e permissão; eliminação bloqueada em pedido aberto (142.572247ms)
+  ✔ Fixtures de recuperação (antes do backup): T26 pagamento pendente/PREPARED e T32 pedido concluído com dados pessoais (326.140935ms)
+✔ Fase 4: operação do piloto com PostgreSQL real e provedores SIMULADOS (5434.399358ms)
+▶ Fase 5: instrumentos de observação
+  ✔ Falhas de checkout registradas por motivo, sem carrinho/comprador, isoladas por loja (288.145506ms)
+  ✔ Relatório por loja agrega pedidos, falhas, atendimento e tempo de suporte sem dados pessoais (38.649285ms)
+✔ Fase 5: instrumentos de observação (1742.305525ms)
+▶ Fase 3: compra, estoque e pagamentos com PostgreSQL real e provedor SIMULADO
+  ✔ Fluxo principal: checkout, snapshots, reserva integral, outbox e baixa única após confirmação autoritativa (237.706954ms)
+  ✔ T03: FKs compostas e RLS impedem vínculos de compra entre lojas (31.20323ms)
+  ✔ T04: comprador só acessa o pedido do próprio carrinho; número/ID não autorizam (93.603214ms)
+  ✔ T05: funcionário lê pedidos, mas não configura gateway, cancela pago, resolve incidente ou simula (116.584067ms)
+  ✔ T06: duas compras concorrentes da última unidade — uma reserva integral vence (158.877529ms)
+  ✔ T07: carrinho com item indisponível não deixa pedido nem reserva parcial (114.361861ms)
+  ✔ T08/T09: mesma chave e nova chave retornam o mesmo pedido; conteúdo diferente gera conflito (144.240767ms)
+  ✔ T10: preço/frete alterados ou total adulterado exigem nova confirmação (129.817022ms)
+  ✔ T11: criação recebida com resposta perdida e criação nunca entregue — mesma operação, sem duplicar (220.486655ms)
+  ✔ T12: webhook repetido, consulta repetida e fato fora de ordem — um reconhecimento, sem regressão (100.969658ms)
+  ✔ T13: assinatura inválida, vendedor/moeda/valor incompatíveis não confirmam pagamento (213.08341ms)
+  ✔ T14: confirmação concorrente com expiração — estado serializado, sem baixa ou liberação dupla (472.088402ms)
+  ✔ Expiração: gateway confirma encerramento → libera e cancela; incerteza só libera após 60 min sem declarar não pago (220.026105ms)
+  ✔ T15: aprovação após liberação — realoca com saldo; sem saldo abre PAID_WITHOUT_STOCK e bloqueia até realocação do Dono (379.12196ms)
+  ✔ T16: duas tentativas pagas — dois recebimentos, uma baixa, excedente acompanhado até devolução confirmada (333.259045ms)
+  ✔ T17/T35: aprovação em pedido cancelado não reabre; devolução externa repetida/atrasada concilia uma vez; anotação não fabrica status (374.502673ms)
+  ✔ T19: devolução parcial e disputa preservam fatos sem apagar pagamento ou entrega (300.294377ms)
+  ✔ T20: falha entre commit e publicação — evento durável, consumo repetido/concorrente sem efeito duplicado (98.356437ms)
+  ✔ T24: alterar produto, fornecedor e tema após compra preserva snapshots; correção de endereço auditada (137.194259ms)
+  ✔ T36 (protocolo): solicitação durável, confirmação imediata, idempotente e com acesso autorizado (105.633112ms)
+  ✔ Conta revogada bloqueia novas cobranças; pedidos anteriores continuam consultáveis (185.069388ms)
+  ✔ EXPLAIN ANALYZE das consultas de reconciliação como app_user (5.992166ms)
+✔ Fase 3: compra, estoque e pagamentos com PostgreSQL real e provedor SIMULADO (6295.596956ms)
+ℹ tests 57
+ℹ suites 0
+ℹ pass 57
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 27438.378925
+
+=== Worker real: T21, interface e T27 em duas lojas ===
+ Container ecommerce-phase7-test-postgres-1 Running 
+ Container ecommerce-phase7-test-redis-1 Running 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Starting 
+ Container ecommerce-phase7-test-migrate-1 Started 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Starting 
+ Container ecommerce-phase7-test-worker-1 Started 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-worker-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Healthy 
+ Container ecommerce-phase7-test-tests-run-02b899eb2d24 Creating 
+ Container ecommerce-phase7-test-tests-run-02b899eb2d24 Created 
+✔ Fase 6: interface do Dono (MFA, plano, domínio, frete) e da plataforma (4314.867087ms)
+▶ T27: fluxo completo em duas lojas com worker real
+  ✔ Duas lojas: compra, recebimento na conta correta, estoque, e-mails e entrega (8386.334826ms)
+  ✖ Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel) (32872.442966ms)
+✖ T27: fluxo completo em duas lojas com worker real (42743.413045ms)
+▶ Fase 3 com worker real: outbox, perda do Redis e interface
+  ✔ T21: jobs publicados e perdidos no Redis são reconstruídos do PostgreSQL e executados uma vez (3640.741911ms)
+  ✔ Webhook simulado → inbox durável → consulta autoritativa pelo worker → pago com baixa única (4170.713261ms)
+  ✔ Interface: comprador revisa, confirma, recebe comprovante e protocolo; lojista vê pedido (desktop/móvel) (14360.64131ms)
+✔ Fase 3 com worker real: outbox, perda do Redis e interface (23639.580809ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 6
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 73276.062229
+
+✖ failing tests:
+
+test at tests/pilot-flow.test.mjs:16:56
+✖ Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel) (32872.442966ms)
+  locator.waitFor: Timeout 30000ms exceeded.
+  Call log:
+    - waiting for getByRole('heading', { name: 'Alertas' }) to be visible
+  
+      at /app/tests/pilot-flow.test.mjs:46:106
+      at async TestContext.<anonymous> (/app/tests/pilot-flow.test.mjs:16:76)
+      at async check (/app/tests/pilot-flow.test.mjs:16:48)
+      at async TestContext.<anonymous> (/app/tests/pilot-flow.test.mjs:36:3) {
+    name: 'TimeoutError',
+    log: [ "  - waiting for getByRole('heading', { name: 'Alertas' }) to be visible" ]
+  }
+
+
+=== Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel ===
+ Container ecommerce-phase7-test-tests-run-ab15081ceb61 Creating 
+ Container ecommerce-phase7-test-tests-run-ab15081ceb61 Created 
+▶ Fase 2 integrada: duas lojas navegáveis, banco e S3 reais
+  ✔ Produto simples, atributos explícitos, SKU único e estoque auditado (80.136765ms)
+  ✔ Ajustes concorrentes serializados e plano real de consulta por tenant (50.479218ms)
+  ✔ T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta (65.582562ms)
+  ✔ T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica (257.078686ms)
+  ✖ T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado (56.578349ms)
+  ✔ Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento (155.907084ms)
+  ✔ Frete com prioridade, retirada, CEP não atendido, validade e fingerprint (240.761904ms)
+  ✔ Arquivamento invalida oferta e carrinho, estoque continua auditável (52.156471ms)
+  ✔ Slug histórico redireciona sem reutilização e domínio não mistura lojas (145.422891ms)
+  ✔ T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE (733.245964ms)
+  ✔ Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel (3062.737099ms)
+✖ Fase 2 integrada: duas lojas navegáveis, banco e S3 reais (6526.757047ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 10
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7705.661385
+
+✖ failing tests:
+
+test at tests/storefront.test.mjs:21:57
+✖ T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado (56.578349ms)
+  SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
+      at JSON.parse (<anonymous>)
+      at parseJSONFromBytes (node:internal/deps/undici/undici:4394:19)
+      at successSteps (node:internal/deps/undici/undici:7048:27)
+      at readAllBytes (node:internal/deps/undici/undici:5965:13)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+
+=== Regressões T01/T02, acesso, worker e UI da fundação ===
+ Container ecommerce-phase7-test-tests-run-372990bf3308 Creating 
+ Container ecommerce-phase7-test-tests-run-372990bf3308 Created 
+▶ Fundação integrada — PostgreSQL real e app_user
+  ✔ UUIDv7, papéis reais e FORCE RLS em todas as tabelas de loja (55.11822ms)
+  ✔ T01: endpoints negam leitura/escrita cruzada, IDs/Host não autorizam (97.952563ms)
+  ✔ T01: RLS bloqueia SELECT/INSERT/UPDATE cruzados no banco (12.478037ms)
+  ✔ T02: mesma conexão alterna A/B e perde contexto após commit/rollback (10.964898ms)
+  ✔ FK composta rejeita autoria por vínculo de outra loja (17.028421ms)
+  ✔ Convite de Funcionário vinculado ao e-mail, expiração/uso único e revogação (123.809033ms)
+  ✔ Sessões/tokens somente como hash, e-mail verificado e recuperação revoga sessões (1471.681623ms)
+  ✔ Worker confirma recurso/ator e bloqueia job adulterado (252.205894ms)
+  ✔ Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais (1742.847462ms)
+  ✔ Revogar vínculo e todas as sessões tem efeito imediato (459.440494ms)
+  ✔ Rate limiting e sanitização de campos sensíveis (2597.786724ms)
+  ✔ EXPLAIN ANALYZE das consultas mínimas sem índices especulativos (4.469693ms)
+✔ Fundação integrada — PostgreSQL real e app_user (8249.67414ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9421.997446
+
+=== Logs sanitizados ===
+
+=== Persistência S3 após reinício local ===
+ Container ecommerce-phase7-test-storage-1 Restarting 
+ Container ecommerce-phase7-test-storage-1 Started 
+ Container ecommerce-phase7-test-storage-1 Running 
+ Container ecommerce-phase7-test-storage-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Healthy 
+ Container ecommerce-phase7-test-tests-run-9bd81e464ce5 Creating 
+ Container ecommerce-phase7-test-tests-run-9bd81e464ce5 Created 
+S3 autenticado pronto; bucket existente preservado.
+
+=== CLI do operador: status e alertas por loja ===
+
+=== Backup PostgreSQL 17 ===
+Backup lógico criado em /tmp/foundation.dump no container PostgreSQL; copie-o para destino seguro antes de recriar o container.
+
+=== Fatos após o backup: pagamentos/devolução e eliminação com ledger externo ===
+ Container ecommerce-phase7-test-tests-run-7baa70622301 Creating 
+ Container ecommerce-phase7-test-tests-run-7baa70622301 Created 
+✔ Fatos posteriores ao backup: pagamento/devolução no provedor e eliminação de dados pessoais (5085.775438ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5905.888971
+
+=== Restore separado ===
+REVOKE
+GRANT
+Restauração concluída em ecommerce_restore. Conferências de dados/RLS são feitas pelo runner de verificação.
+
+=== Conferências após restore ===
+ Container ecommerce-phase7-test-tests-run-6f1a5e16a49d Creating 
+ Container ecommerce-phase7-test-tests-run-6f1a5e16a49d Created 
+✔ Restore preserva pedidos, recebimentos, incidentes e estado da outbox sem reemitir cobranças (39.250825ms)
+✔ T26/T32: restauração antiga, conciliação sem nova cobrança e reaplicação das eliminações (242.858516ms)
+✔ Backup restaurado preserva configurações, vínculos e isolamento como app_user (61.478797ms)
+✔ Restore preserva catálogo/estoque/tema/carrinhos e objetos S3 locais existentes (90.726028ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3369.369623
+
+=== PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO) ===
+{"passed":true,"rpoObservedSeconds":59.8,"rtoDrillSeconds":2.6}
+Etapas reprovadas (execução continuada): Worker real: T21, interface e T27 em duas lojas; Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel; storefront.json reprovado; pilot-flow.json reprovado
+
+Fase 7: código 1 (externos SIMULADOS — não equivale a homologação real). Evidência: docs/execucao/evidencias/fase-7/verification.continuada.simulado.json
+Pendências reais mantidas: 3
+
+real	6m36.677s
+user	0m6.032s
+sys	0m4.985s

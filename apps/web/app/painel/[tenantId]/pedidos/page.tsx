@@ -54,7 +54,7 @@ function OrderList({ query, onFilter }: { query: string; onFilter: (q: string) =
         </form>
         {loadError ? <div style={{ padding: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="Não foi possível carregar os pedidos">{loadError}</Alert></div> : !orders ? <div style={{ padding: 'var(--space-16)' }}><Loading label="Carregando pedidos autorizados…" /></div> :
           orders.length === 0 ? <div style={{ padding: 'var(--space-16)' }}>{query ? <EmptyState icon="search" title="Nenhum pedido com esses filtros" action={<button className="btn btn-secondary btn-sm" onClick={() => onFilter('')}>Limpar filtros</button>} /> : <EmptyState icon="receipt" title="Nenhum pedido ainda">Os pedidos aparecem aqui quando um comprador conclui a compra na vitrine publicada.</EmptyState>}</div> :
-          <table className="data stack"><caption>Mais recentes primeiro; até 100 pedidos por consulta. Datas no {zoneNote(p.timezone)}.</caption>
+          <table className="data stack stack-wide"><caption>Mais recentes primeiro; até 100 pedidos por consulta. Datas no {zoneNote(p.timezone)}.</caption>
             <thead><tr><th scope="col">Pedido</th><th scope="col">Data</th><th scope="col">Pagamento</th><th scope="col">Entrega</th><th scope="col" className="num">Total</th><th scope="col">Pendências</th></tr></thead>
             <tbody>{orders.map((r) => <tr key={r.id}>
               <td className="primary"><Link href={`?pedido=${r.id}${query ? `&${query}` : ''}`} style={{ fontWeight: 600 }}>Nº {r.number}</Link><span className="cell-sub">{label(ORDER_STATUS, r.order_status)} · {r.delivery_kind === 'PICKUP' ? 'retirada' : 'entrega'}</span></td>
