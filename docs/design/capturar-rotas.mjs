@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 // Captura as rotas REAIS do aplicativo (não o protótipo) com dados sintéticos e grava evidências.
-// Uso: node docs/design/capturar-rotas.mjs <rótulo> [--base=http://localhost:3000] [--widths=390,768,1440] [--only=R03,R10]
-// Requer: aplicação local rodando, .local/demo-ui.json gerado por docs/design/ferramentas/dados-demo.mjs (+ admin-demo.mjs),
-// Playwright com Chromium disponível (não instala nada). Saída: docs/design/evidencias/<rótulo>/*.jpg e resultado.json.
-import { createRequire } from 'node:module';
+// Uso: node docs/design/capturar-rotas.mjs <rótulo> [--base=…] [--widths=390,768,1440] [--only=R03,R10] [--zoom=2]
+// Requer: ambiente de docs/design/ambiente/ (ambiente.mjs subir) e .local/demo-ui.json gerado por
+// docs/design/ambiente/gerar-dados.mjs; Chromium via docs/design/ambiente/navegador.mjs (não instala nada).
+// --zoom=N SIMULA o zoom de N×: viewport CSS = largura/N com deviceScaleFactor N (o mesmo reflow de CSS que o zoom
+// produz; o zoom da interface do navegador não é acionado — Playwright não o expõe em modo headless).
+// --texto=P aplica font-size P% na raiz (como a configuração “tamanho da fonte” do navegador): textos, espaços e
+// controles em rem crescem na mesma largura. Saída: docs/design/evidencias/<rótulo>/*.jpg e resultado.json.
 import { createHmac } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -11,17 +14,13 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '../..');
-const require = createRequire(import.meta.url);
-let playwright;
-for (const c of ['/opt/node22/lib/node_modules/playwright', 'playwright', join(repo, 'node_modules/playwright')]) { try { playwright = require(c); break; } catch { /* próximo */ } }
-if (!playwright) { console.error('Playwright não encontrado; nada capturado.'); process.exit(2); }
+import { launch, baseOf } from './ambiente/navegador.mjs';
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=').slice(1).join('=') || d;
 const label = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'depois';
-const base = arg('base', 'http://localhost:3000');
 const widths = arg('widths', '390,768,1440').split(',').map(Number);
 const only = arg('only', '').split(',').filter(Boolean);
-const zoom = Number(arg('zoom', '1'));
-const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8'));
+const zoom = Number(arg('zoom', '1')), texto = Number(arg('texto', '100'));
+const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8')), base = baseOf(demo);
 const out = join(here, 'evidencias', label);
 mkdirSync(out, { recursive: true });
 
@@ -86,6 +85,8 @@ const scenarios = [
   { id: 'R05-operacao', route: 'R05', persona: 'owner', path: `/painel/${A.id}/operacao` },
   { id: 'R06-plataforma', route: 'R06', persona: 'admin', path: '/plataforma' },
   { id: 'R07-preview', route: 'R07', persona: 'owner', path: `/preview/${A.id}` },
+  { id: 'R07-preview-produto', route: 'R07', persona: 'owner', path: `/preview/${A.id}/produtos/camiseta` },
+  { id: 'R07-preview-indisponivel', route: 'R07', persona: 'owner', path: `/preview/${A.id}/categorias/colecao` },
   { id: 'R08-vitrine-a', route: 'R08', persona: 'anon', path: `/lojas/${A.slug}` },
   { id: 'R08-vitrine-b', route: 'R08', persona: 'anon', path: `/lojas/${Bs.slug}` },
   { id: 'R08-busca-vazia', route: 'R08', persona: 'anon', path: `/lojas/${A.slug}?q=inexistente` },
@@ -99,6 +100,7 @@ const scenarios = [
   { id: 'R10-produto-foto-retrato', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await page.getByRole('button', { name: 'Mostrar imagem 2 de 2' }).click(); await page.waitForTimeout(800); } },
   { id: 'R10-adicionado', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/camiseta`, act: async (page) => { await page.getByRole('radio', { name: 'Verde / M' }).check(); await page.getByRole('button', { name: 'Adicionar ao carrinho', exact: true }).click(); await page.getByRole('link', { name: 'Ver carrinho', exact: true }).waitFor(); } },
   { id: 'R10-esgotado', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/tigela-funda` },
+  { id: 'R10-variacao-esgotada', route: 'R10', persona: 'anon', path: `/lojas/${A.slug}/produtos/avental` },
   { id: 'R10-produto-c', route: 'R10', persona: 'anon', path: `/lojas/${Cs.slug}/produtos/camiseta` },
   { id: 'R11-pagina', route: 'R11', persona: 'anon', path: `/lojas/${A.slug}/paginas/sobre` },
   { id: 'R12-carrinho-vazio', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/carrinho` },
@@ -107,6 +109,7 @@ const scenarios = [
   { id: 'R12-dados', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await page.getByRole('form', { name: 'Dados do comprador' }).waitFor(); } },
   { id: 'R12-revisao', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await buyerStep(page); } },
   { id: 'R12-corrigir-dados', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await buyerStep(page); await page.getByRole('button', { name: 'Corrigir dados' }).click(); await page.getByRole('form', { name: 'Dados do comprador' }).waitFor(); } },
+  { id: 'R12-resultado-desconhecido', route: 'R12', persona: 'anon', path: `/lojas/${A.slug}/produtos/caneca-cafe`, act: async (page) => { await toCart(page); await delivery(page); await buyerStep(page); await page.route('**/cart/checkout', async (route) => { await route.fetch().catch(() => {}); await route.abort('failed'); }, { times: 1 }); await page.getByRole('button', { name: /^Confirmar compra de/ }).click(); await page.getByText('Não sabemos se a compra foi registrada').first().waitFor(); } },
   { id: 'R13-pago', route: 'R13', persona: 'buyerPaid', path: `/lojas/${A.slug}/pedidos/${O.paid.id}` },
   { id: 'R13-pendente', route: 'R13', persona: 'buyerPending2', path: `/lojas/${A.slug}/pedidos/${P2.id}` },
   { id: 'R13-recusado', route: 'R13', persona: 'buyerRejected', path: `/lojas/${A.slug}/pedidos/${O.rejected.id}` },
@@ -114,9 +117,9 @@ const scenarios = [
   { id: 'R14-atendimento', route: 'R14', persona: 'anon', path: `/lojas/${A.slug}/atendimento` },
 ].filter((s) => !only.length || only.includes(s.route) || only.includes(s.id));
 
-const browser = await playwright.chromium.launch();
+const browser = await launch();
 let results = [];
-try { const prev = JSON.parse(readFileSync(join(out, 'resultado.json'), 'utf8')).results; results = prev.filter((r) => !scenarios.some((s) => s.id === r.id && widths.includes(r.width) && (r.zoom || 1) === zoom)); } catch { /* primeira execução */ }
+try { const prev = JSON.parse(readFileSync(join(out, 'resultado.json'), 'utf8')).results; results = prev.filter((r) => !scenarios.some((s) => s.id === r.id && widths.includes(r.width) && (r.zoom || 1) === zoom && (r.texto || 100) === texto)); } catch { /* primeira execução */ }
 const cookies = {};
 for (const s of scenarios) {
   cookies[s.persona] ??= await personas[s.persona]();
@@ -134,6 +137,7 @@ for (const s of scenarios) {
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {}); await page.waitForTimeout(600);
       if (s.legacy && process.argv.includes('--legacy')) await s.legacy(page);
       if (s.act && !process.argv.includes('--legacy')) await s.act(page);
+      if (texto !== 100) { await page.addStyleTag({ content: `html { font-size: ${texto}% !important; }` }); await page.waitForTimeout(400); }
       await page.evaluate(() => document.fonts.ready);
       const report = await page.evaluate(() => {
         const overflow = document.documentElement.scrollWidth - window.innerWidth;
@@ -147,8 +151,8 @@ for (const s of scenarios) {
         const small44 = window.innerWidth < 768 ? [...document.querySelectorAll('main .btn:not(.btn-sm), main input[type=radio]+label, .store-nav a, .category-nav a, .thumbs button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 43.5 || r.width < 43.5); }).map((e) => (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30)) : [];
         return { overflow, unnamed, small, small44, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
       });
-      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
-      results.push({ ...s, legacy: undefined, act: undefined, width, zoom, status, ...report, errors });
+      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}${texto !== 100 ? `-t${texto}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: true });
+      results.push({ ...s, legacy: undefined, act: undefined, width, zoom, texto, status, ...report, errors });
       console.log(`${s.id} ${width}px · HTTP ${status} · overflow ${report.overflow}px · sem nome ${report.unnamed} · alvos<24 ${report.small} · <44 ${report.small44.length} · erros ${errors.length} · h1 "${report.h1.slice(0, 50)}"`);
     } catch (e) {
       results.push({ ...s, legacy: undefined, act: undefined, width, status, failure: e.message.slice(0, 300), errors });

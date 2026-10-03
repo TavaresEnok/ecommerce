@@ -65,14 +65,20 @@ export function ProductList({ catalogue, onCreate }: { catalogue: Catalogue; onC
 
 function NewProduct({ catalogue, onCreated }: { catalogue: Catalogue; onCreated: (id: string) => void }) {
   const p = usePanel(), { busy, error, run } = useAction();
-  const [slug, setSlug] = useState(''), [touched, setTouched] = useState(false), [priceError, setPriceError] = useState('');
+  const [slug, setSlug] = useState(''), [touched, setTouched] = useState(false), [priceError, setPriceError] = useState(''), [conflict, setConflict] = useState<{ slug?: string; sku?: string }>({});
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); const b = fields(e.currentTarget), cents = toCents(b.price_cents || '');
     if (!cents) { setPriceError('Informe o preço em reais, por exemplo 49,90.'); return; }
-    setPriceError('');
+    setPriceError(''); setConflict({});
     void run(async () => {
       try { const r = await call(`tenants/${p.tenantId}/catalogue/products`, { method: 'POST', csrf: p.csrf, body: { ...b, price_cents: cents, ...(b.category_id ? {} : { category_id: undefined }) } }); onCreated(r.id); }
-      catch (err) { if (err instanceof ApiError && err.status === 409) throw new Error('Já existe um produto com este endereço ou SKU nesta loja. Altere um deles e tente novamente.'); throw err; }
+      catch (err) {
+        if (!(err instanceof ApiError && err.status === 409)) throw err;
+        // A API responde um 409 único para endereço OU SKU; o painel já tem o catálogo carregado e aponta o campo que colide.
+        const taken = { slug: catalogue.products.some((x) => x.slug === b.slug), sku: catalogue.products.some((x) => x.variants.some((v) => v.sku === b.sku)) };
+        if (taken.slug || taken.sku) { setConflict({ slug: taken.slug ? 'Já existe um produto com este endereço.' : undefined, sku: taken.sku ? 'Já existe uma variação com este SKU nesta loja.' : undefined }); throw new Error(`${taken.slug && taken.sku ? 'Endereço e SKU já estão em uso' : taken.slug ? 'O endereço já está em uso' : 'O SKU já está em uso'}; corrija o campo indicado e tente novamente.`); }
+        throw new Error('Já existe um produto com este endereço ou SKU nesta loja (fora dos produtos carregados nesta página). Altere um deles e tente novamente.');
+      }
     });
   }
   return <section className="surface" aria-labelledby="t-new-product">
@@ -82,10 +88,10 @@ function NewProduct({ catalogue, onCreated }: { catalogue: Catalogue; onCreated:
       {error && <Alert tone="danger" role="alert" title="O produto não foi cadastrado">{error} Os dados digitados foram mantidos.</Alert>}
       <form className="form form-col" aria-label="Cadastrar produto" onSubmit={submit}>
         <Field label="Nome">{(a) => <input className="input" name="name" required maxLength={200} onChange={(e) => { if (!touched) setSlug(slugify(e.target.value)); }} {...a} />}</Field>
-        <Field label="Endereço na vitrine" hint={`/produtos/${slug || 'endereco-do-produto'} · letras minúsculas, números e hífens.`}>{(a) => <input className="input" name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" required value={slug} onChange={(e) => { setTouched(true); setSlug(e.target.value); }} {...a} />}</Field>
+        <Field label="Endereço na vitrine" error={conflict.slug} hint={`/produtos/${slug || 'endereco-do-produto'} · letras minúsculas, números e hífens.`}>{(a) => <input className="input" name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" required value={slug} onChange={(e) => { setTouched(true); setSlug(e.target.value); }} {...a} />}</Field>
         <Field label="Descrição e cuidados" optional hint="Texto simples, até 8.000 caracteres.">{(a) => <textarea className="textarea" name="description" maxLength={8000} {...a} />}</Field>
         <div className="form-grid">
-          <Field label="SKU" hint="Código único nesta loja.">{(a) => <input className="input" name="sku" required maxLength={80} {...a} />}</Field>
+          <Field label="SKU" hint="Código único nesta loja." error={conflict.sku}>{(a) => <input className="input" name="sku" required maxLength={80} {...a} />}</Field>
           <Field label="Preço" error={priceError}>{(a) => <MoneyInput name="price_cents" a11y={a} required />}</Field>
         </div>
         <Field label="Categoria" optional>{(a) => <select className="select" name="category_id" {...a}><option value="">Sem categoria</option>{catalogue.categories.map((c) => <option value={c.id} key={c.id}>{c.name}</option>)}</select>}</Field>

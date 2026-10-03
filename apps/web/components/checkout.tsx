@@ -13,9 +13,9 @@ type Address = { cep: string; street: string; number: string; city: string; stat
 type CartData = { items: { variant_id: string; quantity: number; price_cents: string; name: string; sku: string; available: number; active: boolean; status: string }[]; subtotal_cents: string; valid: boolean };
 const fields = (e: FormEvent<HTMLFormElement>) => { e.preventDefault(); return Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>; };
 class StoreError extends Error { constructor(readonly status: number, message: string) { super(message); } }
-async function call(slug: string, path: string, body?: unknown, extra: Record<string, string> = {}) {
+async function call(slug: string, path: string, body?: unknown, extra: Record<string, string> = {}, timeoutMs?: number) {
   let response: Response;
-  try { response = await fetch(`/api/public/stores/${slug}/${path}`, { method: body ? 'POST' : 'GET', headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...extra }, body: body ? JSON.stringify(body) : undefined, cache: 'no-store' }); }
+  try { response = await fetch(`/api/public/stores/${slug}/${path}`, { method: body ? 'POST' : 'GET', headers: { ...(body ? { 'Content-Type': 'application/json' } : {}), ...extra }, body: body ? JSON.stringify(body) : undefined, cache: 'no-store', signal: timeoutMs ? AbortSignal.timeout(timeoutMs) : undefined }); }
   catch { throw new StoreError(0, 'Não foi possível conectar. Verifique sua conexão e tente novamente.'); }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new StoreError(response.status, typeof data.error === 'string' ? data.error : data.error?.message || (response.status === 429 ? 'Muitas tentativas em pouco tempo. Aguarde um instante e tente de novo.' : 'Não foi possível concluir. Tente novamente.'));
@@ -26,7 +26,20 @@ const uid = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => 
 // Uma chave por intenção confirmada: recarregar ou clicar duas vezes repete a mesma operação em vez de comprar de novo.
 // A chave cobre a cotação e os dados enviados: repetir a mesma intenção reaproveita a chave; corrigir dados gera outra.
 const digest = (text: string) => { let h = 5381; for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) >>> 0; return h.toString(36); };
-function intentKey(quote: string, content: unknown) { const name = `checkout-${quote}-${digest(JSON.stringify(content))}`; let key = ''; try { key = sessionStorage.getItem(name) || ''; } catch { /* sem storage */ } if (!key) { key = uid(); try { sessionStorage.setItem(name, key); } catch { /* sem storage */ } } return key; }
+// Sem sessionStorage (modo privado, bloqueio), a chave vive na memória da página; depois de recarregar, a proteção do
+// servidor por carrinho/versão (checkoutExisting) devolve o pedido já criado em vez de criar outro.
+const memoryKeys = new Map<string, string>();
+function intentKey(quote: string, content: unknown) { const name = `checkout-${quote}-${digest(JSON.stringify(content))}`; let key = memoryKeys.get(name) || ''; try { key = key || sessionStorage.getItem(name) || ''; } catch { /* sem storage */ } if (!key) key = uid(); memoryKeys.set(name, key); try { sessionStorage.setItem(name, key); } catch { /* sem storage */ } return key; }
+type CheckoutBody = { quote_id: string; address: Address; buyer: { name: string; email: string }; method: string; total_cents: string };
+type Intent = { key: string; body: CheckoutBody; total: string };
+// Confirmação enviada e sem resposta conclusiva: guardada para reenviar exatamente a mesma intenção (mesma chave e conteúdo).
+const pendingName = (slug: string) => `checkout-pendente-${slug}`;
+function readPending(slug: string): Intent | null { try { const v = sessionStorage.getItem(pendingName(slug)); return v ? JSON.parse(v) as Intent : null; } catch { return null; } }
+function writePending(slug: string, intent: Intent | null) { try { if (intent) sessionStorage.setItem(pendingName(slug), JSON.stringify(intent)); else sessionStorage.removeItem(pendingName(slug)); } catch { /* sem storage: a intenção fica só na memória da página */ } }
+// Conclusiva = a loja processou e recusou depois de verificar pedido existente (400 de conteúdo, 409 de regra):
+// nada foi criado por esta confirmação. Qualquer outra falha (rede, tempo esgotado, 5xx, 429, resposta sem pedido) é
+// resultado desconhecido: o pedido pode existir. “Chave reutilizada” indica pedido já criado com outro conteúdo.
+const conclusive = (e: unknown) => e instanceof StoreError && (e.status === 400 || e.status === 409) && !/chave reutilizada/i.test(e.message);
 
 type Step = 'delivery' | 'buyer' | 'review';
 export function CartFlow({ slug }: { slug: string }) {
@@ -34,10 +47,12 @@ export function CartFlow({ slug }: { slug: string }) {
   const [step, setStep] = useState<Step>('delivery'), [kind, setKind] = useState('TABLE'), [address, setAddress] = useState<Address | null>(null), [quote, setQuote] = useState<Quote | null>(null);
   const [buyer, setBuyer] = useState({ name: '', email: '', method: 'PIX' }), [methods, setMethods] = useState<{ simulation: boolean; reason: string } | null | undefined>(undefined);
   const [errors, setErrors] = useState<{ cart?: string; delivery?: string; cep?: string; confirm?: string; changed?: boolean }>({}), [info, setInfo] = useState(''), [editItems, setEditItems] = useState(false);
-  const heading = useRef<HTMLHeadingElement>(null);
-  useEffect(() => { call(slug, 'cart').then(setCart).catch((e) => setLoadError(e.message)); call(slug, 'payment-methods').then(setMethods).catch(() => setMethods(null)); }, [slug]);
+  const [unknown, setUnknown] = useState<{ intent: Intent; detail: string; restored: boolean } | null>(null), [recovered, setRecovered] = useState('');
+  const heading = useRef<HTMLHeadingElement>(null), sending = useRef(false);
+  useEffect(() => { call(slug, 'cart').then(setCart).catch((e) => setLoadError(e.message)); call(slug, 'payment-methods').then(setMethods).catch(() => setMethods(null)); const saved = readPending(slug); if (saved) setUnknown({ intent: saved, detail: '', restored: true }); }, [slug]);
   useEffect(() => { heading.current?.focus(); }, [step]);
   async function change(variant_id: string, quantity: number) {
+    if (unknown) return; // mudar itens muda a versão do carrinho: só depois de resolver a confirmação pendente
     setBusy(true); setErrors({}); setInfo('');
     try { setCart(await call(slug, 'cart/items', { variant_id, quantity })); setEditItems(false); if (quote) { setQuote(null); setStep('delivery'); setInfo('Os itens mudaram: calcule a entrega de novo para ver o total atualizado.'); } }
     catch (e) { setErrors({ cart: (e as Error).message }); } finally { setBusy(false); }
@@ -49,18 +64,35 @@ export function CartFlow({ slug }: { slug: string }) {
     catch (err) { const m = (err as Error).message; if (err instanceof StoreError && [404, 409, 422].includes(err.status) && /cep|entrega|frete|atend/i.test(m)) setErrors({ cep: m }); else setErrors({ delivery: m }); }
     finally { setBusy(false); }
   }
-  async function confirm() {
-    if (!quote || !address) return;
-    setBusy(true); setErrors({});
-    try { const body = { quote_id: quote.id, address, buyer: { name: buyer.name, email: buyer.email }, method: buyer.method, total_cents: quote.total_cents }; const order = await call(slug, 'cart/checkout', { key: intentKey(quote.id, body), ...body }); location.assign(`/lojas/${slug}/pedidos/${order.id}`); }
-    catch (e) {
+  async function submit(intent: Intent) {
+    if (sending.current) return; // duplo clique: uma requisição por vez; a mesma chave cobre recargas
+    sending.current = true; setBusy(true); setErrors({}); setRecovered('');
+    writePending(slug, intent);
+    try {
+      const order = await call(slug, 'cart/checkout', { key: intent.key, ...intent.body }, {}, 30000);
+      if (!order?.id) throw new StoreError(0, 'A resposta da loja chegou incompleta.');
+      writePending(slug, null); location.assign(`/lojas/${slug}/pedidos/${order.id}`); return;
+    } catch (e) {
       const m = (e as Error).message;
-      // Só o 409 de preço/frete/disponibilidade pede nova cotação; os demais (loja sem conta de pagamento, vendas pausadas) ficam na revisão.
-      if (e instanceof StoreError && e.status === 409 && /pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ changed: true }); }
-      else setErrors({ confirm: m });
-      setBusy(false);
-    }
+      if (!conclusive(e)) { setUnknown({ intent, detail: m, restored: false }); }
+      else {
+        writePending(slug, null); const was = unknown; setUnknown(null);
+        if (/pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ changed: true }); }
+        else if (was?.restored || !quote) setRecovered(m);
+        else setErrors({ confirm: m });
+      }
+    } finally { sending.current = false; setBusy(false); }
   }
+  function confirm() {
+    if (!quote || !address) return;
+    const body: CheckoutBody = { quote_id: quote.id, address, buyer: { name: buyer.name, email: buyer.email }, method: buyer.method, total_cents: quote.total_cents };
+    void submit({ key: intentKey(quote.id, body), body, total: quote.total_cents });
+  }
+  const pendingPanel = unknown && <Alert tone="warning" role="alert" title="Não sabemos se a compra foi registrada">
+    <p>{unknown.restored ? 'Uma confirmação de compra enviada nesta aba ficou sem resposta.' : `A resposta da loja não chegou${unknown.detail ? ` (${unknown.detail.replace(/\.$/, '')})` : ''}.`} A compra pode ter sido registrada. Não envie outra: “Verificar compra” reenvia exatamente a mesma confirmação de {money(unknown.intent.total)} — se ela já existir, você verá o pedido; se não existir, ela é registrada uma única vez.</p>
+    <p className="small">Até a verificação terminar, itens, entrega e dados ficam travados para não mudar a compra pela metade.</p>
+    <div className="cluster"><button type="button" className="btn btn-primary" disabled={busy} onClick={() => void submit(unknown.intent)}>{busy ? 'Verificando…' : 'Verificar compra'}</button></div>
+  </Alert>;
   if (loadError) return <Alert tone="danger" role="alert" title="Não foi possível abrir o carrinho">{loadError}</Alert>;
   if (!cart) return <p role="status">Carregando carrinho…</p>;
   const invalid = cart.items.filter((i) => !i.active || i.status !== 'ACTIVE' || i.quantity > i.available);
@@ -68,11 +100,13 @@ export function CartFlow({ slug }: { slug: string }) {
   return <>
     <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>
     <h1 ref={heading} tabIndex={-1} style={{ padding: 'var(--space-16) 0 0' }}>Seu carrinho</h1>
+    {unknown && (unknown.restored || step !== 'review') && <div style={{ paddingTop: 'var(--space-16)' }}>{pendingPanel}</div>}
+    {recovered && <div style={{ paddingTop: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="A confirmação anterior foi recusada pela loja">{recovered} Nenhum pedido foi criado por ela. Revise e confirme de novo.</Alert></div>}
     {cart.items.length === 0 ? <div style={{ padding: 'var(--space-24) 0 var(--space-48)' }}><EmptyState icon="cart" title="Seu carrinho está vazio" action={<a className="btn btn-primary" href={`/lojas/${slug}`}>Ver produtos</a>}>Adicionar itens não reserva estoque; a reserva acontece só ao confirmar a compra.</EmptyState></div> :
     <div className={`checkout${step === 'review' ? ' is-review' : ''}`}>
       <div className="checkout-main">
         <section className="step-block" aria-labelledby="t-items">
-          <header><h2 id="t-items">Itens</h2>{step === 'delivery' || editItems ? <span className="small muted">Preços recalculados pela loja; adicionar itens não reserva estoque.</span> : <button type="button" className="btn btn-secondary btn-sm" aria-expanded={false} onClick={() => setEditItems(true)}>Alterar itens</button>}</header>
+          <header><h2 id="t-items">Itens</h2>{step === 'delivery' || editItems ? <span className="small muted">Preços recalculados pela loja; adicionar itens não reserva estoque.</span> : <button type="button" className="btn btn-secondary btn-sm" aria-expanded={false} disabled={!!unknown} onClick={() => setEditItems(true)}>Alterar itens</button>}</header>
           {step !== 'delivery' && !editItems ? <p className="small">{cart.items.reduce((n, i) => n + i.quantity, 0)} {cart.items.reduce((n, i) => n + i.quantity, 0) === 1 ? 'unidade' : 'unidades'} · {money(cart.subtotal_cents)}. Mudar itens exige calcular a entrega de novo.</p> : <>
           {errors.cart && <Alert tone="danger" role="alert" title="Não foi possível atualizar o carrinho">{errors.cart}</Alert>}
           {invalid.length > 0 && <Alert tone="warning" role="alert" title="Revise o carrinho">Há item indisponível ou com quantidade acima do disponível. Ajuste para continuar.</Alert>}
@@ -81,13 +115,13 @@ export function CartFlow({ slug }: { slug: string }) {
             {bad && <p className="error-text"><Icon name="alert" size={16} />{!i.active || i.status !== 'ACTIVE' ? 'Item indisponível. Remova-o para continuar.' : `Só há ${i.available} disponíveis.`}</p>}
             <form className="cart-line-actions" aria-label={`Quantidade de ${i.name}`} onSubmit={(e) => { const b = fields(e); void change(i.variant_id, Number(b.quantity)); }}>
               <Field label={<>Quantidade<span className="sr-only"> de {i.name}</span></>}>{(a) => <input className="input" name="quantity" type="number" min={0} max={99} defaultValue={i.quantity} key={i.quantity} required {...a} />}</Field>
-              <button className="btn btn-secondary btn-sm" disabled={busy}>Atualizar quantidade</button>
-              <button type="button" className="btn btn-quiet btn-sm" disabled={busy} onClick={() => void change(i.variant_id, 0)} aria-label={`Remover ${i.name}`}>Remover</button>
+              <button className="btn btn-secondary btn-sm" disabled={busy || !!unknown}>Atualizar quantidade</button>
+              <button type="button" className="btn btn-quiet btn-sm" disabled={busy || !!unknown} onClick={() => void change(i.variant_id, 0)} aria-label={`Remover ${i.name}`}>Remover</button>
             </form></div></li>; })}</ul></>}
         </section>
         {info && <Alert tone="warning" role="status" title="Recalcule a entrega">{info}</Alert>}
         <section className="step-block" aria-labelledby="t-delivery">
-          <header><h2 id="t-delivery">Entrega</h2>{step !== 'delivery' && quote && <button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={() => { setStep('delivery'); setQuote(null); }}>Alterar entrega</button>}</header>
+          <header><h2 id="t-delivery">Entrega</h2>{step !== 'delivery' && quote && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => { setStep('delivery'); setQuote(null); }}>Alterar entrega</button>}</header>
           {step !== 'delivery' && quote && address ? <dl className="summary"><dt>Método</dt><dd>{quote.method}: {money(quote.price_cents)} · prazo {quote.days} {quote.days === 1 ? 'dia' : 'dias'}</dd><dt>Endereço</dt><dd>{address.street}, {address.number}{address.complement ? `, ${address.complement}` : ''} — {address.city}/{address.state} · CEP {address.cep}</dd></dl> :
           <form className="form" aria-label="Calcular frete" onSubmit={(e) => void quoteDelivery(e)}>
             {errors.delivery && <Alert tone="danger" role="alert" title="Não foi possível calcular a entrega">{errors.delivery}</Alert>}
@@ -106,11 +140,11 @@ export function CartFlow({ slug }: { slug: string }) {
             </div>
             <Field label="Complemento" optional>{(a) => <input className="input" name="complement" autoComplete="address-line2" defaultValue={address?.complement} {...a} />}</Field>
             {kind === 'PICKUP' && <p className="hint">O endereço fica registrado no pedido mesmo na retirada.</p>}
-            <div><button className="btn btn-primary" disabled={busy || !cart.valid || invalid.length > 0}>{busy ? 'Calculando…' : 'Calcular frete'}</button></div>
+            <div><button className="btn btn-primary" disabled={busy || !cart.valid || invalid.length > 0 || !!unknown}>{busy ? 'Calculando…' : 'Calcular frete'}</button></div>
           </form>}
         </section>
         {quote && step !== 'delivery' && <section className="step-block" aria-labelledby="t-buyer">
-          <header><h2 id="t-buyer">Seus dados</h2>{step === 'review' && <button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={() => setStep('buyer')}>Corrigir dados</button>}</header>
+          <header><h2 id="t-buyer">Seus dados</h2>{step === 'review' && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => setStep('buyer')}>Corrigir dados</button>}</header>
           {methods === undefined ? <p role="status" className="small">Consultando meios de pagamento…</p> : !methods?.simulation ? <Alert tone="warning" title="Pagamento indisponível">{methods?.reason || 'A loja ainda não tem meio de pagamento habilitado.'} Nenhum pedido será criado.</Alert> :
           step === 'buyer' ? <form className="form" aria-label="Dados do comprador" onSubmit={(e) => { const b = fields(e); setBuyer({ name: b.name!, email: b.email!, method: b.method! }); setStep('review'); }}>
             <Field label="Nome completo">{(a) => <input className="input" name="name" required maxLength={100} defaultValue={buyer.name} autoComplete="name" {...a} />}</Field>
@@ -127,8 +161,8 @@ export function CartFlow({ slug }: { slug: string }) {
           <Alert tone="warning" title="Ambiente SIMULADO">Nenhum valor real é cobrado. Meios de pagamento reais aguardam homologação.</Alert>
           <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete ({quote.method})</dt><dd>{money(quote.price_cents)}</dd></div><div className="grand"><dt>Total a pagar</dt><dd>{money(quote.total_cents)}</dd></div></dl>
           <p className="small">Ao confirmar, você aceita as políticas do fornecedor exibidas no rodapé. Os itens ficam reservados por até 40 minutos aguardando o pagamento. Se preço, disponibilidade ou frete mudarem, a loja pede nova confirmação.</p>
-          {errors.confirm && <Alert tone="danger" role="alert" title="O pedido não foi criado">{errors.confirm} Tentar de novo não gera compra duplicada.</Alert>}
-          <button type="button" className="btn btn-primary" disabled={busy} onClick={() => void confirm()}>{busy ? 'Confirmando…' : `Confirmar compra de ${money(quote.total_cents)}`}</button>
+          {errors.confirm && <Alert tone="danger" role="alert" title="A loja recusou a confirmação">{errors.confirm} Nenhum pedido foi criado por esta confirmação; corrija o que for preciso e confirme de novo.</Alert>}
+          {unknown ? !unknown.restored && pendingPanel : <button type="button" className="btn btn-primary" disabled={busy} onClick={confirm}>{busy ? 'Confirmando…' : `Confirmar compra de ${money(quote.total_cents)}`}</button>}
         </section>}
       </div>
       <section className="order-summary" aria-labelledby="t-summary">
@@ -175,7 +209,7 @@ export function OrderView({ slug, orderId }: { slug: string; orderId: string }) 
         <dl className="totals"><div><dt>Subtotal</dt><dd>{money(order.subtotal_cents)}</dd></div><div><dt>Frete</dt><dd>{money(order.shipping_cents)}</dd></div><div className="grand"><dt>Total</dt><dd>{money(order.total_cents)}</dd></div></dl>
       </section>
       <div className="checkout-main">
-        <dl className="summary"><dt>Entrega</dt><dd>{order.shipping.name}{order.shipping.kind === 'PICKUP' ? ' (retirada)' : ''} · {order.address.street}, {order.address.number} — {order.address.city}/{order.address.state} · CEP {order.address.cep}</dd><dt>Comprador</dt><dd>{order.buyer.name} · {order.buyer.email}</dd><dt>Fornecedor</dt><dd>{order.supplier.name} · {order.supplier.email} · {order.supplier.address}</dd></dl>
+        <dl className="summary"><dt>Entrega</dt><dd>{order.shipping.name}{order.shipping.kind === 'PICKUP' ? ' (retirada)' : ''} · {order.address.street === 'ANONIMIZADO' ? 'endereço anonimizado' : `${order.address.street}, ${order.address.number}${order.address.complement ? `, ${order.address.complement}` : ''} — ${order.address.city}/${order.address.state} · CEP ${order.address.cep}`}</dd><dt>Comprador</dt><dd>{order.buyer.email === 'anonimizado@invalid' ? 'Dados pessoais anonimizados' : `${order.buyer.name} · ${order.buyer.email}`}</dd><dt>Fornecedor</dt><dd>{order.supplier.name} · {order.supplier.email} · {order.supplier.address}</dd></dl>
         <section className="step-block" aria-labelledby="t-req">
           <header><h2 id="t-req">Atendimento, cancelamento ou arrependimento</h2></header>
           <p className="small">Você recebe um protocolo na hora. Receber a solicitação não confirma cancelamento nem devolução de valores; a loja responde em até 5 dias. O arrependimento (art. 49 do CDC) pode ser pedido em até 7 dias do recebimento.</p>

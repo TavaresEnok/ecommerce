@@ -1,0 +1,18 @@
+# Projeto Compose isolado para revisão visual do redesign (docs/design/ambiente/README.md).
+# Sobrepõe compose.yaml + compose.test.yaml: imagem e volumes próprios (projeto ecommerce-design-demo), web em
+# 127.0.0.1:3400 e origem pública correspondente. Dados apenas sintéticos; pagamentos SIMULADOS (PAYMENT_SIMULATION do
+# .local/test.env). O limite por IP sobe para que capturas e verificações em sequência não esbarrem em 429.
+x-image: &image ecommerce-design-demo:local
+services:
+  storage-init: {image: *image}
+  migrate: {image: *image}
+  api:
+    image: *image
+    environment: {PUBLIC_ORIGIN: "http://localhost:3400", RATE_LIMIT_PER_MINUTE: "5000"}
+  worker:
+    image: *image
+    environment: {PUBLIC_ORIGIN: "http://localhost:3400"}
+  web:
+    image: *image
+    ports: !override ["127.0.0.1:3400:3000"]
+  tests: {image: ecommerce-design-demo-tests:local}

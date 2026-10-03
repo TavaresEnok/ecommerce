@@ -1,17 +1,13 @@
 // Verificações de teclado e foco nas rotas reais (complementa capturar-rotas.mjs).
 // Uso: node docs/design/verificar-teclado.mjs [--base=http://localhost:3000]
 // Requer o ambiente local com os dados de .local/demo-ui.json (fora do git) e Playwright com Chromium.
-import { createRequire } from 'node:module';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url)), repo = join(here, '..', '..');
-const require = createRequire(import.meta.url);
-let playwright;
-for (const c of ['/opt/node22/lib/node_modules/playwright', 'playwright']) { try { playwright = require(c); break; } catch { /* próximo */ } }
-const base = (process.argv.find((a) => a.startsWith('--base=')) || '').slice(7) || 'http://localhost:3000';
-const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8'));
+import { launch, baseOf } from './ambiente/navegador.mjs';
+const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8')), base = baseOf(demo);
 const A = demo.storeA, results = [];
 const check = (id, ok, detail) => { results.push({ id, ok, detail }); console.log(`${ok ? 'ok  ' : 'FALHA'} ${id} — ${detail}`); };
 async function login({ email, password }) {
@@ -19,7 +15,7 @@ async function login({ email, password }) {
   const [name, value] = r.headers.get('set-cookie').split(';')[0].split('='); return [{ name, value, url: base }];
 }
 const focused = (page) => page.evaluate(() => { const e = document.activeElement; return { tag: e?.tagName, text: (e?.getAttribute('aria-label') || e?.textContent || '').trim().slice(0, 60), outline: e ? getComputedStyle(e).outlineStyle : '' }; });
-const browser = await playwright.chromium.launch();
+const browser = await launch();
 
 // 1. Painel: primeiro Tab no link de pular, contorno de foco visível; diálogo com foco inicial, Esc e retorno de foco.
 {

@@ -12,7 +12,7 @@ type Generation = { id: string; status: string; draft: string | null; error_code
 
 export function AiDraftSection({ tenantId, csrf, owner }: { tenantId: string; csrf: string; owner: boolean }) {
   const [settings, setSettings] = useState<Settings | null>(null), [products, setProducts] = useState<{ id: string; name: string; description: string }[]>([]), [product, setProduct] = useState(''), [gen, setGen] = useState<Generation | null>(null), [text, setText] = useState('');
-  const { busy, error, notice, run } = useAction();
+  const { busy, error, notice, run, setNotice } = useAction();
   const api = (path: string, method = 'GET', body?: unknown) => call(path, { method, body, csrf });
   async function load() { setSettings(await api(`tenants/${tenantId}/ai/settings`)); const c = await api(`tenants/${tenantId}/catalogue`); setProducts(c.products); setProduct((p) => p || c.products[0]?.id || ''); }
   const act = (task: () => Promise<unknown>, done: string) => run(async () => { await task(); await load(); }, done);
@@ -26,7 +26,7 @@ export function AiDraftSection({ tenantId, csrf, owner }: { tenantId: string; cs
       {owner && <div><button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void act(() => api(`tenants/${tenantId}/ai/settings`, 'POST', { enabled: !settings.enabled }), settings.enabled ? 'IA desligada nesta loja.' : 'IA ligada nesta loja.')}>{settings.enabled ? 'Desligar nesta loja' : 'Ligar nesta loja'}</button></div>}
       {settings.enabled && <>
         <div className="cluster" style={{ alignItems: 'end' }}><Field label="Produto">{(a) => <select className="select" value={product} onChange={(e) => { setProduct(e.target.value); setGen(null); }} {...a}>{products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>}</Field>
-          <button className="btn btn-primary" disabled={busy || !product} onClick={() => void act(async () => { const g = await api(`tenants/${tenantId}/catalogue/products/${product}/ai-description`, 'POST', { key: uid() }); setGen(g); setText(g.draft ?? ''); }, 'Rascunho gerado; revise antes de salvar.')}>{busy ? 'Gerando…' : 'Gerar rascunho'}</button></div>
+          <button className="btn btn-primary" disabled={busy || !product} onClick={async () => { let status = ''; const ok = await act(async () => { const g = await api(`tenants/${tenantId}/catalogue/products/${product}/ai-description`, 'POST', { key: uid() }); setGen(g); setText(g.draft ?? ''); status = g.status; }, ''); /* só um rascunho concluído é anunciado como gerado; incerto ou falho tem aviso próprio */ if (ok && status === 'SUCCEEDED') setNotice('Rascunho gerado; revise antes de salvar.'); }}>{busy ? 'Gerando…' : 'Gerar rascunho'}</button></div>
         {gen && <div className="stack-sm">
           <p className="cluster-tight small"><StatusBadge map={GENERATION} value={gen.status} />{gen.error_code ? `(${gen.error_code})` : ''}{gen.cost_micros ? ` · custo ${usd(gen.cost_micros)}` : ` · reserva ${usd(gen.reserved_micros)}`}</p>
           {gen.status === 'UNKNOWN' && <Alert tone="warning" title="Resultado incerto">A reserva fica retida até a verificação. Nada foi alterado no produto.</Alert>}

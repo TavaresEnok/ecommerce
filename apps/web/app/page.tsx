@@ -1,6 +1,6 @@
 'use client';
 // R01 — Acesso e lojas. Mesmas chamadas de API de antes; reorganização de interface (DESIGN.md, TELAS-E-FLUXOS R01).
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { call, ApiError, fields, useAction } from '../components/panel/api';
 import { Alert, Badge, ConfirmDialog, CopyButton, EmptyState, Feedback, Field, Loading, StatusBadge, useTitle } from '../components/ui/kit';
 import { Icon } from '../components/ui/icons';
@@ -21,6 +21,9 @@ export default function Home() {
   const [newSlug, setNewSlug] = useState(''), [slugTouched, setSlugTouched] = useState(false);
   const { busy, error, notice, run, setNotice } = useAction();
   useTitle(user ? 'Suas lojas' : 'Entrar');
+  // Depois de entrar pelo formulário, o foco vai para o título “Suas lojas” (o formulário some da tela).
+  const storesTitle = useRef<HTMLHeadingElement>(null), signedIn = useRef(false);
+  useEffect(() => { if (user && signedIn.current) { signedIn.current = false; storesTitle.current?.focus(); } }, [user]);
   const api = (path: string, method = 'GET', body?: unknown, token = csrf) => call(path, { method, body, csrf: token });
   async function refresh(token = csrf) { setStores(await api('tenants', 'GET', undefined, token)); }
   function signedOut() { setUser(null); setSelected(null); setSettings(null); setStores([]); setLocalToken(''); setView('login'); }
@@ -51,7 +54,7 @@ export default function Home() {
       {codeBox}
       {view === 'login' && <section className="surface section stack-sm" aria-labelledby="t-login">
         <h1 id="t-login">Entrar</h1>
-        <form className="form" aria-label="Entrar" onSubmit={submit(async (d) => { const r = await api('auth/login', 'POST', d); setUser(r.user); setCsrf(r.csrf); setLocalToken(''); await refresh(r.csrf); })}>
+        <form className="form" aria-label="Entrar" onSubmit={submit(async (d) => { const r = await api('auth/login', 'POST', d); signedIn.current = true; setUser(r.user); setCsrf(r.csrf); setLocalToken(''); await refresh(r.csrf); })}>
           <Field label="E-mail">{(a) => <input className="input" name="email" type="email" required autoComplete="username" {...a} />}</Field>
           <Field label="Senha">{(a) => <input className="input" name="password" type="password" minLength={12} maxLength={128} required autoComplete="current-password" {...a} />}</Field>
           <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Entrando…' : 'Entrar'}</button>
@@ -105,7 +108,7 @@ export default function Home() {
         <button className="btn btn-quiet btn-sm" disabled={busy} onClick={() => setConfirmRevoke(true)}>Encerrar todas as sessões…</button></div>
     </header>
     <main className="auth-main wide" id="conteudo">
-      <div className="page-head"><div><h1>Suas lojas</h1><p className="meta">Escolha uma loja para abrir o painel ou ajustar a configuração. Você só vê lojas às quais está vinculado.</p></div></div>
+      <div className="page-head"><div><h1 ref={storesTitle} tabIndex={-1}>Suas lojas</h1><p className="meta">Escolha uma loja para abrir o painel ou ajustar a configuração. Você só vê lojas às quais está vinculado.</p></div></div>
       <Feedback error={error} notice={notice} />
       {codeBox}
       <div className="two-col" style={{ gridTemplateColumns: undefined }}>

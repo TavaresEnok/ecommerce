@@ -23,14 +23,25 @@ function walk(node, path) {
 walk(tokens.platform, ['platform']);
 walk(tokens.store, ['store']);
 export const block = `/* tokens:inicio — gerado de docs/design/tokens.json por docs/design/tokens-css.mjs; não editar à mão */\n:root {\n${lines.join('\n')}\n}\n/* tokens:fim */`;
-const check = process.argv.includes('--check');
-let stale = 0;
-for (const rel of consumers) {
-  const file = join(root, rel), css = readFileSync(file, 'utf8');
-  const re = /\/\* tokens:inicio[\s\S]*?\/\* tokens:fim \*\//;
-  if (!re.test(css)) { console.error(`${rel}: marcadores tokens:inicio/fim ausentes`); stale++; continue; }
-  const next = css.replace(re, block);
-  if (next !== css) { stale++; if (!check) writeFileSync(file, next); console.log(`${rel}: ${check ? 'desatualizado' : 'atualizado'}`); }
-  else console.log(`${rel}: em dia`);
+const marked = /\/\* tokens:inicio[\s\S]*?\/\* tokens:fim \*\//;
+// Compara o bloco gerado com o do arquivo tolerando só a convenção de fim de linha (LF ou CRLF, conforme o checkout com
+// `* text=auto`); qualquer outra diferença (valor, nome, espaço, linha a mais) continua sendo “desatualizado”.
+// Ao gravar, o bloco usa o mesmo fim de linha do arquivo.
+export function sync(css, generated = block) {
+  const found = css.match(marked);
+  if (!found) return { status: 'sem-marcadores', next: css };
+  if (found[0].replace(/\r\n/g, '\n') === generated) return { status: 'em-dia', next: css };
+  const eol = css.includes('\r\n') ? '\r\n' : '\n';
+  return { status: 'desatualizado', next: css.replace(marked, () => generated.replace(/\n/g, eol)) };
 }
-if (check && stale) process.exit(1);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const check = process.argv.includes('--check');
+  let stale = 0;
+  for (const rel of consumers) {
+    const file = join(root, rel), { status, next } = sync(readFileSync(file, 'utf8'));
+    if (status === 'sem-marcadores') { console.error(`${rel}: marcadores tokens:inicio/fim ausentes`); stale++; continue; }
+    if (status === 'desatualizado') { stale++; if (!check) writeFileSync(file, next); console.log(`${rel}: ${check ? 'desatualizado' : 'atualizado'}`); }
+    else console.log(`${rel}: em dia`);
+  }
+  if (check && stale) process.exit(1);
+}
