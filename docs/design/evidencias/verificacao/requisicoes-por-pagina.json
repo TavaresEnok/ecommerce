@@ -1,0 +1,41 @@
+{
+ "nota": "Requisições /api/* feitas pelo navegador por carga completa de página (1440 px, Dono da loja A), web da branch (porta 3400) e web da base 831d9a2 (porta 3401) contra a MESMA API do ambiente isolado. Antes da correção a branch somava 42 (painel: 9/7/6/11) — causa dos 429 do pilot-flow na segunda execução do verify (limite de 1000/min por IP em APP_ENV=test). Script: contar-requisicoes.mjs.",
+ "antes_da_correcao_branch": {
+  "/painel/A": 9,
+  "/painel/A/pedidos": 7,
+  "/painel/A/atendimento": 6,
+  "/painel/A/operacao": 11,
+  "total_8_paginas": 42
+ },
+ "branch": {
+  "/": 2,
+  "/painel/A": 9,
+  "/painel/A →": "/api/auth/session, /api/tenants, /api/tenants/:id/settings, /api/tenants/:id/operations/status, /api/tenants/:id/purchase/accounts, /api/tenants/:id/catalogue, /api/tenants/:id/storefront, 2× /api/tenants/:id/storefront/media/:id/small",
+  "/painel/A/pedidos": 4,
+  "/painel/A/pedidos →": "/api/auth/session, /api/tenants, /api/tenants/:id/operations/orders, /api/tenants/:id/purchase/accounts",
+  "/painel/A/atendimento": 3,
+  "/painel/A/atendimento →": "/api/auth/session, /api/tenants, /api/tenants/:id/operations/support",
+  "/painel/A/operacao": 8,
+  "/painel/A/operacao →": "2× /api/auth/session, /api/tenants, /api/tenants/:id/ai/settings, /api/tenants/:id/operations/status, /api/tenants/:id/catalogue, /api/tenants/:id/billing, /api/tenants/:id/domains",
+  "/lojas/a": 2,
+  "/lojas/a/produtos/camiseta": 3,
+  "/lojas/a/carrinho": 2,
+  "total": 33
+ },
+ "base": {
+  "/": 2,
+  "/painel/A": 4,
+  "/painel/A →": "/api/auth/session, /api/tenants, /api/tenants/:id/catalogue, /api/tenants/:id/storefront",
+  "/painel/A/pedidos": 4,
+  "/painel/A/pedidos →": "/api/auth/session, /api/tenants, /api/tenants/:id/operations/orders, /api/tenants/:id/purchase/accounts",
+  "/painel/A/atendimento": 3,
+  "/painel/A/atendimento →": "/api/auth/session, /api/tenants, /api/tenants/:id/operations/support",
+  "/painel/A/operacao": 8,
+  "/painel/A/operacao →": "2× /api/auth/session, /api/tenants, /api/tenants/:id/operations/status, /api/tenants/:id/ai/settings, /api/tenants/:id/billing, /api/tenants/:id/catalogue, /api/tenants/:id/domains",
+  "/lojas/a": 2,
+  "/lojas/a/produtos/camiseta": 2,
+  "/lojas/a/carrinho": 1,
+  "total": 26
+ },
+ "branchMenu": 13
+}

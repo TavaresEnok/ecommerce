@@ -21,15 +21,29 @@ export function usePanel() { const v = useContext(Ctx); if (!v) throw new Error(
 type Load = { state: 'loading' } | { state: 'expired' } | { state: 'denied' } | { state: 'error'; message: string } | { state: 'ready'; value: Omit<PanelContext, 'refresh'> };
 export function PanelShell({ tenantId, children }: { tenantId: string; children: ReactNode }) {
   const [load, setLoad] = useState<Load>({ state: 'loading' });
-  const fetchContext = useCallback(async () => {
+  const fetchContext = useCallback(async (fresh = false) => {
     try {
+      // Sessão e lojas vêm sempre da API (autorização). Configuração, situação de vendas e conta de pagamento só enfeitam
+      // a casca: são pedidas em paralelo e reaproveitadas por 60 s entre recargas da mesma aba (sessionStorage), para não
+      // multiplicar requisições a cada página; ações que mudam esses dados chamam refresh(), que ignora a cópia.
       const session = await call<{ user: { email: string }; csrf: string; mfa: { enabled: boolean; verified: boolean } }>('auth/session');
       const stores = await call<Store[]>('tenants', { csrf: session.csrf });
       const store = stores.find((s) => s.id === tenantId);
       if (!store) { setLoad({ state: 'denied' }); return; }
-      const settings = await call<{ timezone: string; displayName: string }>(`tenants/${tenantId}/settings`, { csrf: session.csrf });
-      const status = await call<{ suspended: boolean; sales_paused: boolean }>(`tenants/${tenantId}/operations/status`, { csrf: session.csrf }).catch(() => null);
-      const accounts = store.role === 'OWNER' ? await call<{ provider: string; environment: string; status: string }[]>(`tenants/${tenantId}/purchase/accounts`, { csrf: session.csrf }).catch(() => null) : null;
+      type Extras = { settings: { timezone: string; displayName: string }; status: { suspended: boolean; sales_paused: boolean } | null; accounts: { provider: string; environment: string; status: string }[] | null };
+      const key = `painel-${tenantId}-${session.user.email}-${store.role}`;
+      let extras: Extras | null = null;
+      if (!fresh) try { const c = JSON.parse(sessionStorage.getItem(key) || 'null') as { at: number; v: Extras } | null; if (c && Date.now() - c.at < 60000) extras = c.v; } catch { /* sem storage */ }
+      if (!extras) {
+        const [settings, status, accounts] = await Promise.all([
+          call<Extras['settings']>(`tenants/${tenantId}/settings`, { csrf: session.csrf }),
+          call<NonNullable<Extras['status']>>(`tenants/${tenantId}/operations/status`, { csrf: session.csrf }).catch(() => null),
+          store.role === 'OWNER' ? call<NonNullable<Extras['accounts']>>(`tenants/${tenantId}/purchase/accounts`, { csrf: session.csrf }).catch(() => null) : Promise.resolve(null),
+        ]);
+        extras = { settings, status, accounts };
+        try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), v: extras })); } catch { /* sem storage */ }
+      }
+      const { settings, status, accounts } = extras;
       const connected = accounts?.filter((a) => a.status === 'CONNECTED') ?? null;
       const payment = connected === null ? 'UNKNOWN' : connected.length === 0 ? 'NONE' : connected.some((a) => a.provider === 'SIMULATED' || a.environment === 'SIMULATED') ? 'SIMULATED' : 'REAL';
       setLoad({ state: 'ready', value: { tenantId, csrf: session.csrf, email: session.user.email, store: { ...store, name: settings.displayName || store.name }, owner: store.role === 'OWNER', timezone: settings.timezone, mfa: session.mfa, status, payment } });
@@ -44,9 +58,9 @@ export function PanelShell({ tenantId, children }: { tenantId: string; children:
     {load.state === 'loading' ? <Loading label="Carregando dados autorizados da loja…" /> :
       load.state === 'expired' ? <Alert tone="warning" role="alert" title="Sessão expirada">Entre novamente para continuar. <a href="/">Ir para o acesso</a></Alert> :
       load.state === 'denied' ? <Alert tone="danger" role="alert" title="Loja não encontrada">Esta loja não existe ou você não tem vínculo ativo com ela. <a href="/">Voltar às suas lojas</a></Alert> :
-      <Alert tone="danger" role="alert" title="Não foi possível carregar o painel">{load.message} <button className="btn btn-secondary btn-sm" onClick={() => void fetchContext()}>Tentar novamente</button></Alert>}
+      <Alert tone="danger" role="alert" title="Não foi possível carregar o painel">{load.message} <button className="btn btn-secondary btn-sm" onClick={() => void fetchContext(true)}>Tentar novamente</button></Alert>}
   </main></div>;
-  return <Ctx.Provider value={{ ...load.value, refresh: fetchContext }}><Suspense><Frame>{children}</Frame></Suspense></Ctx.Provider>;
+  return <Ctx.Provider value={{ ...load.value, refresh: () => fetchContext(true) }}><Suspense><Frame>{children}</Frame></Suspense></Ctx.Provider>;
 }
 
 function Frame({ children }: { children: ReactNode }) {
