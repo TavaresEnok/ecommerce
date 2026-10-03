@@ -5,13 +5,15 @@
 
 > Este redesign **não** torna o sistema pronto para produção. Pagamentos seguem SIMULADOS, a devolução continua orientada no provedor, e não houve aprovação visual do responsável nem auditoria de acessibilidade com leitor de tela.
 
-## 1. Situação em três eixos
+## 1. Situação em três eixos (03/10/2026, commit `ff73c7d` + documentação)
 
 | Eixo | Situação | Base |
 |---|---|---|
-| **Implementação** | Concluída nos três lotes (A, B, C); rotas R01–R14 redesenhadas, nenhuma rota nova de servidor, nenhuma regra de negócio ou resposta de API alterada | §2–§3 |
-| **Funcional** | Suítes de UI aprovadas, com uma falha **preexistente** (T23); typecheck de todos os workspaces e build aprovados; 24 verificações extras de aceite e 12 de teclado aprovadas | §4 |
-| **Visual** | Capturas reais em 390/768/1440, 320 px e zoom de 200%, examinadas por mim; 88 critérios do ACEITE preenchidos (57 aprovados, 7 aprovados parcialmente ou com ressalva, 11 parciais, 1 alterado por decisão, 12 sem execução). **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
+| **Implementação** | Lotes A, B e C concluídos; rodada de correções da revisão de `7f5572d` concluída (§8). Nenhuma regra de negócio nem resposta de API alterada | §2–§3, §8 |
+| **Funcional** | **Não concluído.** `verificar-aceite.mjs` 65/65 e `verificar-teclado.mjs` 12/12 na rodada do zero (uma falha transitória do teste A-R01-06 aprovada na repetição, §8). `scripts/verify.mjs --phase=7` oficial não passa do build neste ambiente; a execução continuada reprova o pilot-flow “Interface” (429) na base e na branch — falha preexistente, não resolvida. Verificação continuada não reexecutada depois das correções de CSS de `ff73c7d` | §4, §8, [verificação](evidencias/verificacao/LEIA-ME.md) |
+| **Visual** | ACEITE: 88 critérios — **83 aprovados, 3 parciais** (G-04 zoom real do navegador, G-05/G-06 percurso de Tab só em parte das rotas), **1 reprovado preexistente** (G-13) e **1 alterado** (A-R12-07). Nenhum sem evidência. **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
+
+A entrega **não** está concluída como um todo: G-13 continua reprovado (preexistente) e G-04/G-05/G-06 estão parciais.
 
 ## 2. Rotas alteradas
 
@@ -90,12 +92,11 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 8. Preview: carrinho e busca levavam a rotas inexistentes; o aviso espremia o nome da loja.
 
 **Fragilidades que continuam (pendências reais)**
-- Fotos fora da proporção do tema ganham faixas neutras grandes na moldura 4:5 (sem corte nem distorção, por decisão D-16). Convém orientar o lojista a enviar na proporção do tema ou permitir escolher a proporção.
-- No preview, links de produto e do menu apontam para `/lojas/preview/…` e dão 404 (comportamento anterior mantido).
+- Na grade da vitrine (moldura 4:5), fotos em paisagem ainda ganham faixas neutras (sem corte nem distorção, D-16); na página do produto a moldura acompanha a foto entre 4:5 e 4:3.
 - O 409 do cadastro de produto não distingue endereço de SKU; o erro fica no resumo do formulário, não no campo.
 - “Pagamento indisponível” depende de um sinal global (simulação desligada no ambiente); uma loja sem conta conectada só descobre na confirmação. Corrigir pede mudança de API — fora do redesign.
 - No celular o resumo do pedido fica depois da etapa atual (D-17); o critério A-R12-07, que pedia o resumo antes, foi registrado como “alterado”.
-- Doze cenários do ACEITE sem evidência: A-R01-03, A-R01-05, A-R02-06, A-R02-10, A-R02-12, A-R03-02, A-R03-05, A-R03-10, A-R04-04, A-R05-06, A-R08-04, A-R13-05.
+- Os doze cenários antes sem evidência foram exercitados na rodada de 03/10 (§8).
 - Sem leitor de tela real e sem auditoria completa de acessibilidade; nenhuma declaração de conformidade WCAG.
 - Checkout continua sem bairro, telefone ou CPF (decisão de produto, não alterada).
 - T23 (upload de 10 MB via proxy do Next) segue falhando e não pertence a este trabalho.
@@ -105,3 +106,28 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 1. Subir o ambiente local (README/`compose.yaml`), criar dados com `node scripts/seed.mjs --local` e os dados de demonstração usados nas capturas (pedidos pendente/pago/recusado/excedente, Funcionário, administrador com MFA) em `.local/demo-ui.json` (fora do git).
 2. `node docs/design/capturar-rotas.mjs depois` (+ `--widths=320`, `--widths=1280 --zoom=2`), `node docs/design/verificar-teclado.mjs`, `node docs/design/verificar-aceite.mjs` (altera dados de demonstração).
 3. Suítes: `node --test tests/<suíte>.test.mjs` com `BASE_URL` apontando para a web de teste.
+
+## 8. Rodada de correções sobre a revisão de `7f5572d` (03/10/2026)
+
+**Checkout sem resposta conclusiva** (`components/checkout.tsx`, D-18): rejeição conclusiva (400/409 depois da verificação de pedido existente) × resultado desconhecido (rede, tempo esgotado, 5xx, 429). No desconhecido a mesma intenção (chave + conteúdo) é guardada na memória e no `sessionStorage`, itens/entrega/dados ficam travados e só “Verificar compra” reenvia; nunca se afirma que o pedido não existe. Proteção do servidor mantida sem alteração: `checkoutExisting` devolve o pedido existente pela chave (mesmo conteúdo) e pelo carrinho + versão (qualquer chave); lacuna documentada: 503 (fila) é lançado antes da verificação de pedido existente, por isso é tratado como desconhecido. Testes CK-01…CK-05 em `verificar-aceite.mjs`.
+
+**Reprodutibilidade** (D-20): `docs/design/ambiente/` (Compose isolado `ecommerce-design-demo`, `gerar-dados.mjs`, `rodada-completa.sh`, README com dependências e limpeza restrita ao projeto de teste). `.local/demo-ui.json` (senhas e segredo MFA sintéticos) fica fora do git, modo 0600. Demonstração: três rodadas completas do zero nesta sessão (`limpar → subir → dados → capturas → teclado → aceite`).
+
+**Preview** (D-19): `/preview/[tenantId]/[[...path]]` com início, páginas e produtos do rascunho; o resto como “indisponível no preview”. PV-01: 9 links, 0 quebrados, 0 para a loja pública; anônimo negado; rascunho não vaza; noindex.
+
+**Defeitos encontrados nesta rodada e corrigidos**
+1. Texto em 200% (fonte do navegador 32 px): checkout e menu da loja com uma letra por linha, topo do painel sobreposto, lateral com palavras partidas. Causa: `overflow-wrap: anywhere` no corpo e pontos de quebra em px. Correção D-22 (pontos de quebra em `em`, `break-word`, topo com altura mínima).
+2. Lista de pedidos em 768 px: data quebrada por caractere e coluna “Pendências” cortada (a métrica de rolagem dava 0 px). Correção: empilhada até 1279 px.
+3. Capturas de texto 200%: o `fullPage` do Playwright redefine a fonte durante a captura (as imagens saíam com 16 px); agora a página é capturada com janela alta.
+4. Teste: “pedido mais recente” lia `body[0]` de `purchase/orders`, que ordena o número como texto (defeito **preexistente da API**, não usado pela interface; tarefa separada sugerida). Teste: conexão keep-alive fechada durante reinício do worker → uma repetição só para erro de soquete.
+5. Fotos: moldura do produto acompanha a proporção da foto (entre 4:5 e 4:3), miniaturas e imagem do tema inteiras, sem corte nem distorção (D-16 revisada).
+
+**Zoom:** `--zoom=2` é simulação de reflow (viewport CSS 640 + `deviceScaleFactor` 2), não o zoom real do navegador, que o Playwright headless não aciona — por isso G-04 fica parcial. Texto em 200% usa a preferência real de fonte do Chromium (`Page.setFontSizes`).
+
+**Tokens:** `tokens-css.mjs --check` normaliza só `\r\n` e grava no EOL do arquivo; `tokens-css.test.mjs` 8/8 (LF, CRLF, diferença real detectada em ambos, conteúdo preservado).
+
+**Imagens examinadas visualmente nesta rodada** (`evidencias/depois/`): R01-lojas-1440, R01-acesso-390, R02-produtos-390, R02-produto-editar-1440, R03-pedido-excedente-390, R03-pedidos-1440, R03-pedidos-768 (antes e depois da correção), R03-pedidos-1024, R04-protocolo-1440, R04-atendimento-390, R05-operacao-390, R05-operacao-1440, R06-plataforma-1440, R06-plataforma-320, R07-preview-390, R07-preview-indisponivel-1440, R07-preview-produto-1440, R08-vitrine-a-390, R08-vitrine-b-1440, R09-categoria-390, R09-categoria-1440, R10-produto-foto-retrato-390, R10-variacao-esgotada-1440, R11-pagina-390, R11-pagina-1440, R12-resultado-desconhecido-390, R12-revisao-1440, R12-dados-320, R12-dados-1280-t200 e R02-produtos-1280-t200 (antes e depois), R13-pendente-390, R13-pendente-1440, R14-atendimento-390, R14-atendimento-1440, R03-pedido-excedente-1280-z200, aceite-falha-A-R01-06. As 14 rotas foram vistas em celular e desktop; as demais imagens só pelas métricas de `resultado.json`.
+
+**Verificação por fase:** [evidências e procedimento](evidencias/verificacao/LEIA-ME.md). T23 (upload de 10 MB pelo proxy do Next, ~15% de 500 por EPIPE) e o 429 do pilot-flow reproduzem na base com o mesmo procedimento; ficaram como tarefas separadas. Nenhuma integração externa refeita; nada aqui é homologação real.
+
+**Pendências abertas:** G-13 (falhas preexistentes acima); verificação continuada sobre `ff73c7d`; zoom real do navegador; percurso de Tab nas demais rotas; leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).

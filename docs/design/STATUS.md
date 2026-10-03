@@ -1,7 +1,7 @@
 # Status dos materiais de design
 
-**Data:** 02/10/2026 · **Base:** `0179f4d` (produto, fases 0 a 7) + `831d9a2` (materiais) · **Branch:** `claude/gallant-fermat-6x20fs`
-**Estado:** redesign **implementado nas rotas reais R01–R14** (lotes A, B e C) e verificado localmente — detalhes, resultados e pendências em [RELATORIO-FINAL.md](RELATORIO-FINAL.md); critérios em [ACEITE.md](ACEITE.md). **Não houve aprovação visual do responsável.** O redesign **não** torna o sistema pronto para produção.
+**Data:** 03/10/2026 · **Base:** `0179f4d` (produto, fases 0 a 7) + `831d9a2` (materiais) · **Branch:** `claude/gallant-fermat-6x20fs`
+**Estado:** redesign **implementado nas rotas reais R01–R14** (lotes A, B e C) + rodada de correções de 03/10. ACEITE: 83 aprovados, 3 parciais, 1 reprovado preexistente (G-13), 1 alterado. **Entrega não concluída como um todo** (G-13, G-04, G-05, G-06) — detalhes, resultados e pendências em [RELATORIO-FINAL.md](RELATORIO-FINAL.md); critérios em [ACEITE.md](ACEITE.md). **Não houve aprovação visual do responsável.** O redesign **não** torna o sistema pronto para produção.
 
 ## 0. Implementação (prompt 2) — registro de progresso
 
@@ -10,6 +10,7 @@
 | A — fundamentos, acesso e painel | **Concluído** (tokens gerados em `apps/web/app/style.css`, fonte em `apps/web/app/fonts/`, componentes `components/ui/`, casca `components/panel/Shell.tsx` + `app/painel/[tenantId]/layout.tsx`, R01 e R02) | typecheck/build ok; `foundation.test.mjs` aprovado; `storefront.test.mjs` aprovado exceto T23 (falha preexistente do proxy do Next com upload de 10 MB rejeitado — reproduzida na web da base `831d9a2`); capturas em 390/768/1440 examinadas |
 | B — operação e administração | **Concluído** (R03 com filtros na URL e síntese do estado, R04, R05 com `commercial.tsx`/`ai-draft.tsx`, R06 com contexto global) | typecheck/build ok; `purchase-worker`, `pilot-flow` e `commercial-ui` aprovados (seletores de número do pedido e protocolo passaram de botão para link); capturas em 390/768/1440 examinadas |
 | C — vitrine e compra | **Concluído** (R07–R14: vitrine com marca por loja, produto com galeria 4:5 sem distorção, checkout em etapas na mesma rota, comprovante, contato; 404 e erro da vitrine) | typecheck/build ok; `storefront` (exceto T23 preexistente), `purchase-worker` e `pilot-flow` aprovados; capturas examinadas |
+| Rodada de correções (03/10) | **Concluída** (`ff73c7d` + documentação): checkout sem resposta conclusiva, preview navegável, ambiente reproduzível, texto 200% e lista de pedidos em 768 px (D-22) | `verificar-aceite.mjs` 65/65, `verificar-teclado.mjs` 12/12, rodada do zero; verify continuado: falhas da branch ⊂ falhas da base ([verificação](evidencias/verificacao/LEIA-ME.md)) |
 | Verificação final e correções | **Concluído** (`1500fbb` + documentação): login com senha errada, 409 na confirmação, chave de idempotência, nomes acessíveis da administração, estouros em 768/320 px, alvos de 44 px, preview | 5 suítes de UI (T23 preexistente), `verificar-teclado.mjs` 12/12, `verificar-aceite.mjs` 24/24, capturas 390/768/1440 + 320 px + zoom 200% em `evidencias/depois/`; ACEITE preenchido |
 
 Ambiente usado: Postgres 17.9/Redis/SeaweedFS do `compose.yaml` em contêiner; API, worker e web no host com Node 24.21.0; suítes de UI no contêiner oficial `mcr.microsoft.com/playwright:v1.63.0-noble` com `--network host --add-host web:127.0.0.1`. Detalhes no relatório final.
@@ -64,7 +65,7 @@ Revisão crítica (registrada):
 - **Rede:** o proxy bloqueou (403) `shopify.dev`, `www.carbondesignsystem.com`, `hydrogen.shop`, `baymard.com`, `www.radix-ui.com`, `www.w3.org`. Nenhuma referência foi consultada; nenhuma observação visual externa foi feita. Para consultar, liberar os domínios em *Network access* do ambiente.
 - **Georgia** não existe no Linux do ambiente: a opção “Serifada” foi renderizada com a serifada do sistema.
 - **Acessibilidade:** verificações automatizadas e inspeção do protótipo; sem leitor de tela real e sem auditoria completa. Não há declaração de conformidade WCAG.
-- Rotas reais renderizadas e testadas no prompt 2 (ver RELATORIO-FINAL.md §4–§5). Doze cenários do ACEITE continuam sem evidência (lista no relatório, §6).
+- Rotas reais renderizadas e testadas no prompt 2 (ver RELATORIO-FINAL.md §4–§5). Nenhum cenário do ACEITE sem evidência; parciais e reprovado preexistente no relatório, §1 e §8.
 - **Digest das fontes:** `scripts/verify.mjs` calcula hash de todo o repositório (exceto `docs/execucao/`); estes arquivos novos mudam o digest. As evidências das fases continuam válidas para o commit que testaram; nova execução gera nova evidência.
 - **Decisão de produto pendente (não resolvida aqui):** o checkout não pede bairro, telefone nem documento. Incluir algum deles muda o contrato do pedido e exige decisão do responsável — fora do redesign.
 - **Aprovação visual do responsável:** pendente.
@@ -72,6 +73,6 @@ Revisão crítica (registrada):
 ## 5. Próximos passos sugeridos
 
 1. Revisão visual do responsável sobre [`evidencias/depois/`](evidencias/depois/) comparando com [`evidencias/antes/`](evidencias/antes/).
-2. Executar os 12 cenários do ACEITE sem evidência e os trechos “parcial”.
+2. Resolver G-13 (429 do pilot-flow e T23, preexistentes) e reexecutar a verificação continuada sobre o commit final; zoom real do navegador e percurso de Tab nas demais rotas.
 3. Decidir as pendências de produto listadas no RELATORIO-FINAL.md §6 (proporção de foto por loja, links do preview, distinção endereço/SKU no 409, sinal de pagamento por loja, campos do checkout).
 4. Teste com leitor de tela real.
