@@ -1,99 +1,99 @@
 {
   "phase": 7,
   "specification": "1.1",
-  "startedAt": "2026-10-02T17:38:21.274Z",
+  "startedAt": "2026-10-03T14:52:20.651Z",
   "environment": "ecommerce-phase7-test",
   "steps": [
     {
       "name": "Contrato de evidências externas (estrutura, modo, ambiente, data, referência e commit)",
       "result": "passed",
-      "durationMs": 257
+      "durationMs": 345
     },
     {
       "name": "Preparação isolada",
       "result": "passed",
-      "durationMs": 4294
+      "durationMs": 6985
     },
     {
       "name": "Build em Node LTS",
       "result": "passed",
-      "durationMs": 84802
+      "durationMs": 147098
     },
     {
       "name": "Migrations, S3 privado e saúde",
       "result": "passed",
-      "durationMs": 18521
+      "durationMs": 21685
     },
     {
       "name": "Tipos",
       "result": "passed",
-      "durationMs": 22385
+      "durationMs": 24448
     },
     {
       "name": "Fase 3+4: núcleo transacional e operação do piloto com worker parado",
       "result": "passed",
-      "durationMs": 28782
+      "durationMs": 32858
     },
     {
       "name": "Worker real: T21, interface e T27 em duas lojas",
       "result": "passed",
-      "durationMs": 57050
+      "durationMs": 82061
     },
     {
       "name": "Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel",
       "result": "passed",
-      "durationMs": 11672
+      "durationMs": 27184
     },
     {
       "name": "Regressões T01/T02, acesso, worker e UI da fundação",
       "result": "passed",
-      "durationMs": 11472
+      "durationMs": 64890
     },
     {
       "name": "Logs sanitizados",
       "result": "passed",
-      "durationMs": 860
+      "durationMs": 994
     },
     {
       "name": "Persistência S3 após reinício local",
       "result": "passed",
-      "durationMs": 29916
+      "durationMs": 25988
     },
     {
       "name": "CLI do operador: status e alertas por loja",
       "result": "passed",
-      "durationMs": 3035
+      "durationMs": 3872
     },
     {
       "name": "Backup PostgreSQL 17",
       "result": "passed",
-      "durationMs": 893
+      "durationMs": 1064
     },
     {
       "name": "Fatos após o backup: pagamentos/devolução e eliminação com ledger externo",
       "result": "passed",
-      "durationMs": 4168
+      "durationMs": 25100
     },
     {
       "name": "Restore separado",
       "result": "passed",
-      "durationMs": 1957
+      "durationMs": 3389
     },
     {
       "name": "Conferências após restore",
       "result": "passed",
-      "durationMs": 5284
+      "durationMs": 63694
     },
     {
       "name": "PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO)",
       "result": "passed",
-      "durationMs": 79199
+      "durationMs": 78198
     }
   ],
   "exitCode": 2,
   "externalHomologation": false,
   "externalMode": "REAL",
-  "commit": "0179f4d7fce0fedf31c866c8a9f9cfb48f66efde",
+  "commit": "67f22ac4a8820be555f18933fb46a41c528ccb98",
   "worktreeClean": false,
   "simulatedExternals": [],
   "realPending": [
@@ -106,7 +106,59 @@
     "COMERCIAL (D03/D07/D09): decisões comerciais aprovadas (preço/recorrência/fiscal, borda de domínio, frete) e homologação dos provedores",
     "IA (D11): provedor de IA real (chave, orçamento autorizado, chamada paga controlada com custo reconciliado)"
   ],
-  "sourceDigest": "8397f9e64875415f653f002ea74b9d69ea28fda83fee1d15e1458e9b6cf1e3a7",
+  "limiterWaits": [
+    {
+      "files": [
+        "tests/purchase.test.mjs",
+        "tests/operations.test.mjs",
+        "tests/pilot-observation.test.mjs",
+        "tests/commercial.test.mjs",
+        "tests/ai.test.mjs"
+      ],
+      "waitedSeconds": 0
+    },
+    {
+      "files": [
+        "tests/purchase-worker.test.mjs",
+        "tests/pilot-flow.test.mjs",
+        "tests/commercial-ui.test.mjs"
+      ],
+      "waitedSeconds": 16,
+      "previousWindowRequests": 740
+    },
+    {
+      "files": [
+        "tests/storefront.test.mjs"
+      ],
+      "waitedSeconds": 13,
+      "previousWindowRequests": 296
+    },
+    {
+      "files": [
+        "tests/foundation.test.mjs"
+      ],
+      "waitedSeconds": 51,
+      "previousWindowRequests": 201
+    },
+    {
+      "files": [
+        "tests/post-backup.test.mjs"
+      ],
+      "waitedSeconds": 21,
+      "previousWindowRequests": 999
+    },
+    {
+      "files": [
+        "tests/restore.test.mjs",
+        "tests/storefront-restore.test.mjs",
+        "tests/purchase-restore.test.mjs",
+        "tests/recovery.test.mjs"
+      ],
+      "waitedSeconds": 57,
+      "previousWindowRequests": 4
+    }
+  ],
+  "sourceDigest": "7592dc3d080426fc8534eefd275db40e24af32cffcb3b1b242995702a51039b3",
   "isolatedProject": "ecommerce-phase7-test",
   "opsStatus": {
     "tenants": 18,
@@ -141,11 +193,11 @@
       "Rate limiting e sanitização de campos sensíveis",
       "EXPLAIN ANALYZE das consultas mínimas sem índices especulativos"
     ],
-    "completedAt": "2026-10-02T17:42:21.035Z"
+    "completedAt": "2026-10-03T14:59:11.910Z"
   },
   "restore": {
     "passed": true,
-    "completedAt": "2026-10-02T17:43:05.815Z",
+    "completedAt": "2026-10-03T15:01:15.275Z",
     "sourceDatabase": "ecommerce",
     "restoredDatabase": "ecommerce_restore",
     "postgresMajor": 17,
@@ -159,7 +211,7 @@
       "negação sem contexto",
       "ENABLE/FORCE RLS"
     ],
-    "checkDurationMs": 55,
+    "checkDurationMs": 58,
     "financialReconciliation": "Não aplicável: domínio de pagamentos ausente na Fase 1."
   },
   "storefront": {
@@ -259,14 +311,14 @@
               "Parallel Aware": false,
               "Async Capable": false,
               "Startup Cost": 0.14,
-              "Total Cost": 6.47,
+              "Total Cost": 6.48,
               "Plan Rows": 1,
               "Plan Width": 32,
-              "Actual Startup Time": 0.14,
-              "Actual Total Time": 0.149,
+              "Actual Startup Time": 0.093,
+              "Actual Total Time": 0.1,
               "Actual Rows": 1,
               "Actual Loops": 1,
-              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fdb5-7002-768c-9d66-0fd3237dc4ce'::uuid)",
+              "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a10245-97b5-71cc-9c0c-a0d8b3451710'::uuid)",
               "Shared Hit Blocks": 3,
               "Shared Read Blocks": 0,
               "Shared Dirtied Blocks": 0,
@@ -288,14 +340,14 @@
                   "Relation Name": "products",
                   "Alias": "products",
                   "Startup Cost": 0.14,
-                  "Total Cost": 6.47,
+                  "Total Cost": 6.48,
                   "Plan Rows": 1,
                   "Plan Width": 32,
-                  "Actual Startup Time": 0.134,
-                  "Actual Total Time": 0.142,
+                  "Actual Startup Time": 0.09,
+                  "Actual Total Time": 0.096,
                   "Actual Rows": 1,
                   "Actual Loops": 1,
-                  "Index Cond": "(tenant_id = '01a0fdb5-7002-768c-9d66-0fd3237dc4ce'::uuid)",
+                  "Index Cond": "(tenant_id = '01a10245-97b5-71cc-9c0c-a0d8b3451710'::uuid)",
                   "Rows Removed by Index Recheck": 0,
                   "Filter": "((status = 'ACTIVE'::text) AND (search_document @@ websearch_to_tsquery('portuguese'::regconfig, shop.search_text('cafes'::text))))",
                   "Rows Removed by Filter": 1,
@@ -324,9 +376,9 @@
               "Temp Read Blocks": 0,
               "Temp Written Blocks": 0
             },
-            "Planning Time": 3.997,
+            "Planning Time": 2.911,
             "Triggers": [],
-            "Execution Time": 0.202
+            "Execution Time": 0.147
           }
         ]
       }
@@ -334,21 +386,21 @@
     "indexDecision": "GIN parcial de tsvector português após EXPLAIN ANALYZE registrado antes da migration. UNIQUE por tenant cobre escopo. Fixture pequena não é ensaio de capacidade.",
     "stores": [
       {
-        "tenantId": "01a0fdb5-7002-768c-9d66-0fd3237dc4ce",
-        "slug": "aurora-4f6ce29b8f",
-        "canonical": "http://aurora-4f6ce29b8f.localhost:3000"
+        "tenantId": "01a10245-97b5-71cc-9c0c-a0d8b3451710",
+        "slug": "aurora-f1e770e72c",
+        "canonical": "http://aurora-f1e770e72c.localhost:3000"
       },
       {
-        "tenantId": "01a0fdb5-7251-72aa-8c96-f5ef18eacde0",
-        "slug": "brisa-4f6ce29b8f",
-        "canonical": "http://brisa-4f6ce29b8f.localhost:3000"
+        "tenantId": "01a10245-9a6f-70dc-b8fa-1f7a0ce7f26b",
+        "slug": "brisa-f1e770e72c",
+        "canonical": "http://brisa-f1e770e72c.localhost:3000"
       }
     ],
-    "completedAt": "2026-10-02T17:42:09.524Z"
+    "completedAt": "2026-10-03T14:58:06.842Z"
   },
   "storefront-restore": {
     "passed": true,
-    "completedAt": "2026-10-02T17:43:06.957Z",
+    "completedAt": "2026-10-03T15:01:16.050Z",
     "tenants": 2,
     "checks": [
       "catálogo",
@@ -484,12 +536,12 @@
               "Node Type": "Limit",
               "Parallel Aware": false,
               "Async Capable": false,
-              "Startup Cost": 2.9,
-              "Total Cost": 2.9,
+              "Startup Cost": 2.58,
+              "Total Cost": 2.59,
               "Plan Rows": 1,
               "Plan Width": 24,
-              "Actual Startup Time": 0.026,
-              "Actual Total Time": 0.027,
+              "Actual Startup Time": 0.094,
+              "Actual Total Time": 0.096,
               "Actual Rows": 3,
               "Actual Loops": 1,
               "Plans": [
@@ -498,12 +550,12 @@
                   "Parent Relationship": "Outer",
                   "Parallel Aware": false,
                   "Async Capable": false,
-                  "Startup Cost": 2.9,
-                  "Total Cost": 2.9,
+                  "Startup Cost": 2.58,
+                  "Total Cost": 2.59,
                   "Plan Rows": 1,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.026,
-                  "Actual Total Time": 0.026,
+                  "Actual Startup Time": 0.093,
+                  "Actual Total Time": 0.094,
                   "Actual Rows": 3,
                   "Actual Loops": 1,
                   "Sort Key": [
@@ -519,14 +571,14 @@
                       "Parallel Aware": false,
                       "Async Capable": false,
                       "Startup Cost": 0.01,
-                      "Total Cost": 2.89,
+                      "Total Cost": 2.57,
                       "Plan Rows": 1,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.012,
-                      "Actual Total Time": 0.018,
+                      "Actual Startup Time": 0.065,
+                      "Actual Total Time": 0.072,
                       "Actual Rows": 3,
                       "Actual Loops": 1,
-                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid)",
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid)",
                       "Plans": [
                         {
                           "Node Type": "Seq Scan",
@@ -536,14 +588,14 @@
                           "Relation Name": "payment_attempts",
                           "Alias": "a",
                           "Startup Cost": 0.01,
-                          "Total Cost": 2.89,
+                          "Total Cost": 2.57,
                           "Plan Rows": 1,
                           "Plan Width": 24,
-                          "Actual Startup Time": 0.009,
-                          "Actual Total Time": 0.014,
+                          "Actual Startup Time": 0.06,
+                          "Actual Total Time": 0.067,
                           "Actual Rows": 3,
                           "Actual Loops": 1,
-                          "Filter": "((tenant_id = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid) AND (next_check_at <= now()))",
+                          "Filter": "((tenant_id = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid) AND (next_check_at <= now()))",
                           "Rows Removed by Filter": 41
                         }
                       ]
@@ -552,9 +604,9 @@
                 }
               ]
             },
-            "Planning Time": 0.114,
+            "Planning Time": 0.149,
             "Triggers": [],
-            "Execution Time": 0.039
+            "Execution Time": 0.122
           }
         ]
       },
@@ -565,12 +617,12 @@
               "Node Type": "Limit",
               "Parallel Aware": false,
               "Async Capable": false,
-              "Startup Cost": 4.42,
-              "Total Cost": 4.43,
+              "Startup Cost": 8.18,
+              "Total Cost": 8.18,
               "Plan Rows": 1,
               "Plan Width": 24,
-              "Actual Startup Time": 0.041,
-              "Actual Total Time": 0.045,
+              "Actual Startup Time": 0.059,
+              "Actual Total Time": 0.062,
               "Actual Rows": 25,
               "Actual Loops": 1,
               "Plans": [
@@ -579,12 +631,12 @@
                   "Parent Relationship": "Outer",
                   "Parallel Aware": false,
                   "Async Capable": false,
-                  "Startup Cost": 4.42,
-                  "Total Cost": 4.43,
+                  "Startup Cost": 8.18,
+                  "Total Cost": 8.18,
                   "Plan Rows": 1,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.041,
-                  "Actual Total Time": 0.042,
+                  "Actual Startup Time": 0.059,
+                  "Actual Total Time": 0.06,
                   "Actual Rows": 25,
                   "Actual Loops": 1,
                   "Sort Key": [
@@ -599,33 +651,35 @@
                       "Parent Relationship": "Outer",
                       "Parallel Aware": false,
                       "Async Capable": false,
-                      "Startup Cost": 0.01,
-                      "Total Cost": 4.41,
+                      "Startup Cost": 0.15,
+                      "Total Cost": 8.17,
                       "Plan Rows": 1,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.019,
-                      "Actual Total Time": 0.031,
+                      "Actual Startup Time": 0.039,
+                      "Actual Total Time": 0.053,
                       "Actual Rows": 48,
                       "Actual Loops": 1,
-                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid)",
+                      "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid)",
                       "Plans": [
                         {
-                          "Node Type": "Seq Scan",
+                          "Node Type": "Index Scan",
                           "Parent Relationship": "Outer",
                           "Parallel Aware": false,
                           "Async Capable": false,
+                          "Scan Direction": "Forward",
+                          "Index Name": "purchase_outbox_pending",
                           "Relation Name": "purchase_outbox",
                           "Alias": "purchase_outbox",
-                          "Startup Cost": 0.01,
-                          "Total Cost": 4.41,
+                          "Startup Cost": 0.15,
+                          "Total Cost": 8.17,
                           "Plan Rows": 1,
                           "Plan Width": 24,
-                          "Actual Startup Time": 0.016,
-                          "Actual Total Time": 0.024,
+                          "Actual Startup Time": 0.036,
+                          "Actual Total Time": 0.045,
                           "Actual Rows": 48,
                           "Actual Loops": 1,
-                          "Filter": "((executed_at IS NULL) AND (tenant_id = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid) AND (next_run_at <= now()))",
-                          "Rows Removed by Filter": 82
+                          "Index Cond": "((tenant_id = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid) AND (next_run_at <= now()))",
+                          "Rows Removed by Index Recheck": 0
                         }
                       ]
                     }
@@ -633,9 +687,9 @@
                 }
               ]
             },
-            "Planning Time": 0.108,
+            "Planning Time": 0.071,
             "Triggers": [],
-            "Execution Time": 0.057
+            "Execution Time": 0.074
           }
         ]
       },
@@ -650,8 +704,8 @@
               "Total Cost": 8.16,
               "Plan Rows": 1,
               "Plan Width": 24,
-              "Actual Startup Time": 0.029,
-              "Actual Total Time": 0.029,
+              "Actual Startup Time": 0.033,
+              "Actual Total Time": 0.034,
               "Actual Rows": 0,
               "Actual Loops": 1,
               "Plans": [
@@ -664,11 +718,11 @@
                   "Total Cost": 8.16,
                   "Plan Rows": 1,
                   "Plan Width": 24,
-                  "Actual Startup Time": 0.028,
-                  "Actual Total Time": 0.028,
+                  "Actual Startup Time": 0.033,
+                  "Actual Total Time": 0.033,
                   "Actual Rows": 0,
                   "Actual Loops": 1,
-                  "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid)",
+                  "One-Time Filter": "((NULLIF(current_setting('app.current_tenant_id'::text, true), ''::text))::uuid = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid)",
                   "Plans": [
                     {
                       "Node Type": "Index Scan",
@@ -683,20 +737,20 @@
                       "Total Cost": 8.16,
                       "Plan Rows": 1,
                       "Plan Width": 24,
-                      "Actual Startup Time": 0.025,
-                      "Actual Total Time": 0.026,
+                      "Actual Startup Time": 0.03,
+                      "Actual Total Time": 0.03,
                       "Actual Rows": 0,
                       "Actual Loops": 1,
-                      "Index Cond": "(tenant_id = '01a0fdb4-6e23-731d-a0c5-594828600bb5'::uuid)",
+                      "Index Cond": "(tenant_id = '01a10243-fce3-759b-b7dd-8efdef45bac9'::uuid)",
                       "Rows Removed by Index Recheck": 0
                     }
                   ]
                 }
               ]
             },
-            "Planning Time": 0.231,
+            "Planning Time": 0.353,
             "Triggers": [],
-            "Execution Time": 0.039
+            "Execution Time": 0.044
           }
         ]
       }
@@ -704,15 +758,15 @@
     "indexDecision": "Índices parciais de pendências por tenant (0006) cobrem as consultas periódicas; fixture pequena, sem ensaio de capacidade.",
     "stores": [
       {
-        "tenantId": "01a0fdb4-6e23-731d-a0c5-594828600bb5",
-        "slug": "aurora-p34cf993b2"
+        "tenantId": "01a10243-fce3-759b-b7dd-8efdef45bac9",
+        "slug": "aurora-p38f74da17"
       },
       {
-        "tenantId": "01a0fdb4-7082-716d-86ac-9e6586a71b60",
-        "slug": "brisa-p34cf993b2"
+        "tenantId": "01a10244-0076-741e-bb0c-cb6315c2dca0",
+        "slug": "brisa-p38f74da17"
       }
     ],
-    "completedAt": "2026-10-02T17:41:00.868Z"
+    "completedAt": "2026-10-03T14:56:17.757Z"
   },
   "purchase-worker": {
     "passed": true,
@@ -769,11 +823,11 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:41:57.835Z"
+    "completedAt": "2026-10-03T14:57:39.533Z"
   },
   "purchase-restore": {
     "passed": true,
-    "completedAt": "2026-10-02T17:43:04.062Z",
+    "completedAt": "2026-10-03T15:01:13.093Z",
     "counts": {
       "transactions": 12,
       "incidents": 20,
@@ -842,7 +896,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:40:52.106Z"
+    "completedAt": "2026-10-03T14:56:08.243Z"
   },
   "pilot-flow": {
     "passed": true,
@@ -854,7 +908,7 @@
     ],
     "stores": [
       {
-        "store": "aurora-f45926d763",
+        "store": "aurora-f4b63ab81c",
         "order": "1",
         "total_cents": "7480",
         "seller": "conta SIMULADA da própria loja",
@@ -866,7 +920,7 @@
         ]
       },
       {
-        "store": "brisa-f45926d763",
+        "store": "brisa-f4b63ab81c",
         "order": "1",
         "total_cents": "7480",
         "seller": "conta SIMULADA da própria loja",
@@ -916,7 +970,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:41:32.897Z"
+    "completedAt": "2026-10-03T14:57:14.173Z"
   },
   "post-backup": {
     "passed": true,
@@ -924,38 +978,38 @@
       "APPROVED x2 e devolução parcial após o backup (provedor SIMULADO)",
       "eliminação com ledger externo no S3"
     ],
-    "completedAt": "2026-10-02T17:42:59.963Z"
+    "completedAt": "2026-10-03T15:00:08.943Z"
   },
   "recovery": {
     "passed": true,
     "steps": [
       {
         "step": "backup antigo contém dado eliminado depois",
-        "elapsedMs": 43
+        "elapsedMs": 42
       },
       {
         "step": "eliminações reaplicadas a partir do ledger externo",
-        "elapsedMs": 94
+        "elapsedMs": 98
       },
       {
         "step": "pós-restauração: vendas pausadas, PREPARED→UNKNOWN, e-mails retidos",
-        "elapsedMs": 104
+        "elapsedMs": 109
       },
       {
         "step": "estado do provedor SIMULADO reproduzido (equivale a consultar o gateway)",
-        "elapsedMs": 135
+        "elapsedMs": 139
       },
       {
         "step": "pagamentos e devolução posteriores conciliados",
-        "elapsedMs": 210
+        "elapsedMs": 215
       },
       {
         "step": "e-mails anteriores retidos para revisão; somente fatos novos enviados",
-        "elapsedMs": 231
+        "elapsedMs": 236
       },
       {
         "step": "vendas reabertas após conciliação",
-        "elapsedMs": 234
+        "elapsedMs": 239
       }
     ],
     "held": 30,
@@ -966,27 +1020,27 @@
       "applied": 1
     },
     "limitation": "Ensaio com pg_dump lógico em ambiente isolado; o provedor é SIMULADO. RPO real depende de WAL/PITR (ver pitr.json) e backup externo (D04).",
-    "completedAt": "2026-10-02T17:43:05.169Z"
+    "completedAt": "2026-10-03T15:01:14.582Z"
   },
   "pitr": {
     "passed": true,
     "environment": "ecommerce-phase7-test",
-    "startedAt": "2026-10-02T17:43:07.831Z",
+    "startedAt": "2026-10-03T15:01:16.761Z",
     "method": "pg_basebackup (tar) + archive_command em volume local + recovery_target_time",
     "steps": [
       {
         "step": "base backup físico",
-        "at": "2026-10-02T17:43:11.180Z"
+        "at": "2026-10-03T15:01:21.090Z"
       },
       {
         "step": "marcadores antes/depois do alvo e WAL arquivado",
-        "segment": "000000010000000000000005"
+        "segment": "000000010000000000000007"
       }
     ],
-    "rpoObservedSeconds": 59.4,
+    "rpoObservedSeconds": 58.6,
     "archiveTimeoutSeconds": 60,
-    "target": "2026-10-02 17:44:15.051066+00",
-    "rtoDrillSeconds": 6.4,
+    "target": "2026-10-03 15:02:24.161743+00",
+    "rtoDrillSeconds": 5.4,
     "restored": {
       "markers": [
         "rpo-probe",
@@ -1000,7 +1054,7 @@
       "RTO medido apenas para banco sintético pequeno; não inclui provisionamento de host, mídia, segredos nem conciliação.",
       "Ferramenta mantida (pgBackRest/WAL-G) com destino externo continua recomendada para produção."
     ],
-    "finishedAt": "2026-10-02T17:44:26.884Z"
+    "finishedAt": "2026-10-03T15:02:34.780Z"
   },
   "pilot-observation": {
     "passed": true,
@@ -1017,7 +1071,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:40:54.193Z"
+    "completedAt": "2026-10-03T14:56:11.317Z"
   },
   "commercial": {
     "passed": true,
@@ -1080,7 +1134,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:40:45.800Z"
+    "completedAt": "2026-10-03T14:56:01.904Z"
   },
   "commercial-ui": {
     "passed": true,
@@ -1108,7 +1162,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:41:22.914Z"
+    "completedAt": "2026-10-03T14:56:57.570Z"
   },
   "ai": {
     "passed": true,
@@ -1156,7 +1210,7 @@
         "result": "passed"
       }
     ],
-    "completedAt": "2026-10-02T17:40:38.945Z"
+    "completedAt": "2026-10-03T14:55:53.857Z"
   },
   "capacity": {
     "passed": true,
@@ -1183,5 +1237,5 @@
   "externalAccepted": [],
   "externalInvalid": [],
   "error": "PENDENTE_EXTERNA MERCADO_PAGO (D02): homologação do Mercado Pago no sandbox (OAuth de vendedor, Pix, cartão tokenizado, consulta, webhook assinado em HTTPS público, reembolso). Registre docs/execucao/evidencias/fase-0/homologacao-mercado-pago.json. PENDENTE_EXTERNA DOMINIO_HTTPS (D03): domínio da plataforma, DNS público e certificado HTTPS público (Caddy) com rota até a loja. Registre docs/execucao/evidencias/fase-4/homologacao-dominio.json. PENDENTE_EXTERNA EMAIL (D05): provedor de e-mail com remetente verificado (SPF/DKIM) e entrega real de mensagem transacional. Registre docs/execucao/evidencias/fase-4/homologacao-email.json. PENDENTE_EXTERNA BACKUP_EXTERNO (D04): backup externo cifrado em outra região, retenção de 30 dias, chave separada e restauração a partir dele. Registre docs/execucao/evidencias/fase-4/homologacao-backup-externo.json. PENDENTE_EXTERNA OPERACAO (D06): VM, monitoramento de host/disco, canal de alerta e pessoa de plantão definidos e testados. Registre docs/execucao/evidencias/fase-4/homologacao-operacao.json. PENDENTE_EXTERNA PILOTO (D01/D08/D10): observações reais do piloto (autorização de ativação, ao menos duas lojas, período observado). Registre docs/execucao/evidencias/fase-5/observacoes.json. PENDENTE_EXTERNA COMERCIAL (D03/D07/D09): decisões comerciais aprovadas (preço/recorrência/fiscal, borda de domínio, frete) e homologação dos provedores. Registre docs/execucao/evidencias/fase-6/decisoes-comerciais.json. PENDENTE_EXTERNA IA (D11): provedor de IA real (chave, orçamento autorizado, chamada paga controlada com custo reconciliado). Registre docs/execucao/evidencias/fase-7/homologacao-ia.json.",
-  "finishedAt": "2026-10-02T17:44:26.933Z"
+  "finishedAt": "2026-10-03T15:02:34.823Z"
 }
