@@ -1,7 +1,7 @@
 import { Body, Controller, ForbiddenException, Injectable, Module, Post, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'node:crypto';
 import { newId } from '@ecommerce/database';
-import { AccessModule, SessionGuard, type Actor, type AuthRequest } from './access.js';
+import { AccessModule, AllowPendingMfa, SessionGuard, type Actor, type AuthRequest } from './access.js';
 import { Infrastructure, required } from './infrastructure.js';
 import { digest, randomToken } from './security.js';
 import { object, text } from './catalogue.js';
@@ -41,7 +41,7 @@ export class MfaService {
 class MfaController {constructor(private s:MfaService){}
  @Post('setup') setup(@Req() r:AuthRequest){return this.s.setup(r.actor);}
  @Post('enable') enable(@Req() r:AuthRequest,@Body() b:unknown){return this.s.enable(r.actor,b);}
- @Post('verify') verify(@Req() r:AuthRequest,@Body() b:unknown){return this.s.verify(r.actor,b);}
+ @Post('verify') @AllowPendingMfa() verify(@Req() r:AuthRequest,@Body() b:unknown){return this.s.verify(r.actor,b);}
 }
 @Module({imports:[AccessModule],providers:[MfaService],controllers:[MfaController],exports:[MfaService]})
 export class MfaModule{}

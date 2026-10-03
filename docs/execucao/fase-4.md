@@ -5,6 +5,7 @@
 - **Liberação operacional:** **NÃO_SOLICITADA**. Nenhum lojista convidado, nenhuma publicação, e-mail externo, pagamento ou devolução real.
 - **Data:** 01/10/2026. Ambiente `ecommerce-phase4-test` (Docker Desktop, Node 24.21.0, PostgreSQL 17.9 com arquivamento de WAL, Redis 7.4.7, SeaweedFS S3 local). Dados sintéticos.
 - **Resultado do verificador:** `node scripts/verify.mjs --phase=4` → **código 0** (execução final 17:12–17:18 UTC, fontes `3cfbe8d2…fe51`, já incluindo a POC da Fase 0). Verificação técnica local; não substitui homologação externa.
+- **Atualização 02/10/2026 (revisão 0179f4, R6):** o código 0 acima era do contrato antigo. Agora o verificador exige evidência externa REAL, validada por conteúdo e commit, desde a Fase 3. Sem ela, o resultado é **código 2**. Veja [revisao-0179f4.md](revisao-0179f4.md).
 
 ## 1. Entregue
 

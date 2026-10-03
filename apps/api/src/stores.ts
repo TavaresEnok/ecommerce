@@ -5,6 +5,7 @@ import { AcceptInviteDto, CreateStoreDto, EmailDto, SettingsDto } from './dto.js
 import { Infrastructure, localMailbox } from './infrastructure.js';
 import { digest, randomToken } from './security.js';
 import { assertQuota, PILOT_PLAN } from '@ecommerce/purchase';
+import { jobStatus, type JobSource } from './jobs.js';
 type Membership = {id: string; role: 'OWNER'|'EMPLOYEE'; user_id: string; status: string};
 @Injectable()
 export class StoresService {
@@ -85,9 +86,9 @@ export class StoresService {
   }
   async job(tenantId: string, id: string, actor: Actor) {
     await this.read(tenantId,actor);
-    const job = await this.infra.queue.getJob(id);
-    if (!job || job.data.tenantId !== tenantId || job.data.userId !== actor.id) throw new NotFoundException('Job não encontrado.');
-    return { state: await job.getState(), result: job.returnvalue };
+    const status = await jobStatus(this.infra.queue as unknown as JobSource, id, job => job.data.tenantId === tenantId && job.data.userId === actor.id);
+    if (!status) throw new NotFoundException('Job não encontrado.');
+    return status;
   }
 }
 @Controller()

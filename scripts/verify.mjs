@@ -1,7 +1,9 @@
 import { existsSync,mkdirSync,readFileSync,writeFileSync,readdirSync,rmSync } from 'node:fs';
 import { join,relative } from 'node:path';
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { root,command,composeArgs,docker } from './compose.mjs';
+import { evaluateExternal } from './external-evidence.mjs';
 const argv=process.argv.slice(2),simulated=argv.includes('--externos-simulados'),args=argv.filter(a=>a!=='--externos-simulados'),match=args.length===1&&/^--phase=([1234567])$/.exec(args[0]);
 if(!match){console.error('Uso: node scripts/verify.mjs --phase=1|2|3|4|5|6|7 [--externos-simulados]. Demais fases não implementadas.');process.exit(2);}
 const phase=Number(match[1]);process.env.VERIFY_PHASE=String(phase);
@@ -9,7 +11,10 @@ const phase=Number(match[1]);process.env.VERIFY_PHASE=String(phase);
 // overwrites (or counts as) the real verification.
 const evidence=join(root,`docs/execucao/evidencias/fase-${phase}/verification${simulated?'.simulado':''}.json`);
 mkdirSync(join(root,'artifacts'),{recursive:true});mkdirSync(join(root,`docs/execucao/evidencias/fase-${phase}`),{recursive:true});
-const summary={phase,specification:'1.1',startedAt:new Date().toISOString(),environment:`ecommerce-phase${phase}-test`,steps:[],exitCode:2,externalHomologation:false,externalMode:simulated?'SIMULADO':'REAL',simulatedExternals:[],realPending:[]};
+// Tested code version: real evidence must reference an ancestor of this HEAD.
+const git=(...a)=>spawnSync('git',a,{cwd:root,encoding:'utf8'});const head=git('rev-parse','HEAD').stdout?.trim()||null;
+const isAncestor=commit=>Boolean(head)&&git('merge-base','--is-ancestor',commit,'HEAD').status===0;
+const summary={phase,specification:'1.1',startedAt:new Date().toISOString(),environment:`ecommerce-phase${phase}-test`,steps:[],exitCode:2,externalHomologation:false,externalMode:simulated?'SIMULADO':'REAL',commit:head,worktreeClean:head?git('status','--porcelain').stdout.trim()==='':null,simulatedExternals:[],realPending:[]};
 function digestSources(){const hash=createHash('sha256'),excluded=new Set(['node_modules','dist','.next','.git','.local','artifacts','test-results','playwright-report','.playwright-mcp']);function walk(path){for(const item of readdirSync(path,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(excluded.has(item.name)||item.name.startsWith('.env')||item.name.endsWith('.tsbuildinfo'))continue;const full=join(path,item.name),rel=relative(root,full).replaceAll('\\','/');if(rel.startsWith('docs/execucao/'))continue;if(item.isDirectory())walk(full);else hash.update(rel).update(readFileSync(full));}}walk(root);return hash.digest('hex');}
 function step(name,action){console.log(`\n=== ${name} ===`);const start=Date.now();try{action();summary.steps.push({name,result:'passed',durationMs:Date.now()-start});}catch(error){summary.steps.push({name,result:'failed',durationMs:Date.now()-start});throw error;}}
 const missing=message=>Object.assign(new Error(message),{exitCode:2});
@@ -23,9 +28,16 @@ try{
  const env=readFileSync(join(root,'.local/test.env'),'utf8');if(!/^APP_ENV=test$/m.test(env)||!/^NODE_ENV=test$/m.test(env))throw missing('Configuração não identificada como teste.');
  if(phase>=3&&!/^PAYMENT_SIMULATION=true$/m.test(env))throw missing('Fases 3+ exigem PAYMENT_SIMULATION=true no ambiente de teste.');
  if(!/specification|especificação/i.test(readFileSync(join(root,`docs/execucao/fase-${phase}.md`),'utf8')))throw missing('Relatório de fase inválido.');
+ step('Contrato de evidências externas (estrutura, modo, ambiente, data, referência e commit)',()=>command(process.execPath,['--test','tests/external-evidence.test.mjs'],{timeout:60000}));
  try{docker(['info','--format','{{.ServerVersion}}'],{capture:true,timeout:15000});}catch{throw missing('Docker Desktop/engine indisponível.');}
  const compose=composeArgs(true),run=(files,timeout=300000)=>docker([...compose,'run','--rm','--no-deps','tests','node','--test','--test-concurrency=1',...files],{timeout});summary.sourceDigest=digestSources();
  for(const file of [...upTo(reports),'phase2-fixture.json','purchase-fixture.json','recovery-fixture.json',...upTo(screenshots).flatMap(s=>[`${s}-390.png`,`${s}-1440.png`])])rmSync(join(root,'artifacts',file),{force:true});
+ // Volumes are recreated only for a test project owned by this checkout: containers of the same project name started from
+ // another directory (another run/copy) make the verifier stop with code 2 instead of deleting their data.
+ const project=compose[compose.indexOf('--project-name')+1];if(!/^ecommerce-(phase\d|capacity)-test$/.test(project))throw missing(`Projeto de teste inesperado: ${project}.`);
+ const owners=docker(['ps','-a','--filter',`label=com.docker.compose.project=${project}`,'--format','{{.Label "com.docker.compose.project.working_dir"}}'],{capture:true,timeout:30000}).split('\n').map(s=>s.trim()).filter(Boolean);
+ const foreign=[...new Set(owners)].filter(dir=>dir.toLowerCase()!==root.toLowerCase());if(foreign.length)throw missing(`O projeto ${project} pertence a outra execução (${foreign.join(', ')}); nada foi removido. Use outra cópia/nome ou remova manualmente.`);
+ summary.isolatedProject=project;
  step('Preparação isolada',()=>docker([...compose,'down','--volumes','--remove-orphans']));
  step('Build em Node LTS',()=>docker([...compose,'build','tests','api','postgres'],{timeout:600000}));
  step('Migrations, S3 privado e saúde',()=>docker([...compose,'up','-d','--wait','--wait-timeout','150','web','worker'],{timeout:240000}));
@@ -46,19 +58,15 @@ try{
  if(phase>=4)step('PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO)',()=>command(process.execPath,['scripts/pitr-drill.mjs','--test'],{timeout:600000}));
  for(const file of upTo(reports)){if(!existsSync(join(root,'artifacts',file)))throw missing(`Evidência obrigatória ausente: ${file}`);const data=JSON.parse(readFileSync(join(root,'artifacts',file),'utf8'));if(!data.passed)throw new Error(`Evidência reprovada: ${file}`);summary[file.replace('.json','')]=data;}
  for(const shot of screenshots[phase]||[])for(const width of [390,1440])if(!existsSync(join(root,`artifacts/${shot}-${width}.png`)))throw missing(`Screenshot obrigatório ausente: ${shot}-${width}.png`);
- // Fase 5: técnica verificada acima; conclusão depende de T33 completo e de observação real autorizada — nunca fabricada.
- const pending=[];
- const external=(simFile,message,check=()=>{})=>{const p=join(root,simFile);summary.realPending.push(message);if(simulated&&existsSync(p)){const d=JSON.parse(readFileSync(p,'utf8'));if(d.mode!=='SIMULADO')throw new Error(`${simFile} sem marcação SIMULADO.`);check(d);summary.simulatedExternals.push(simFile);}else pending.push(message);};
- if(phase>=5){const dir=join(root,`docs/execucao/evidencias/fase-${phase>=6?6:5}`),cap=join(dir,'capacidade.json'),obs=join(root,'docs/execucao/evidencias/fase-5/observacoes.json');
+ // Fase 5+: T33 completo é pré-requisito técnico local.
+ if(phase>=5){const cap=join(root,`docs/execucao/evidencias/fase-${phase>=6?6:5}/capacidade.json`);
   if(!existsSync(cap))throw missing('T33 ausente: execute node scripts/capacity.mjs e registre docs/execucao/evidencias/fase-5/capacidade.json.');
-  const c=JSON.parse(readFileSync(cap,'utf8'));summary.capacity={passed:c.passed,quick:c.quick,targets:c.targets};if(c.quick)throw missing('T33 registrado apenas na execução reduzida; execute o ensaio completo.');if(!c.passed)throw new Error('T33 reprovado: metas ou invariantes violados.');
-  if(!existsSync(obs))external('docs/execucao/evidencias/fase-5/observacoes.simulado.json','PENDENTE_EXTERNA: sem observações reais do piloto (autorização de ativação, lojas convidadas e período observado).',d=>{if(!d.passed||d.stores?.length<2)throw new Error('Piloto simulado incompleto.');if(d.stores.some(x=>/@|d{11}/.test(JSON.stringify(x.pilotReport))))throw new Error('Piloto simulado contém dado pessoal.');});
-  else{const o=JSON.parse(readFileSync(obs,'utf8'));if(!o.authorization?.reference||o.environment!=='PRODUCTION'||!Array.isArray(o.stores)||o.stores.length<2)throw missing('Observações do piloto incompletas: autorização, ambiente PRODUCTION e ao menos duas lojas.');
-  if(/@|\b\d{11}\b|\b\d{14}\b/.test(JSON.stringify(o)))throw new Error('Observações contêm possível dado pessoal; sanitize.');summary.pilot={stores:o.stores.length,period:o.period};}}
- if(phase>=6){const d=join(root,'docs/execucao/evidencias/fase-6/decisoes-comerciais.json');if(!existsSync(d))external('docs/execucao/evidencias/fase-6/decisoes-comerciais.simulado.json','PENDENTE_EXTERNA: decisões comerciais (D03 domínio/borda, D07 preço/recorrência/fiscal, D09 frete) e homologação dos provedores não registradas.',x=>{if(!x.provisional)throw new Error('Decisões simuladas devem ser provisórias.');});}
- if(phase>=7&&!existsSync(join(root,'docs/execucao/evidencias/fase-7/homologacao-ia.json')))external('docs/execucao/evidencias/fase-7/homologacao-ia.simulado.json','PENDENTE_EXTERNA: homologação do provedor de IA real (chave, orçamento autorizado e chamada paga controlada) não registrada.');
- if(simulated&&phase>=4)for(const f of ['docs/execucao/evidencias/fase-4/staging.simulado.json','docs/execucao/evidencias/fase-4/backup-externo.simulado.json']){const p=join(root,f);if(!existsSync(p)||!JSON.parse(readFileSync(p,'utf8')).passed)throw missing(`Substituto simulado ausente/reprovado: ${f} (node scripts/staging.mjs check / node scripts/offsite-drill.mjs).`);summary.simulatedExternals.push(f);}
- if(pending.length)throw missing(pending.join(' '));
+  const c=JSON.parse(readFileSync(cap,'utf8'));summary.capacity={passed:c.passed,quick:c.quick,targets:c.targets};if(c.quick)throw missing('T33 registrado apenas na execução reduzida; execute o ensaio completo.');if(!c.passed)throw new Error('T33 reprovado: metas ou invariantes violados.');}
+ // Evidências externas obrigatórias (Fases 3+): validadas por conteúdo e vínculo ao commit; ausência/inválida → 2, REPROVADO → 1.
+ const ext=evaluateExternal({phase,simulated,root,isAncestor});summary.externalAccepted=ext.accepted;summary.simulatedExternals=ext.simulated.map(s=>s.file);summary.realPending=ext.realPending;summary.externalInvalid=ext.invalid;
+ summary.externalHomologation=ext.realPending.length===0&&ext.accepted.length>0;
+ if(ext.failed.length)throw new Error(`Homologação externa reprovada: ${ext.failed.join(' | ')}`);
+ if(ext.invalid.length||ext.pending.length)throw missing([...ext.invalid.map(i=>`EVIDÊNCIA_INVÁLIDA ${i}`),...ext.pending].join(' '));
  if(phase===2&&summary.storefront.visual.length!==2)throw missing('Evidência visual incompleta.');
  if(digestSources()!==summary.sourceDigest)throw missing('Fonte alterada durante verificação; repita com árvore estável.');summary.exitCode=0;
 }catch(error){summary.exitCode=error.exitCode||1;summary.error=error.message;console.error(error.message);}

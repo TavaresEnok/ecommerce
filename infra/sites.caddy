@@ -1,0 +1,46 @@
+# Shared by production (Caddyfile) and local staging (Caddyfile.staging); only the certificate issuer differs.
+(security) {
+	encode zstd gzip
+	# Body limits per route: only the media upload (POST /api/tenants/{uuid}/catalogue/media) may carry up to 10 MiB, the
+	# same ceiling the API enforces; everything else stays at 16 KB. The application keeps its own type/size/concurrency checks.
+	@media {
+		method POST
+		path_regexp ^/api/tenants/[0-9a-f-]{36}/catalogue/media$
+	}
+	@other {
+		not {
+			method POST
+			path_regexp ^/api/tenants/[0-9a-f-]{36}/catalogue/media$
+		}
+	}
+	request_body @media {
+		max_size 10MiB
+	}
+	request_body @other {
+		max_size 16KB
+	}
+	header {
+		Referrer-Policy no-referrer
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Strict-Transport-Security "max-age=31536000"
+	}
+}
+# Client identity for the API rate limit: header_up replaces whatever the client sent, so only the edge sets these.
+(upstream) {
+	reverse_proxy web:3000 {
+		header_up X-Client-IP {remote_host}
+		header_up X-Edge-Auth {$EDGE_PROXY_SECRET}
+	}
+}
+{$PLATFORM_HOST} {
+	import security
+	import upstream
+}
+https:// {
+	tls {
+		on_demand
+	}
+	import security
+	import upstream
+}

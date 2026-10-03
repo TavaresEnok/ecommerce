@@ -19,6 +19,18 @@ import { PlatformModule } from './platform.js';
 import { DomainModule } from './domains.js';
 import { AiModule } from './ai.js';
 import { PurchaseError } from '@ecommerce/purchase';
+import { secureEqual } from './security.js';
+// Client identity for rate limiting. Path: edge (Caddy) → web (Next) → API. Only the edge sees the client's TCP address;
+// it overwrites X-Client-IP with it and adds X-Edge-Auth (shared secret), discarding any client-sent values. X-Forwarded-For
+// is never trusted (Next forwards it unchanged). Without a valid pair (direct access in dev/test) the TCP peer is the key.
+export function clientKey(request: FastifyRequest) {
+  const secret = process.env.EDGE_PROXY_SECRET || '', auth = request.headers['x-edge-auth'], ip = request.headers['x-client-ip'];
+  if (secret && typeof auth === 'string' && typeof ip === 'string' && secureEqual(auth, secret) && /^[0-9a-fA-F:.]{2,45}$/.test(ip)) return `client:${ip}`;
+  return `peer:${request.ip}`;
+}
+const limit = (name: string, fallback: number) => Number(process.env[name]) || (process.env.APP_ENV === 'test' ? 1000 : fallback);
+// Scopes: credential endpoints (brute force), platform administration, everything else. Each counts per client and route.
+const AUTH_ROUTES = new Set(['/auth/login','/auth/register','/auth/recover','/auth/reset','/auth/verify-email','/auth/mfa/verify','/auth/mfa/enable']);
 @Catch()
 class SafeErrors implements ExceptionFilter {
   catch(error: unknown, host: ArgumentsHost) {
@@ -46,7 +58,7 @@ class HealthController {
 class AppModule {}
 async function bootstrap() {
   if (required('COOKIE_SECRET').length < 32) throw new Error('COOKIE_SECRET must be at least 32 characters');
-  if (required('APP_ENV') === 'production' && (process.env.LOCAL_MAILBOX === 'true' || !required('PUBLIC_ORIGIN').startsWith('https://'))) throw new Error('Unsafe production configuration');
+  if (required('APP_ENV') === 'production' && (process.env.LOCAL_MAILBOX === 'true' || !required('PUBLIC_ORIGIN').startsWith('https://') || (process.env.EDGE_PROXY_SECRET || '').length < 32)) throw new Error('Unsafe production configuration');
   const adapter = new FastifyAdapter({ bodyLimit: 16384, trustProxy: false, logger: {
     level:'info', redact:['req.headers.cookie','req.headers.authorization','req.headers.x-csrf-token','res.headers.set-cookie'],
     serializers:{req:(req:any)=>({method:req.method,route:req.url?.split('?')[0]}),res:(res:any)=>({statusCode:res.statusCode})}
@@ -56,10 +68,12 @@ async function bootstrap() {
   await app.register(helmet,{contentSecurityPolicy:false});
   adapter.getInstance().addHook('onRoute', options => {
     if (options.url === '/tenants/:tenantId/catalogue/media') options.bodyLimit=10*1024*1024;
-        if (options.url === '/health/ready') options.config = {...options.config, rateLimit:false};
+    if (options.url === '/health/ready') options.config = {...options.config, rateLimit:false};
+    else if (options.method === 'POST' && AUTH_ROUTES.has(options.url)) options.config = {...options.config, rateLimit:{max:limit('AUTH_RATE_LIMIT_PER_MINUTE',10),timeWindow:'1 minute'}};
+    else if (options.url.startsWith('/platform/')) options.config = {...options.config, rateLimit:{max:limit('PLATFORM_RATE_LIMIT_PER_MINUTE',60),timeWindow:'1 minute'}};
   });
-  // Per-IP limit; RATE_LIMIT_PER_MINUTE lets the capacity rehearsal (single client IP) and real deployments tune it explicitly.
-  await app.register(rateLimit,{max:Number(process.env.RATE_LIMIT_PER_MINUTE)||(process.env.APP_ENV==='test'?1000:120),timeWindow:'1 minute'});
+  // Per-client limit (see clientKey); RATE_LIMIT_PER_MINUTE lets the capacity rehearsal (single client) and deployments tune it.
+  await app.register(rateLimit,{max:limit('RATE_LIMIT_PER_MINUTE',120),timeWindow:'1 minute',keyGenerator:clientKey});
   const server = adapter.getInstance();
   server.addContentTypeParser('application/octet-stream',{parseAs:'buffer',bodyLimit:10*1024*1024},(_request,body,done)=>done(null,body));
   server.addHook('onRequest',async (request,reply) => {

@@ -5,6 +5,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 import { Queue } from 'bullmq';
 import { createDatabase, newId, rows, sql, withTenant, assertApplicationRole } from '@ecommerce/database';
+import { jobStatus } from '../apps/api/dist/jobs.js';
 const base=process.env.BASE_URL;
 assert.equal(process.env.APP_ENV,'test');
 assert.ok(base && new URL(base).hostname==='web');
@@ -113,6 +114,18 @@ test('Fundação integrada — PostgreSQL real e app_user',async t=>{
       employee.cookie=login.headers.get('set-cookie').split(';')[0];employee.csrf=login.body.csrf;employee.password=newPassword;
       assert.ok(login.headers.get('set-cookie').includes('HttpOnly'));assert.ok(login.headers.get('set-cookie').includes('SameSite=Strict'));assert.equal(login.headers.get('cache-control'),'no-store');
       assert.equal((await api('auth/logout',{method:'POST',actor:employee})).status,201);assert.equal((await api('auth/session',{actor:employee})).status,401);
+    });
+    await check('R5: estado completed nunca vem com resultado anterior (conclusão entre as leituras)',async()=>{
+      // Deterministic race: the job completes exactly between loading it and reading its state.
+      const owner={tenantId:A,userId:a.id};let completed=false;
+      const queue={getJob:async()=>completed?{data:owner,returnvalue:{tenantId:A},getState:async()=>'completed'}:{data:owner,returnvalue:null,getState:async()=>{completed=true;return 'completed';}}};
+      const status=await jobStatus(queue,'j1',j=>j.data.tenantId===A);
+      assert.equal(status.state,'completed');assert.equal(status.result.tenantId,A);
+      // Removed by retention between the reads: not found instead of "completed" without result.
+      let first=true;const vanishing={getJob:async()=>{if(!first)return undefined;first=false;return {data:owner,returnvalue:null,getState:async()=>'completed'};}};
+      assert.equal(await jobStatus(vanishing,'j2',()=>true),null);
+      const waiting={getJob:async()=>({data:owner,returnvalue:null,getState:async()=>'waiting'})};assert.deepEqual(await jobStatus(waiting,'j3',()=>true),{state:'waiting',result:null});
+      assert.equal(await jobStatus(waiting,'j4',()=>false),null);
     });
     await check('Worker confirma recurso/ator e bloqueia job adulterado',async()=>{
       const job=await api(`tenants/${A}/configuration-check`,{method:'POST',actor:a});assert.equal(job.status,201);

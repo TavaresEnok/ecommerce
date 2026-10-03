@@ -1,20 +1,21 @@
 {
   "passed": true,
-  "mode": "SIMULADO (substitutos locais)",
+  "mode": "SIMULADO",
+  "substitute": "substitutos locais (Caddy com autoridade local, Mailpit, arquivo de zona DNS)",
   "steps": [
     {
       "name": "HTTPS da plataforma via Caddy (autoridade local)",
       "detail": {
         "status": 200
       },
-      "at": "2026-10-02T15:16:35.353Z"
+      "at": "2026-10-02T17:31:19.792Z"
     },
     {
       "name": "Compra por HTTPS (pagamento SIMULADO)",
       "detail": {
         "order": "1"
       },
-      "at": "2026-10-02T15:16:37.967Z"
+      "at": "2026-10-02T17:31:21.806Z"
     },
     {
       "name": "E-mail transacional entregue por SMTP (Mailpit) com link seguro",
@@ -22,30 +23,30 @@
         "subject": "AURORA TESTE: recebemos seu pedido nº 1",
         "from": "nao-responda@lojas.demo.test"
       },
-      "at": "2026-10-02T15:16:40.027Z"
+      "at": "2026-10-02T17:31:23.843Z"
     },
     {
       "name": "Acesso ao pedido pelo link do e-mail",
       "detail": {},
-      "at": "2026-10-02T15:16:40.045Z"
+      "at": "2026-10-02T17:31:23.868Z"
     },
     {
       "name": "Domínio próprio: prova DNS + certificado emitido sob demanda + rota da loja certa",
       "detail": {
-        "host": "loja-aurora.demo.test"
+        "host": "loja-66b30263.demo.test"
       },
-      "at": "2026-10-02T15:16:40.585Z"
+      "at": "2026-10-02T17:31:24.408Z"
     },
     {
       "name": "Hostname não comprovado: Caddy recusa emitir certificado",
       "detail": {},
-      "at": "2026-10-02T15:16:40.597Z"
+      "at": "2026-10-02T17:31:24.416Z"
     },
     {
       "name": "Domínio canônico aplicado",
       "detail": {},
-      "at": "2026-10-02T15:16:40.680Z"
+      "at": "2026-10-02T17:31:24.449Z"
     }
   ],
-  "completedAt": "2026-10-02T15:16:40.680Z"
+  "completedAt": "2026-10-02T17:31:24.449Z"
 }

@@ -2,7 +2,7 @@ import { Body, CanActivate, Controller, ExecutionContext, ForbiddenException, Ge
 import type { FastifyRequest } from 'fastify';
 import { newId, rows, sql, withTenant, type Transaction } from '@ecommerce/database';
 import { activePlans, alerts, assignPlan, billingCycle, billingView, cancelAtPeriodEnd, changePlan, PurchaseError, receiveBillingEvent, SimulatedBillingProvider, simulationEnabled, subscription, tenantStatus } from '@ecommerce/purchase';
-import { AccessModule, AccessService, SessionGuard as OwnerSession, type AuthRequest } from './access.js';
+import { AccessModule, AccessService, SessionGuard as OwnerSession, rejectPendingMfa, type AuthRequest } from './access.js';
 import { cookieName, secureEqual } from './security.js';
 import { id, object, text } from './catalogue.js';
 import { Infrastructure, required } from './infrastructure.js';
@@ -12,7 +12,7 @@ import { StoresModule, StoresService } from './stores.js';
 @Injectable()
 class PlatformGuard implements CanActivate {
  constructor(private access:AccessService,private infra:Infrastructure){}
- async canActivate(context:ExecutionContext){const req=context.switchToHttp().getRequest<AuthRequest>();req.actor=await this.access.authenticate(req.cookies[cookieName()]);
+ async canActivate(context:ExecutionContext){const req=context.switchToHttp().getRequest<AuthRequest>();req.actor=await this.access.authenticate(req.cookies[cookieName()]);rejectPendingMfa(req.actor);
   if(!['GET','HEAD'].includes(req.method)){const csrf=req.headers['x-csrf-token'];if(req.headers.origin!==required('PUBLIC_ORIGIN')||typeof csrf!=='string'||!secureEqual(csrf,req.actor.csrf))throw new ForbiddenException('Proteção CSRF: origem ou código inválido.');}
   const {rowCount}=await this.infra.access.pool.query('select 1 from access.platform_admins where user_id=$1 and revoked_at is null',[req.actor.id]);if(!rowCount)throw new ForbiddenException('Acesso exclusivo da administração da plataforma.');requireMfa(req.actor);return true;}
 }

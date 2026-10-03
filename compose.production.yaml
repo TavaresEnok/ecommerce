@@ -1,17 +1,19 @@
 # Preparação apenas; não autoriza publicação. Use --env-file .env.production.
 services:
   api:
-    environment: {APP_ENV: production, NODE_ENV: production, LOCAL_MAILBOX: "false"}
+    environment: {APP_ENV: production, NODE_ENV: production, LOCAL_MAILBOX: "false", PLATFORM_HOST: "${PLATFORM_HOST:?Configure hostname autorizado}", EDGE_PROXY_SECRET: "${EDGE_PROXY_SECRET:?Execute npm run setup}"}
   worker:
     environment: {APP_ENV: production}
   web:
     ports: !reset []
+    # The web proxy only serves the portal on PLATFORM_HOST and its managed subdomains; without it every request is 404.
+    environment: {PLATFORM_HOST: "${PLATFORM_HOST:?Configure hostname autorizado}"}
   caddy:
     image: caddy:2.10.2-alpine
     profiles: [production]
-    environment: {PLATFORM_HOST: "${PLATFORM_HOST:?Configure hostname autorizado}"}
+    environment: {PLATFORM_HOST: "${PLATFORM_HOST:?Configure hostname autorizado}", EDGE_PROXY_SECRET: "${EDGE_PROXY_SECRET:?Execute npm run setup}"}
     ports: ["80:80", "443:443"]
-    volumes: ["./infra/Caddyfile:/etc/caddy/Caddyfile:ro", "caddy-data:/data", "caddy-config:/config"]
+    volumes: ["./infra/Caddyfile:/etc/caddy/Caddyfile:ro", "./infra/sites.caddy:/etc/caddy/sites.caddy:ro", "caddy-data:/data", "caddy-config:/config"]
     depends_on: {web: {condition: service_healthy}}
     restart: unless-stopped
     mem_limit: 256m

@@ -6,7 +6,7 @@ export default function Home() {
   const [user,setUser]=useState<{email:string}|null>(null);
   const [csrf,setCsrf]=useState(''); const [stores,setStores]=useState<Store[]>([]); const [selected,setSelected]=useState<Store|null>(null);
   const [settings,setSettings]=useState<Settings|null>(null); const [notice,setNotice]=useState(''); const [error,setError]=useState('');
-  const [localToken,setLocalToken]=useState(''); const [busy,setBusy]=useState(false);
+  const [localToken,setLocalToken]=useState(''); const [busy,setBusy]=useState(false); const [mfaPending,setMfaPending]=useState(false);
   const [members,setMembers]=useState<{id:string;role:string;status:string}[]>([]);
   async function api(path:string,method='GET',data?:unknown,token=csrf) {
     const response=await fetch(`/api/${path}`,{method,credentials:'same-origin',cache:'no-store',headers:{...(data?{'Content-Type':'application/json'}:{}),'X-CSRF-Token':token},body:data?JSON.stringify(data):undefined});
@@ -17,7 +17,7 @@ export default function Home() {
   async function action(task:()=>Promise<void>) { setBusy(true);setError('');setNotice(''); try {await task();}catch(error){setError(error instanceof Error?error.message:'Falha de comunicação.');}finally{setBusy(false);} }
   const fields=(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();return Object.fromEntries(new FormData(event.currentTarget));};
   async function refresh(token=csrf) {setStores(await api('tenants','GET',undefined,token));}
-  useEffect(()=>{fetch('/api/auth/session',{cache:'no-store'}).then(async response=>{if(response.ok){const result=await response.json();setUser(result.user);setCsrf(result.csrf);await refresh(result.csrf);}}).catch(()=>setError('Não foi possível conectar à API.'));},[]);
+  useEffect(()=>{fetch('/api/auth/session',{cache:'no-store'}).then(async response=>{if(response.ok){const result=await response.json();setUser(result.user);setCsrf(result.csrf);if(result.mfa?.enabled&&!result.mfa.verified){setMfaPending(true);return;}await refresh(result.csrf);}}).catch(()=>setError('Não foi possível conectar à API.'));},[]);
   async function select(store:Store) {
       setSelected(null);setSettings(null);setMembers([]);
       const configuration=await api(`tenants/${store.id}/settings`);
@@ -30,7 +30,7 @@ export default function Home() {
     {error && <p role="alert" className="error">{error}</p>}{notice && <p role="status" className="success">{notice}</p>}
     {localToken && <section aria-label="Código local"><strong>Código LOCAL — não é entrega de e-mail</strong><output data-testid="local-token">{localToken}</output><button onClick={()=>setLocalToken('')}>Ocultar código</button></section>}
     {!user ? <div className="grid">
-      <section><h2>Entrar</h2><form aria-label="Entrar" onSubmit={event=>{const data=fields(event);void action(async()=>{const result=await api('auth/login','POST',data);setUser(result.user);setCsrf(result.csrf);setLocalToken('');await refresh(result.csrf);});}}>
+      <section><h2>Entrar</h2><form aria-label="Entrar" onSubmit={event=>{const data=fields(event);void action(async()=>{const result=await api('auth/login','POST',data);setUser(result.user);setCsrf(result.csrf);setLocalToken('');if(result.mfaRequired){setMfaPending(true);return;}await refresh(result.csrf);});}}>
         <label>E-mail<input name="email" type="email" required autoComplete="username"/></label><label>Senha<input name="password" type="password" minLength={12} maxLength={128} required autoComplete="current-password"/></label><button disabled={busy}>Entrar</button>
       </form></section>
       <section><h2>Criar acesso local</h2><form aria-label="Criar acesso" onSubmit={event=>{const data=fields(event);void action(async()=>{const result=await api('auth/register','POST',data);setLocalToken(result.localToken);setNotice(result.message);});}}>
@@ -39,8 +39,8 @@ export default function Home() {
       <section><h2>Recuperar acesso</h2><form aria-label="Recuperar acesso" onSubmit={event=>{const data=fields(event);void action(async()=>{const result=await api('auth/recover','POST',data);setLocalToken(result.localToken);setNotice(result.message);});}}><label>E-mail<input name="email" type="email" required/></label><button disabled={busy}>Gerar código local</button></form>
         <form aria-label="Redefinir senha" onSubmit={event=>{const data=fields(event);void action(async()=>{const result=await api('auth/reset','POST',data);setLocalToken('');setNotice(result.message);});}}><label>Código de recuperação<input name="token" required defaultValue={localToken} key={`recover-${localToken}`}/></label><label>Nova senha<input name="password" type="password" minLength={12} maxLength={128} required autoComplete="new-password"/></label><button disabled={busy}>Redefinir senha</button></form>
       </section>
-    </div> : <>
-      <section><div className="row"><p>Autenticado como <strong>{user.email}</strong></p><button disabled={busy} onClick={()=>void action(async()=>{await api('auth/logout','POST');setUser(null);setSelected(null);setSettings(null);setLocalToken('');})}>Sair</button><button disabled={busy} onClick={()=>void action(async()=>{await api('auth/revoke-all','POST');setUser(null);setSelected(null);setSettings(null);setLocalToken('');})}>Revogar todas as sessões</button></div></section>
+    </div> : mfaPending ? <section><h2>Verificação em duas etapas</h2><p>Autenticado como <strong>{user.email}</strong>. Confirme o código do autenticador para acessar as lojas.</p><form aria-label="Confirmar MFA" onSubmit={event=>{const data=fields(event);void action(async()=>{await api('auth/mfa/verify','POST',data);setMfaPending(false);await refresh();});}}><label>Código do autenticador ou de recuperação<input name="code" required autoComplete="one-time-code"/></label><button disabled={busy}>Confirmar</button></form><button disabled={busy} onClick={()=>void action(async()=>{await api('auth/logout','POST');setUser(null);setMfaPending(false);})}>Sair</button></section> : <>
+      <section><div className="row"><p>Autenticado como <strong>{user.email}</strong></p><button disabled={busy} onClick={()=>void action(async()=>{await api('auth/logout','POST');setUser(null);setMfaPending(false);setSelected(null);setSettings(null);setLocalToken('');})}>Sair</button><button disabled={busy} onClick={()=>void action(async()=>{await api('auth/revoke-all','POST');setUser(null);setSelected(null);setSettings(null);setLocalToken('');})}>Revogar todas as sessões</button></div></section>
       <div className="grid"><section><h2>Suas lojas</h2>{stores.length===0?<p>Nenhuma loja vinculada. Crie um rascunho local ou aceite um convite.</p>:<ul>{stores.map(store=><li key={store.id}><button disabled={busy} onClick={()=>void action(()=>select(store))}>{store.name} — {store.role==='OWNER'?'Dono':'Funcionário'}</button><small>{store.slug}</small></li>)}</ul>}
         <h3>Criar loja local</h3><form aria-label="Criar loja" onSubmit={event=>{const data=fields(event);void action(async()=>{const store=await api('tenants','POST',data);await refresh();await select(store);setNotice('Loja criada em rascunho.');});}}><label>Nome da loja<input name="name" maxLength={100} required/></label><label>Identificador da loja<input name="slug" pattern="[a-z0-9]+(-[a-z0-9]+)*" minLength={3} maxLength={50} required/></label><button disabled={busy}>Criar loja</button></form>
       </section>

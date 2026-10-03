@@ -40,7 +40,7 @@ node scripts/verify.mjs --phase=7 --externos-simulados
 ```
 
 Staging local: https://localhost:8443 (aceitar a autoridade local do Caddy), e-mails capturados em http://localhost:8025.
-O resultado do modo simulado vai para `verification.simulado.json`, com `externalMode: "SIMULADO"`, a lista
+Depois da revisão 0179f4 (R6), o modo simulado aceita apenas substitutos com `mode: "SIMULADO"`. Itens sem substituto (VM, monitoramento e plantão, D06) continuam pendentes, então a partir da Fase 4 o modo simulado também termina em código 2. O resultado do modo simulado vai para `verification.simulado.json`, com `externalMode: "SIMULADO"`, a lista
 `simulatedExternals` e `realPending` (as pendências reais que continuam abertas).
 
 ## O que continua pendente de verdade

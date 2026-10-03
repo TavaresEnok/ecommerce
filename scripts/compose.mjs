@@ -7,8 +7,8 @@ export function composeArgs(test=false) {
   const phase=Number(process.env.VERIFY_PHASE||1);
   return ['compose','--project-name',test?`ecommerce-phase${phase}-test`:'ecommerce-foundation','--env-file',test?'.local/test.env':'.env','-f','compose.yaml',...(test?['-f','compose.test.yaml',...(phase>=2?['-f',`compose.phase${phase}.test.yaml`]:[])]:[])];
 }
-export function command(program,args,{timeout=180000,capture=false}={}) {
-  const result=spawnSync(program,args,{cwd:root,timeout,stdio:capture?'pipe':'inherit',encoding:'utf8',windowsHide:true,maxBuffer:256*1024*1024});
+export function command(program,args,{timeout=180000,capture=false,env}={}) {
+  const result=spawnSync(program,args,{cwd:root,timeout,env:env||process.env,stdio:capture?'pipe':'inherit',encoding:'utf8',windowsHide:true,maxBuffer:256*1024*1024});
   if(result.error) throw Object.assign(new Error(result.error.code==='ETIMEDOUT'?'Tempo limite excedido.':`Não foi possível executar ${program} (${result.error.code}).`),{exitCode:result.error.code==='ETIMEDOUT'?1:2});
   if(result.status!==0) throw Object.assign(new Error(`Falha em ${program} (código ${result.status}). ${capture?'Consulte a disponibilidade do serviço.':''}`),{exitCode:1});
   return result.stdout||'';

@@ -5,6 +5,7 @@
 - **Liberação operacional:** **NÃO_SOLICITADA**. Nenhum pagamento, reembolso, publicação ou convite real.
 - **Data:** 01/10/2026. Ambiente `ecommerce-phase3-test` (Docker Desktop, Node 24.21.0 nos containers, PostgreSQL 17.9, Redis 7.4.7). Somente dados sintéticos.
 - **Resultado:** `node scripts/verify.mjs --phase=3` → **código 0** (verificação técnica local com simulação). A fase não é marcada CONCLUÍDA porque a homologação externa do gateway não existe.
+- **Atualização 02/10/2026 (revisão 0179f4, R6):** o código 0 acima era do contrato antigo. Agora o verificador exige evidência externa REAL, validada por conteúdo e commit, desde a Fase 3. Sem ela, o resultado é **código 2**. Veja [revisao-0179f4.md](revisao-0179f4.md).
 
 ## 0. Diagnóstico ao retomar
 

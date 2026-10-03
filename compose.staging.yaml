@@ -3,10 +3,8 @@
 services:
   web:
     ports: !override ["127.0.0.1:3900:3000"]
-    environment: {PLATFORM_HOST: lojas.demo.test}
   api:
     environment:
-      PLATFORM_HOST: lojas.demo.test
       DNS_OVERRIDES_FILE: /staging/dns.json
       TLS_PROBE_CA_FILE: /staging/caddy-root.crt
     volumes: ["./.local/staging:/staging:ro", "caddy-data:/caddy-data:ro"]
@@ -23,7 +21,8 @@ services:
   caddy:
     image: caddy:2.10.2-alpine
     ports: ["127.0.0.1:8443:443"]
-    volumes: ["./infra/Caddyfile.staging:/etc/caddy/Caddyfile:ro", "caddy-data:/data"]
+    environment: {PLATFORM_HOST: "${PLATFORM_HOST:?}", EDGE_PROXY_SECRET: "${EDGE_PROXY_SECRET:?Execute npm run setup}"}
+    volumes: ["./infra/Caddyfile.staging:/etc/caddy/Caddyfile:ro", "./infra/sites.caddy:/etc/caddy/sites.caddy:ro", "caddy-data:/data"]
     depends_on: {web: {condition: service_healthy}}
     restart: unless-stopped
     mem_limit: 128m

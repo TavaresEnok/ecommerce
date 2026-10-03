@@ -1,4 +1,5 @@
-import { Body, CanActivate, Controller, ExecutionContext, ForbiddenException, Get, Injectable, Module, Post, Req, Res, ServiceUnavailableException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, CanActivate, Controller, ExecutionContext, ForbiddenException, Get, Injectable, Module, Post, Req, Res, ServiceUnavailableException, SetMetadata, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { newId, rows, sql } from '@ecommerce/database';
 import { CredentialsDto, EmailDto, RecoveryDto, TokenDto } from './dto.js';
@@ -71,12 +72,18 @@ export class AccessService {
     return { message: 'Sessões revogadas.' };
   }
 }
+// A password-only session of an account with MFA enabled is "pending": it may only answer the challenge, read the
+// minimal session state and sign out. Every other guarded route is refused centrally until the second factor is verified.
+const PENDING_MFA_ALLOWED = 'access:pending-mfa-allowed';
+export const AllowPendingMfa = () => SetMetadata(PENDING_MFA_ALLOWED, true);
+export function rejectPendingMfa(actor: Actor) { if (actor.mfaEnabled && !actor.mfaVerified) throw new ForbiddenException({ message: 'Confirme o código do autenticador (MFA) para continuar.', code: 'MFA_PENDING' }); }
 @Injectable()
 export class SessionGuard implements CanActivate {
-  constructor(private readonly access: AccessService) {}
+  constructor(private readonly access: AccessService, private readonly reflector: Reflector) {}
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest<AuthRequest>();
     req.actor = await this.access.authenticate(req.cookies[cookieName()]);
+    if (!this.reflector.getAllAndOverride<boolean>(PENDING_MFA_ALLOWED, [context.getHandler(), context.getClass()])) rejectPendingMfa(req.actor);
     if (!['GET','HEAD','OPTIONS'].includes(req.method)) {
       const csrf = req.headers['x-csrf-token'];
       if (req.headers.origin !== required('PUBLIC_ORIGIN') || typeof csrf !== 'string' || !secureEqual(csrf, req.actor.csrf)) throw new ForbiddenException('Proteção CSRF: origem ou código inválido.');
@@ -96,11 +103,11 @@ export class AccessController {
   }
   @Post('recover') recover(@Body() input: EmailDto) { return this.access.recover(input.email); }
   @Post('reset') reset(@Body() input: RecoveryDto) { return this.access.reset(input); }
-  @Get('session') @UseGuards(SessionGuard) session(@Req() req: AuthRequest) { return { user: {id:req.actor.id,email:req.actor.email}, csrf: req.actor.csrf, localMailbox: localMailbox(), mfa: { enabled: req.actor.mfaEnabled, verified: req.actor.mfaVerified } }; }
-  @Post('logout') @UseGuards(SessionGuard) async logout(@Req() req: AuthRequest, @Res({passthrough:true}) reply: FastifyReply) {
+  @Get('session') @UseGuards(SessionGuard) @AllowPendingMfa() session(@Req() req: AuthRequest) { return { user: {id:req.actor.id,email:req.actor.email}, csrf: req.actor.csrf, localMailbox: localMailbox(), mfa: { enabled: req.actor.mfaEnabled, verified: req.actor.mfaVerified } }; }
+  @Post('logout') @UseGuards(SessionGuard) @AllowPendingMfa() async logout(@Req() req: AuthRequest, @Res({passthrough:true}) reply: FastifyReply) {
     reply.clearCookie(cookieName(), {path:'/'}); return this.access.logout(req.actor, false);
   }
-  @Post('revoke-all') @UseGuards(SessionGuard) async revoke(@Req() req: AuthRequest, @Res({passthrough:true}) reply: FastifyReply) {
+  @Post('revoke-all') @UseGuards(SessionGuard) @AllowPendingMfa() async revoke(@Req() req: AuthRequest, @Res({passthrough:true}) reply: FastifyReply) {
     reply.clearCookie(cookieName(), {path:'/'}); return this.access.logout(req.actor, true);
   }
 }

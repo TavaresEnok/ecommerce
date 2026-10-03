@@ -1,0 +1,52 @@
+{
+  "mode": "LOCAL",
+  "note": "Caminho borda → web → API no staging local; certificados da autoridade local, não públicos.",
+  "production": {
+    "platformHost": "web, api e caddy",
+    "edgeSecret": "api = caddy (valor omitido)",
+    "webPorts": 0,
+    "withoutPlatformHost": "recusada",
+    "caddyValidate": "ok"
+  },
+  "clients": [
+    {
+      "role": "A",
+      "passed": true,
+      "steps": [
+        {
+          "name": "R2: cliente A limitado; cabeçalhos forjados (X-Forwarded-For, X-Client-IP, X-Edge-Auth) não contornam",
+          "detail": {
+            "first429": 121
+          }
+        }
+      ],
+      "limitedAt": "2026-10-02T17:32:44.950Z",
+      "completedAt": "2026-10-02T17:32:44.952Z"
+    },
+    {
+      "role": "B",
+      "passed": true,
+      "steps": [
+        {
+          "name": "R2: cliente B não é afetado pelo limite de A",
+          "detail": {}
+        },
+        {
+          "name": "R3: domínio principal → portal; subdomínio gerenciado → loja certa; hostname desconhecido recusado (web 404, sem certificado)",
+          "detail": {
+            "store": "aurora-edge0072a1"
+          }
+        },
+        {
+          "name": "R4: PNG válido acima de 16 KB aceito (201); acima de 10 MiB recusado (413); JSON de 20 KB e corpo grande fora da rota de mídia recusados (413)",
+          "detail": {
+            "png": 49363
+          }
+        }
+      ],
+      "completedAt": "2026-10-02T17:32:48.152Z"
+    }
+  ],
+  "completedAt": "2026-10-02T17:32:48.642Z",
+  "passed": true
+}

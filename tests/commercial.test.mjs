@@ -32,9 +32,18 @@ test('Fase 6: comercialização preparada sem terceiros',async t=>{
    await enableMfa(a.actor);assert.equal(a.actor.recovery.length,10);assert.equal(expect(await api('auth/session',{actor:a.actor}),200).mfa.verified,true);
    const again=await login(a.email,a.password);assert.equal(again.mfaRequired,true);assert.equal(expect(await api('auth/session',{actor:again}),200).mfa.verified,false);
    expect(await api(`tenants/${a.id}/domains`,{method:'POST',actor:again,body:{hostname:'x.example.test'}}),403);
+   // R1 (revisão 0179f4): a password-only session of an MFA account is restricted centrally — no reads, exports or changes.
+   const ready=expect(await api(`tenants/${a.id}/operations/exports`,{method:'POST',actor:a.actor,body:{kind:'STORE'}}));
+   const pending=[[`tenants`,'GET'],[`tenants/${a.id}/settings`,'GET'],[`tenants/${a.id}/purchase/orders`,'GET'],[`tenants/${a.id}/operations/orders`,'GET'],[`tenants/${a.id}/catalogue`,'GET'],[`tenants/${a.id}/settings`,'PATCH',{displayName:'Alterado sem MFA',timezone:'UTC'}],[`tenants/${a.id}/operations/exports`,'POST',{kind:'STORE'}],[`tenants/${a.id}/billing`,'GET'],[`tenants/${a.id}/ai/settings`,'GET'],[`platform/tenants`,'GET']];
+   for(const [path,method,body] of pending){const r=await api(path,{method,actor:again,body});assert.equal(r.status,403,`${method} ${path} → ${r.status} ${JSON.stringify(r.body)}`);}
+   expect(await api(`tenants/${a.id}/operations/exports/${ready.id}`,{actor:again,headers:{'x-export-token':ready.token}}),403);
+   assert.equal(expect(await api(`tenants/${a.id}/settings`,{actor:a.actor}),200).displayName!=='Alterado sem MFA',true);
    expect(await api('auth/mfa/verify',{method:'POST',actor:again,body:{code:totp(a.actor.secret,a.actor.step)}}),401);
    expect(await api('auth/mfa/verify',{method:'POST',actor:again,body:{code:a.actor.recovery[0]}}));expect(await api('auth/mfa/verify',{method:'POST',actor:again,body:{code:a.actor.recovery[0]}}),401);
    assert.equal(expect(await api('auth/session',{actor:again}),200).mfa.verified,true);
+   // After the second factor the same session regains normal permissions.
+   expect(await api(`tenants/${a.id}/settings`,{actor:again}),200);expect(await api(`tenants/${a.id}/operations/exports/${ready.id}`,{actor:again,headers:{'x-export-token':ready.token}}),200);
+   const sessionOut=await login(a.email,a.password);expect(await api('auth/logout',{method:'POST',actor:sessionOut}));
    const raw=(await db.pool.query('select 1')).rowCount;assert.equal(raw,1);await enableMfa(b.actor);
   });
   await check('Administração da plataforma: papel concedido só pelo operador, MFA obrigatório, motivo e auditoria',async()=>{

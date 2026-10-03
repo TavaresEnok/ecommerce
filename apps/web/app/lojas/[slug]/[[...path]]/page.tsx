@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { edgeHeaders } from '../../../../components/edge';
+import { headers } from 'next/headers';
 import { notFound,permanentRedirect } from 'next/navigation';
 import Storefront from '../../../../components/storefront';
 import { loadProduct,loadStore,loadStoreOptional,decimal } from '../../../../components/store-data';
@@ -12,7 +14,7 @@ export default async function Page({params,searchParams}:Props){const {slug,path
   const {q=''}=await searchParams,data=await loadStore(slug,path.length?'':q,path[0]==='categorias'?path[1]:''),product=path[0]==='produtos'&&path[1]?await loadProduct(slug,path[1]):null;
   if(path.length&&!['produtos','categorias','paginas','carrinho','pedidos','atendimento'].includes(path[0]))notFound();
   if(path.length>2 || (['carrinho','atendimento'].includes(path[0]||'')&&path.length!==1)||(path[0]==='pedidos'&&!/^[0-9a-f-]{36}$/.test(path[1]||'')))notFound();
-  if(path[0]==='produtos'&&!product){const response=await fetch(`${process.env.API_INTERNAL_URL || 'http://localhost:3001'}/public/stores/${encodeURIComponent(slug)}/redirect/${encodeURIComponent(path[1]||'')}`,{cache:'no-store'});if(response.ok){const current=await response.json();if(current.slug!==path[1])permanentRedirect(`/lojas/${slug}/produtos/${current.slug}`);}notFound();}if(path[0]==='paginas'&&!data.theme.pages.some(p=>p.slug===path[1]))notFound();if(path[0]==='categorias'&&!data.categories.some(c=>c.slug===path[1]))notFound();
+  if(path[0]==='produtos'&&!product){const response=await fetch(`${process.env.API_INTERNAL_URL || 'http://localhost:3001'}/public/stores/${encodeURIComponent(slug)}/redirect/${encodeURIComponent(path[1]||'')}`,{cache:'no-store',headers:edgeHeaders(await headers())});if(response.ok){const current=await response.json();if(current.slug!==path[1])permanentRedirect(`/lojas/${slug}/produtos/${current.slug}`);}notFound();}if(path[0]==='paginas'&&!data.theme.pages.some(p=>p.slug===path[1]))notFound();if(path[0]==='categorias'&&!data.categories.some(c=>c.slug===path[1]))notFound();
   const json=product?{'@context':'https://schema.org','@type':'Product',name:product.name,description:product.description,url:`${data.route.canonical}/produtos/${product.slug}`,image:product.media.map(m=>`${data.route.canonical}/api/public/stores/${slug}/media/${m.id}/large`),offers:product.variants.filter(v=>v.active).map(v=>({'@type':'Offer',sku:v.sku,price:decimal(v.price_cents),priceCurrency:'BRL',availability:`https://schema.org/${v.available>0?'InStock':'OutOfStock'}`,url:`${data.route.canonical}/produtos/${product.slug}`,seller:{'@type':'Organization',name:data.theme.supplier?.name}}))}:null;
   if(product)data.products=[product];
   return <>{json&&<script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(json).replace(/</g,'\\u003c')}}/>}<Storefront data={data} path={path}/></>;

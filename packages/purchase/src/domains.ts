@@ -16,6 +16,8 @@ const MAX_DOMAINS=5,FAILURES_BEFORE_FAILED=3;
 function zoneFile():DnsLookup|null{const file=process.env.DNS_OVERRIDES_FILE;if(!file||process.env.APP_ENV==='production')return null;
  const read=(name:string,type:string)=>{try{const zone=JSON.parse(readFileSync(file,'utf8')) as Record<string,Record<string,string[]>>;return zone[name.toLowerCase()]?.[type]??[];}catch{return [];}};
  return {txt:async n=>read(n,'TXT'),cname:async n=>read(n,'CNAME'),a:async n=>read(n,'A')};}
+// Staging only: where the zone file's CNAME points (the edge), so the HTTPS probe follows the same path as a real resolver.
+function zoneTarget(hostname:string){const file=process.env.DNS_OVERRIDES_FILE;if(!file||process.env.APP_ENV==='production')return null;try{const zone=JSON.parse(readFileSync(file,'utf8')) as Record<string,Record<string,string[]>>;return zone[hostname.toLowerCase()]?.CNAME?.[0]?.replace(/\.$/,'')??null;}catch{return null;}}
 export function systemDns():DnsLookup{const zone=zoneFile();if(zone)return zone;const r=new Resolver({timeout:5000,tries:2});const safe=async(fn:()=>Promise<string[]>)=>{try{return await fn();}catch{return [];}};
  return {txt:name=>safe(async()=>(await r.resolveTxt(name)).map(parts=>parts.join(''))),cname:name=>safe(()=>r.resolveCname(name)),a:name=>safe(()=>r.resolve4(name))};}
 // HTTPS GET of the store home through the public path (DNS → TLS → Caddy → web). Certificate validation is never disabled.
@@ -24,7 +26,7 @@ export function httpsProbe(origin=process.env.TLS_PROBE_ORIGIN):RouteProbe{retur
  const local=origin&&['development','test'].includes(process.env.APP_ENV||'')?new URL(origin):null;
  // Staging only: trust the local Caddy CA explicitly (validation stays on; only the root set changes).
  const ca=process.env.TLS_PROBE_CA_FILE&&process.env.APP_ENV!=='production'?readFileSync(process.env.TLS_PROBE_CA_FILE):undefined;
- const req=(local?http:https).request(local?{host:local.hostname,port:local.port,path:'/',headers:{host:hostname},timeout:10000}:{host:hostname,servername:hostname,path:'/',timeout:10000,...(ca?{ca}:{})},res=>{let body='';res.setEncoding('utf8');res.on('data',c=>{if(body.length<300000)body+=c;});res.on('end',()=>res.statusCode===200?resolve(body):reject(new Error(`HTTP ${res.statusCode}`)));});
+ const req=(local?http:https).request(local?{host:local.hostname,port:local.port,path:'/',headers:{host:hostname},timeout:10000}:{host:zoneTarget(hostname)??hostname,servername:hostname,headers:{host:hostname},path:'/',timeout:10000,...(ca?{ca}:{})},res=>{let body='';res.setEncoding('utf8');res.on('data',c=>{if(body.length<300000)body+=c;});res.on('end',()=>res.statusCode===200?resolve(body):reject(new Error(`HTTP ${res.statusCode}`)));});
  req.on('timeout',()=>req.destroy(new Error('timeout')));req.on('error',reject);req.end();});}
 export function normalizeHostname(input:string,platformHost=process.env.PLATFORM_HOST||''){
  const raw=String(input||'').trim().toLowerCase().replace(/\.$/,''),ascii=domainToASCII(raw);

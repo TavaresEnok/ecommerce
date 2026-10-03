@@ -1,16 +1,12 @@
+# Local staging only: same sites as production (sites.caddy), certificates from Caddy's local authority instead of ACME.
 {
 	local_certs
 	on_demand_tls {
 		ask http://api:3001/internal/tls/ask
 	}
 }
-localhost, lojas.demo.test {
-	tls internal
-	reverse_proxy web:3000
-}
-https:// {
-	tls internal {
-		on_demand
-	}
-	reverse_proxy web:3000
+import /etc/caddy/sites.caddy
+localhost {
+	import security
+	import upstream
 }

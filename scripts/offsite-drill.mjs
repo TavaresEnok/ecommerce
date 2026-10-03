@@ -4,7 +4,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { docker, root } from './compose.mjs';
 import { stagingCompose as c } from './staging.mjs';
-const work=join(root,'.local/staging/offsite'),report={mode:'SIMULADO (armazenamento externo substituto local)',startedAt:new Date().toISOString(),steps:[],passed:false};
+const work=join(root,'.local/staging/offsite'),report={mode:'SIMULADO',substitute:'armazenamento externo substituto local (segundo S3)',startedAt:new Date().toISOString(),steps:[],passed:false};
 const t0=Date.now(),mark=s=>{report.steps.push({step:s,elapsedSeconds:Math.round((Date.now()-t0)/100)/10});console.log('✔',s);};
 const psql=(db,q)=>docker([...c,'exec','-T','postgres','psql','-q','-U','postgres','-d',db,'-tAc',q],{capture:true,timeout:60000}).trim();
 try{

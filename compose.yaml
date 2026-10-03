@@ -83,12 +83,15 @@ services:
       S3_BUCKET: ${S3_BUCKET:?}
       UPLOADS_DISABLED: ${UPLOADS_DISABLED:-false}
       RATE_LIMIT_PER_MINUTE: ${RATE_LIMIT_PER_MINUTE:-}
+      AUTH_RATE_LIMIT_PER_MINUTE: ${AUTH_RATE_LIMIT_PER_MINUTE:-}
+      PLATFORM_RATE_LIMIT_PER_MINUTE: ${PLATFORM_RATE_LIMIT_PER_MINUTE:-}
+      EDGE_PROXY_SECRET: ${EDGE_PROXY_SECRET:-}
     depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}, storage-init: {condition: service_completed_successfully}}
     healthcheck: {test: [CMD, node, -e, "fetch('http://localhost:3001/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 5s, retries: 30}
   web:
     <<: *app
     command: [npm, run, start, -w, "@ecommerce/web"]
-    environment: {NODE_ENV: production, API_INTERNAL_URL: "http://api:3001"}
+    environment: {NODE_ENV: production, API_INTERNAL_URL: "http://api:3001", PLATFORM_HOST: "${PLATFORM_HOST:-}"}
     ports: ["127.0.0.1:${WEB_PORT:-3000}:3000"]
     depends_on: {api: {condition: service_healthy}}
     healthcheck: {test: [CMD, node, -e, "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 5s, retries: 30}

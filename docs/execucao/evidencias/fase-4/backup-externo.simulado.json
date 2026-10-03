@@ -1,5 +1,5 @@
 {
-  "mode": "SIMULADO (armazenamento externo substituto local)",
+  "mode": "SIMULADO",
   "startedAt": "2026-10-02T15:36:26.760Z",
   "steps": [
     {
@@ -47,5 +47,6 @@
     "Chave de cifra no .local/staging.env; em produção ficaria em cofre separado com procedimento de recuperação.",
     "Sem retenção/expiração automática de 30 dias nem compressão do WAL — dependem da ferramenta/provedor escolhidos."
   ],
-  "finishedAt": "2026-10-02T15:36:46.413Z"
+  "finishedAt": "2026-10-02T15:36:46.413Z",
+  "substitute": "armazenamento externo substituto local"
 }

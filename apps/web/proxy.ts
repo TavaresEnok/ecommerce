@@ -1,4 +1,5 @@
 import { NextRequest,NextResponse } from 'next/server';
+import { edgeHeaders } from './components/edge';
 const API=process.env.API_INTERNAL_URL || 'http://localhost:3001';
 const PLATFORM=['localhost','127.0.0.1','web',...(process.env.PLATFORM_HOST?[process.env.PLATFORM_HOST.toLowerCase()]:[])];
 const notFound=(message:string)=>new NextResponse(message,{status:404,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex'}});
@@ -8,7 +9,7 @@ export async function proxy(request:NextRequest){const host=request.headers.get(
   const managed=host.endsWith('.localhost')||PLATFORM.slice(3).some(p=>host.endsWith(`.${p}`));
   if(PLATFORM.includes(host))return NextResponse.next();
   // Managed subdomain or a store's own domain: resolution is done by the API (only ACTIVE custom domains resolve).
-  const response=await fetch(`${API}/public/resolve?host=${encodeURIComponent(host)}`,{cache:'no-store'});
+  const response=await fetch(`${API}/public/resolve?host=${encodeURIComponent(host)}`,{cache:'no-store',headers:edgeHeaders(request.headers)});
   if(!response.ok)return notFound(managed?'Loja não encontrada':'Host não autorizado');
   const route=await response.json() as {slug:string;canonical:string};
   if(path.startsWith('/api/public/stores/')&&path.split('/')[4]!==route.slug)return notFound('Loja incompatível com hostname');
