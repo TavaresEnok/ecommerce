@@ -1,0 +1,14 @@
+  ✔ Produto simples, atributos explícitos, SKU único e estoque auditado (81.217417ms)
+  ✔ Ajustes concorrentes serializados e plano real de consulta por tenant (54.921172ms)
+  ✔ T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta (68.38774ms)
+  ✔ T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica (275.531775ms)
+  ✔ T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado (1647.689104ms)
+  ✔ Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento (169.28075ms)
+  ✔ Frete com prioridade, retirada, CEP não atendido, validade e fingerprint (298.756108ms)
+  ✔ Arquivamento invalida oferta e carrinho, estoque continua auditável (75.541487ms)
+  ✔ Slug histórico redireciona sem reutilização e domínio não mistura lojas (205.635494ms)
+  ✔ T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE (861.965258ms)
+  ✔ Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel (3614.480082ms)
+ℹ tests 12
+ℹ pass 12
+ℹ fail 0
