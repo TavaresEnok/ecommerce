@@ -2,10 +2,15 @@ import { NextRequest,NextResponse } from 'next/server';
 import { edgeHeaders } from './components/edge';
 const API=process.env.API_INTERNAL_URL || 'http://localhost:3001';
 const PLATFORM=['localhost','127.0.0.1','web',...(process.env.PLATFORM_HOST?[process.env.PLATFORM_HOST.toLowerCase()]:[])];
+const MEDIA_UPLOAD=/^\/api\/tenants\/[0-9a-f-]{36}\/catalogue\/media$/,MEDIA_MAX_BYTES=10*1024*1024;
 const notFound=(message:string)=>new NextResponse(message,{status:404,headers:{'Cache-Control':'no-store','X-Robots-Tag':'noindex'}});
 export async function proxy(request:NextRequest){const host=request.headers.get('host')?.toLowerCase().split(':')[0]||'',path=request.nextUrl.pathname;
   // Internal endpoints (e.g. Caddy TLS permission) are only reachable inside the network.
   if(path.startsWith('/api/internal'))return notFound('Não encontrado');
+  // T23: a media upload above the API ceiling is refused here by its declared length. Forwarding it made the API answer 413
+  // and close the socket while this proxy was still writing the (already truncated) body, which surfaced as an intermittent
+  // 500. The API keeps enforcing the same limit for anything that reaches it.
+  if(request.method==='POST'&&MEDIA_UPLOAD.test(path)&&Number(request.headers.get('content-length'))>MEDIA_MAX_BYTES)return NextResponse.json({statusCode:413,error:'Arquivo acima do limite de 10 MB.'},{status:413,headers:{'Cache-Control':'no-store'}});
   const managed=host.endsWith('.localhost')||PLATFORM.slice(3).some(p=>host.endsWith(`.${p}`));
   if(PLATFORM.includes(host))return NextResponse.next();
   // Managed subdomain or a store's own domain: resolution is done by the API (only ACTIVE custom domains resolve).
