@@ -1,0 +1,28 @@
+// Conjunto mínimo de ícones em traço (20×20, currentColor). Sem biblioteca externa (DESIGN.md §3.4, D-10).
+const paths: Record<string, React.ReactNode> = {
+  search: <><circle cx="8.5" cy="8.5" r="5.5" /><path d="M12.6 12.6 17 17" /></>,
+  plus: <path d="M10 4v12M4 10h12" />,
+  alert: <><path d="M10 3 18 17H2z" /><path d="M10 8v4" /><path d="M10 14.6v.1" /></>,
+  check: <><circle cx="10" cy="10" r="7.5" /><path d="m6.6 10.2 2.3 2.3 4.6-4.7" /></>,
+  tick: <path d="m4.5 10.5 3.5 3.5 7.5-8" />,
+  clock: <><circle cx="10" cy="10" r="7.5" /><path d="M10 6v4l2.6 1.8" /></>,
+  info: <><circle cx="10" cy="10" r="7.5" /><path d="M10 9v5" /><path d="M10 6.4v.1" /></>,
+  x: <path d="m5 5 10 10M15 5 5 15" />,
+  imageOff: <><rect x="3" y="4" width="14" height="12" rx="2" /><path d="m3 13 4-4 3 3" /><path d="M3 3l14 14" /></>,
+  upload: <path d="M10 13V4M6.5 7.5 10 4l3.5 3.5M4 13v3h12v-3" />,
+  box: <><path d="M3 6.5 10 3l7 3.5v7L10 17l-7-3.5z" /><path d="m3 6.5 7 3.5 7-3.5M10 10v7" /></>,
+  brush: <path d="M4 16c3 0 4-1.5 4-3.5L15.5 5a1.4 1.4 0 0 0-2-2L6 10.5C4 10.5 4 13 4 16z" />,
+  receipt: <><path d="M5 3h10v14l-2-1.2-1.6 1.2-1.4-1.2-1.4 1.2L7 15.8 5 17z" /><path d="M8 7h4M8 10h4" /></>,
+  chat: <path d="M3.5 4h13v9H8l-4.5 3.5z" />,
+  gauge: <><path d="M3 14a7 7 0 1 1 14 0" /><path d="m10 14 3-4" /></>,
+  eye: <><path d="M2 10s3-5.5 8-5.5 8 5.5 8 5.5-3 5.5-8 5.5S2 10 2 10z" /><circle cx="10" cy="10" r="2.2" /></>,
+  store: <path d="M3 8 4.5 4h11L17 8zM4 8v8h12V8M8 16v-4h4v4" />,
+  back: <path d="m12 5-5 5 5 5" />,
+  copy: <><rect x="7" y="7" width="10" height="10" rx="1.5" /><path d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-7A1.5 1.5 0 0 0 3 4.5v7A1.5 1.5 0 0 0 4.5 13H7" /></>,
+  shield: <path d="M10 2.5 16 5v4.5c0 4-2.7 6.6-6 8-3.3-1.4-6-4-6-8V5z" />,
+  cart: <><path d="M2.5 3.5h2l2 9.5h9l1.5-6.5H6" /><circle cx="8" cy="16.5" r="1" /><circle cx="14.5" cy="16.5" r="1" /></>,
+};
+export type IconName = keyof typeof paths;
+export function Icon({ name, size = 20, label }: { name: IconName; size?: 16 | 20; label?: string }) {
+  return <svg className={`icon${size === 16 ? ' icon-16' : ''}`} viewBox="0 0 20 20" {...(label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true, focusable: false })}>{paths[name]}</svg>;
+}

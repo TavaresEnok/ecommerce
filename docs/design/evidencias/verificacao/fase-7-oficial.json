@@ -1,0 +1,26 @@
+{
+  "phase": 7,
+  "specification": "1.1",
+  "startedAt": "2026-10-03T00:21:48.329Z",
+  "environment": "ecommerce-phase7-test",
+  "steps": [
+    {
+      "name": "Preparação isolada",
+      "result": "passed",
+      "durationMs": 103
+    },
+    {
+      "name": "Build em Node LTS",
+      "result": "failed",
+      "durationMs": 72257
+    }
+  ],
+  "exitCode": 1,
+  "externalHomologation": false,
+  "externalMode": "SIMULADO",
+  "simulatedExternals": [],
+  "realPending": [],
+  "sourceDigest": "7c8feb030ee1d7bf14bd6d5bcf7990f56b1c8d66e1af2ae3a0639f0a999d5fd9",
+  "error": "Falha em docker (código 1). ",
+  "finishedAt": "2026-10-03T00:23:00.887Z"
+}

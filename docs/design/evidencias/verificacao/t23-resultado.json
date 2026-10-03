@@ -1,0 +1,52 @@
+{
+  "objetivo": "T23 (upload de 10 MB + 1 deve responder 413) isolado do resto da suíte, na mesma pilha Docker do verify (web Next em contêiner, rewrite /api → api:3001)",
+  "sonda": "docs/design/evidencias/verificacao/t23-sonda.mjs (30 envios por rodada: SVG recusado seguido do arquivo de 10 MB + 1, como no teste)",
+  "resultado_sonda": {
+    "branch_0a134d6": [
+      {
+        "web_proxy_next": {
+          "413": 24,
+          "500": 6
+        },
+        "api_direta": {
+          "413": 30
+        }
+      },
+      {
+        "web_proxy_next": {
+          "413": 28,
+          "500": 2
+        },
+        "api_direta": {
+          "413": 30
+        }
+      }
+    ],
+    "base_831d9a2": [
+      {
+        "web_proxy_next": {
+          "413": 25,
+          "500": 5
+        },
+        "api_direta": {
+          "413": 30
+        }
+      },
+      {
+        "web_proxy_next": {
+          "413": 25,
+          "500": 5
+        },
+        "api_direta": {
+          "413": 30
+        }
+      }
+    ]
+  },
+  "suite_storefront": {
+    "branch_0a134d6": "1 falha no verify + 1 falha em 5 execuções isoladas (T23, mesma mensagem)",
+    "base_831d9a2": "1 falha em 7 execuções (T23, mesma mensagem)"
+  },
+  "log_web": "Failed to proxy http://api:3001/.../catalogue/media Error: write EPIPE (Next recebe o fechamento da conexão pela API ao recusar o corpo grande e devolve 500)",
+  "conclusao": "Falha intermitente (~15% por envio) no proxy de rewrite do Next quando a API recusa o corpo antes de recebê-lo inteiro; idêntica na base e na branch; next.config.mjs, proxy.ts, API e lockfile sem alteração entre 831d9a2 e a branch. Não é regressão do redesign e não foi corrigida nesta rodada."
+}

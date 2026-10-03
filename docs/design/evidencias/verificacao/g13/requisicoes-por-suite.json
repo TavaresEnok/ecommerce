@@ -1,0 +1,49 @@
+{
+ "nota": "Requisições à API por suíte rodada SOZINHA, com a API recém-reiniciada (limitador zerado), commit deecdc1, 03/10/2026. Contagem a partir de \"incoming request\" no log da API, sem /health/ready. Os 429 de ai.test.mjs são do limite de geração simultânea de IA (esperados pelo teste), não do limite por IP.",
+ "etapa_api": {
+  "purchase": {
+   "requisicoes": 232,
+   "segundos": 5,
+   "respostas429": 0
+  },
+  "operations": {
+   "requisicoes": 221,
+   "segundos": 5,
+   "respostas429": 0
+  },
+  "pilot-observation": {
+   "requisicoes": 50,
+   "segundos": 2,
+   "respostas429": 0
+  },
+  "commercial": {
+   "requisicoes": 186,
+   "segundos": 5,
+   "respostas429": 0
+  },
+  "ai": {
+   "requisicoes": 96,
+   "segundos": 3,
+   "respostas429": 2
+  }
+ },
+ "etapa_interface": {
+  "purchase-worker": {
+   "requisicoes": 108,
+   "segundos": 23,
+   "respostas429": 0
+  },
+  "pilot-flow": {
+   "requisicoes": 118,
+   "segundos": 9,
+   "respostas429": 0
+  },
+  "commercial-ui": {
+   "requisicoes": 102,
+   "segundos": 4,
+   "respostas429": 0
+  }
+ },
+ "total_etapa_api": 785,
+ "total_etapa_interface": 328
+}

@@ -1,0 +1,14 @@
+
+=== Preparação isolada ===
+
+=== Build em Node LTS ===
+ Image ecommerce-foundation:local Building 
+2:=== Preparação isolada ===
+4:=== Build em Node LTS ===
+97:#23 70.65 npm error code SELF_SIGNED_CERT_IN_CHAIN
+98:#23 70.65 npm error errno SELF_SIGNED_CERT_IN_CHAIN
+104:70.65 npm error code SELF_SIGNED_CERT_IN_CHAIN
+105:70.65 npm error errno SELF_SIGNED_CERT_IN_CHAIN
+125:target tests: failed to solve: process "/bin/sh -c npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund" did not complete successfully: exit code: 1
+127:Falha em docker (código 1). 
+129:Fase 7: código 1 (externos SIMULADOS — não equivale a homologação real). Evidência: docs/execucao/evidencias/fase-7/verification.simulado.json

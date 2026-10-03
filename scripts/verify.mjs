@@ -14,7 +14,7 @@ mkdirSync(join(root,'artifacts'),{recursive:true});mkdirSync(join(root,`docs/exe
 // Tested code version: real evidence must reference an ancestor of this HEAD.
 const git=(...a)=>spawnSync('git',a,{cwd:root,encoding:'utf8'});const head=git('rev-parse','HEAD').stdout?.trim()||null;
 const isAncestor=commit=>Boolean(head)&&git('merge-base','--is-ancestor',commit,'HEAD').status===0;
-const summary={phase,specification:'1.1',startedAt:new Date().toISOString(),environment:`ecommerce-phase${phase}-test`,steps:[],exitCode:2,externalHomologation:false,externalMode:simulated?'SIMULADO':'REAL',commit:head,worktreeClean:head?git('status','--porcelain').stdout.trim()==='':null,simulatedExternals:[],realPending:[]};
+const summary={phase,specification:'1.1',startedAt:new Date().toISOString(),environment:`ecommerce-phase${phase}-test`,steps:[],exitCode:2,externalHomologation:false,externalMode:simulated?'SIMULADO':'REAL',commit:head,worktreeClean:head?git('status','--porcelain').stdout.trim()==='':null,simulatedExternals:[],realPending:[],limiterWaits:[]};
 function digestSources(){const hash=createHash('sha256'),excluded=new Set(['node_modules','dist','.next','.git','.local','artifacts','test-results','playwright-report','.playwright-mcp']);function walk(path){for(const item of readdirSync(path,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){if(excluded.has(item.name)||item.name.startsWith('.env')||item.name.endsWith('.tsbuildinfo'))continue;const full=join(path,item.name),rel=relative(root,full).replaceAll('\\','/');if(rel.startsWith('docs/execucao/'))continue;if(item.isDirectory())walk(full);else hash.update(rel).update(readFileSync(full));}}walk(root);return hash.digest('hex');}
 function step(name,action){console.log(`\n=== ${name} ===`);const start=Date.now();try{action();summary.steps.push({name,result:'passed',durationMs:Date.now()-start});}catch(error){summary.steps.push({name,result:'failed',durationMs:Date.now()-start});throw error;}}
 const missing=message=>Object.assign(new Error(message),{exitCode:2});
@@ -30,7 +30,19 @@ try{
  if(!/specification|especificação/i.test(readFileSync(join(root,`docs/execucao/fase-${phase}.md`),'utf8')))throw missing('Relatório de fase inválido.');
  step('Contrato de evidências externas (estrutura, modo, ambiente, data, referência e commit)',()=>command(process.execPath,['--test','tests/external-evidence.test.mjs'],{timeout:60000}));
  try{docker(['info','--format','{{.ServerVersion}}'],{capture:true,timeout:15000});}catch{throw missing('Docker Desktop/engine indisponível.');}
- const compose=composeArgs(true),run=(files,timeout=300000)=>docker([...compose,'run','--rm','--no-deps','tests','node','--test','--test-concurrency=1',...files],{timeout});summary.sourceDigest=digestSources();
+// Isolamento entre lotes de suítes. O limite por IP da API (janela fixa de 1 min, em memória) vê todo o tráfego dos testes
+// pelo IP do contêiner web (o Next faz o proxy de /api), então um lote herdava a cota consumida pelo anterior (ex.: suítes
+// de API gastam ~785 requisições em 20 s e as de interface, logo em seguida, recebiam 429). Antes de cada lote, uma
+// requisição pelo mesmo caminho lê x-ratelimit-remaining/reset; se a janela aberta por outro lote ainda vale, espera ela
+// vencer. O limite não muda: cada lote continua sujeito a ele por inteiro (a própria consulta conta 1).
+function isolateLimiter(files){
+ let probe;try{probe=JSON.parse(docker([...compose,'exec','-T','web','node','-e',"fetch('http://localhost:3000/api/health/live').then(r=>console.log(JSON.stringify({limit:+r.headers.get('x-ratelimit-limit'),remaining:+r.headers.get('x-ratelimit-remaining'),reset:+r.headers.get('x-ratelimit-reset')})))"],{timeout:30000,capture:true}).trim());}catch{summary.limiterWaits.push({files,skipped:'web indisponível para a consulta'});return;}
+ if(!probe.limit||probe.remaining>=probe.limit-1){summary.limiterWaits.push({files,waitedSeconds:0});return;}
+ const seconds=probe.reset+1;console.log(`Isolamento do limitador: janela anterior com ${probe.limit-probe.remaining-1} requisições; aguardando ${seconds}s antes de ${files.join(', ')}`);
+ Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,seconds*1000);summary.limiterWaits.push({files,waitedSeconds:seconds,previousWindowRequests:probe.limit-probe.remaining-1});
+}
+
+ const compose=composeArgs(true),run=(files,timeout=300000)=>{isolateLimiter(files);return docker([...compose,'run','--rm','--no-deps','tests','node','--test','--test-concurrency=1',...files],{timeout});};summary.sourceDigest=digestSources();
  for(const file of [...upTo(reports),'phase2-fixture.json','purchase-fixture.json','recovery-fixture.json',...upTo(screenshots).flatMap(s=>[`${s}-390.png`,`${s}-1440.png`])])rmSync(join(root,'artifacts',file),{force:true});
  // Volumes are recreated only for a test project owned by this checkout: containers of the same project name started from
  // another directory (another run/copy) make the verifier stop with code 2 instead of deleting their data.

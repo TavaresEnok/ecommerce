@@ -51,7 +51,7 @@ test('Fase 3 com worker real: outbox, perda do Redis e interface',async t=>{
           assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);await page.screenshot({path:`/app/artifacts/phase3-order-${viewport.width}.png`,fullPage:true});
           const intruder=await browser.newContext();const other=await intruder.newPage();await other.goto(`${base}/lojas/${a.slug}/pedidos/${orderId}`);await other.getByText('Pedido não autorizado.').waitFor();await intruder.close();
           await context.addCookies([{name:a.actor.cookie.split('=')[0],value:a.actor.cookie.split('=')[1],domain:'web',path:'/'}]);await page.goto(`${base}/painel/${A}/pedidos`);await page.getByRole('heading',{name:'Pedidos recentes'}).waitFor();
-          await page.getByRole('button',{name:/^Nº \d+$/}).first().click();await page.getByRole('heading',{name:'Protocolos do consumidor'}).waitFor();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);await page.screenshot({path:`/app/artifacts/phase3-admin-${viewport.width}.png`,fullPage:true});
+          await page.getByRole('link',{name:/^Nº \d+$/}).first().click();await page.getByRole('heading',{name:'Protocolos do consumidor'}).waitFor();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);await page.screenshot({path:`/app/artifacts/phase3-admin-${viewport.width}.png`,fullPage:true});
           assert.equal(errors.length,0,errors.join('\n'));report.visual.push({viewport,pages:['produto','carrinho/frete','revisão','comprovante','protocolo','painel de pedidos'],result:'passed'});
         }finally{await context.close();}
       }

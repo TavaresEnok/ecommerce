@@ -1,35 +1,75 @@
 'use client';
-import { FormEvent, useEffect, useState } from 'react';
-import { money } from './storefront';
-const fields=(e:FormEvent<HTMLFormElement>)=>{e.preventDefault();return Object.fromEntries(new FormData(e.currentTarget)) as Record<string,string>;};
-async function call(path:string,csrf:string,method='GET',body?:unknown){const response=await fetch(`/api/${path}`,{method,cache:'no-store',headers:{...(method==='POST'?{'Content-Type':'application/json'}:{}),'X-CSRF-Token':csrf},body:method==='POST'?JSON.stringify(body||{}):undefined});const data=await response.json();if(!response.ok)throw new Error(typeof data.error==='string'?data.error:data.error?.message||'Não foi possível concluir.');return data;}
-type Plan={id:string;code:string;version:number;name:string;price_cents:string|null;billing_interval:string;entitlements:Record<string,number|string>};
-type Billing={subscription:{status:string;current_period_end:string|null;cancel_at_period_end:boolean;grace_until:string|null};plan:Plan;pending_plan:Plan|null;invoices:{id:string;period_start:string;amount_cents:string;status:string;due_at:string}[];usage:Record<string,number|string>;available_plans:Plan[]};
-type Domain={id:string;hostname:string;status:string;canonical:boolean;failure_reason:string|null;challenge:{name:string;type:string;value:string}};
-// MFA, plano/faturas, domínio próprio e transportadora — seções do Dono (Fase 6). Ações sensíveis exigem MFA confirmado nesta sessão.
-export function CommercialSections({tenantId,csrf}:{tenantId:string;csrf:string}){
- const [mfa,setMfa]=useState<{enabled:boolean;verified:boolean}|null>(null),[setup,setSetup]=useState<{secret:string;otpauth:string}|null>(null),[codes,setCodes]=useState<string[]>([]),[billing,setBilling]=useState<Billing|null>(null),[domains,setDomains]=useState<Domain[]>([]),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
- async function load(){const s=await call('auth/session',csrf);setMfa(s.mfa);setBilling(await call(`tenants/${tenantId}/billing`,csrf));setDomains(await call(`tenants/${tenantId}/domains`,csrf));}
- async function act(action:()=>Promise<unknown>,done:string){setBusy(true);setError('');setNotice('');try{await action();await load();setNotice(done);}catch(e){setError((e as Error).message);}finally{setBusy(false);}}
- useEffect(()=>{if(csrf)void load().catch(e=>setError(e.message));},[csrf,tenantId]);
- const ent=billing?.plan.entitlements;
- return <>{error&&<p role="alert" className="error">{error}</p>}{notice&&<p role="status" className="success">{notice}</p>}
-  <section aria-label="Verificação em duas etapas"><h2>Verificação em duas etapas (MFA)</h2>
-   {!mfa?<p>Carregando…</p>:mfa.enabled?<><p>MFA ativo · {mfa.verified?'confirmado nesta sessão':'confirme para ações financeiras, de plano e de domínio'}.</p>{!mfa.verified&&<form aria-label="Confirmar MFA" onSubmit={e=>{const b=fields(e);void act(()=>call('auth/mfa/verify',csrf,'POST',b),'MFA confirmado nesta sessão.');}}><label>Código do autenticador ou de recuperação<input name="code" required autoComplete="one-time-code"/></label><button disabled={busy}>Confirmar</button></form>}</>
-   :setup?<form aria-label="Ativar MFA" onSubmit={e=>{const b=fields(e);void act(async()=>{const r=await call('auth/mfa/enable',csrf,'POST',b);setCodes(r.recovery_codes);setSetup(null);},'MFA ativado.');}}><p>Cadastre no aplicativo autenticador a chave <code>{setup.secret}</code> (ou o endereço <code>{setup.otpauth}</code>) e informe o código de 6 dígitos.</p><label>Código<input name="code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="one-time-code"/></label><button disabled={busy}>Ativar</button></form>
-   :<><p>Obrigatório para devoluções pela plataforma, plano, domínio e administração.</p><button disabled={busy} onClick={()=>void act(async()=>setSetup(await call('auth/mfa/setup',csrf,'POST')),'Chave gerada.')}>Configurar MFA</button></>}
-   {codes.length>0&&<div className="local"><p>Códigos de recuperação (uso único; guarde agora, não serão exibidos de novo):</p><ul>{codes.map(c=><li key={c}><code>{c}</code></li>)}</ul></div>}</section>
-  {billing&&<section aria-label="Plano e faturas"><h2>Plano e faturas</h2><p>Plano <strong>{billing.plan.name}</strong> ({billing.plan.code} v{billing.plan.version}) · situação {billing.subscription.status}{billing.subscription.current_period_end?` · período até ${new Date(billing.subscription.current_period_end).toLocaleDateString('pt-BR')}`:''}{billing.subscription.cancel_at_period_end?' · cancelamento ao fim do período':''}{billing.pending_plan?` · muda para ${billing.pending_plan.name} no próximo ciclo`:''}</p>
-   {billing.subscription.status==='PAST_DUE'&&<p className="error">Fatura em atraso. Tolerância até {billing.subscription.grace_until?new Date(billing.subscription.grace_until).toLocaleDateString('pt-BR'):'-'}; depois, novas vendas são bloqueadas (pedidos existentes continuam).</p>}
-   {ent&&<p>Uso: produtos ativos {String(billing.usage.active_products)}/{String(ent.active_products)} · variações ativas {String(billing.usage.active_variants)}/{String(ent.active_variants)} · equipe {String(billing.usage.members)}/{String(ent.members)} · mídia {Math.round(Number(billing.usage.media_bytes)/1048576)} MB/{Math.round(Number(ent.media_bytes)/1048576)} MB ({String(ent.media_mode)==='STRICT'?'cota rigorosa':'tolerância do piloto'})</p>}
-   {billing.available_plans.length===0?<p>Nenhum plano pago publicado pela plataforma. O preço depende de decisão comercial (D07).</p>:<form aria-label="Trocar plano" onSubmit={e=>{const b=fields(e);void act(()=>call(`tenants/${tenantId}/billing/plan`,csrf,'POST',b),'Plano atualizado.');}}><label>Plano<select name="plan_version_id">{billing.available_plans.map(p=><option key={p.id} value={p.id}>{p.name} — {p.price_cents?money(p.price_cents):'sem preço'}/mês</option>)}</select></label><button disabled={busy}>Contratar/trocar (vale no próximo ciclo)</button></form>}
-   {billing.subscription.current_period_end&&!billing.subscription.cancel_at_period_end&&<button disabled={busy} onClick={()=>void act(()=>call(`tenants/${tenantId}/billing/cancel`,csrf,'POST'),'Cancelamento agendado para o fim do período.')}>Cancelar ao fim do período</button>}
-   <h3>Faturas</h3>{billing.invoices.length===0?<p>Nenhuma.</p>:<ul>{billing.invoices.map(i=><li key={i.id}>{new Date(i.period_start).toLocaleDateString('pt-BR')} · {money(i.amount_cents)} · {i.status} · vence {new Date(i.due_at).toLocaleDateString('pt-BR')}</li>)}</ul>}</section>}
-  <section aria-label="Domínio próprio"><h2>Domínio próprio</h2><p>1) Cadastre o hostname; 2) crie o registro TXT indicado e um CNAME para o endereço da plataforma; 3) clique em verificar. O domínio só fica ativo quando o HTTPS entrega esta loja.</p>
-   <form aria-label="Cadastrar domínio" onSubmit={e=>{const b=fields(e);void act(()=>call(`tenants/${tenantId}/domains`,csrf,'POST',b),'Domínio cadastrado; configure o DNS.');}}><label>Hostname<input name="hostname" required maxLength={253} placeholder="www.minhaloja.com.br"/></label><button disabled={busy}>Cadastrar</button></form>
-   <ul>{domains.map(d=><li key={d.id}><strong>{d.hostname}</strong> · {d.status}{d.canonical?' · canônico':''}{d.failure_reason&&<small className="error">{d.failure_reason}</small>}{d.status!=='ACTIVE'&&<small>TXT <code>{d.challenge.name}</code> = <code>{d.challenge.value}</code></small>}
-    <div className="row">{d.status!=='ACTIVE'&&<button disabled={busy} onClick={()=>void act(()=>call(`tenants/${tenantId}/domains/${d.id}/verify`,csrf,'POST'),'Verificação executada.')}>Verificar</button>}{d.status==='ACTIVE'&&!d.canonical&&<button disabled={busy} onClick={()=>void act(()=>call(`tenants/${tenantId}/domains/${d.id}/canonical`,csrf,'POST'),'Domínio canônico definido.')}>Tornar canônico</button>}<button disabled={busy} onClick={()=>void act(()=>call(`tenants/${tenantId}/domains/${d.id}/disable`,csrf,'POST'),'Domínio removido.')}>Remover</button></div></li>)}</ul></section>
-  <section aria-label="Transportadora"><h2>Transportadora (cotação integrada)</h2><p>Provedor real ainda não homologado (D09); disponível somente o simulador em ambiente de teste. Itens precisam de peso e dimensões.</p>
-   <form aria-label="Configurar transportadora" onSubmit={e=>{const b=fields(e);void act(()=>call(`tenants/${tenantId}/operations/carrier`,csrf,'POST',{origin_cep:b.origin_cep,enabled:b.enabled==='true',provider:'SIMULATED'}),'Transportadora configurada.');}}><label>CEP de origem<input name="origin_cep" required pattern="[0-9]{5}-?[0-9]{3}"/></label><label>Situação<select name="enabled"><option value="true">Ativa</option><option value="false">Desativada</option></select></label><button disabled={busy}>Salvar</button></form></section>
- </>;
+// Seções do Dono na Operação (Fase 6): MFA, plano e faturas, domínio próprio e transportadora. Mesmos endpoints de antes;
+// ações sensíveis continuam exigindo MFA confirmado nesta sessão no servidor.
+import { type FormEvent, useEffect, useState } from 'react';
+import { call, fields, useAction } from './panel/api';
+import { Alert, ConfirmDialog, CopyButton, Feedback, Field, StatusBadge } from './ui/kit';
+import { DOMAIN, INVOICE, SUBSCRIPTION } from './ui/status';
+import { bytes, formatDate, money } from './ui/format';
+
+type Plan = { id: string; code: string; version: number; name: string; price_cents: string | null; billing_interval: string; entitlements: Record<string, number | string> };
+type Billing = { subscription: { status: string; current_period_end: string | null; cancel_at_period_end: boolean; grace_until: string | null }; plan: Plan; pending_plan: Plan | null; invoices: { id: string; period_start: string; amount_cents: string; status: string; due_at: string }[]; usage: Record<string, number | string>; available_plans: Plan[] };
+type Domain = { id: string; hostname: string; status: string; canonical: boolean; failure_reason: string | null; challenge: { name: string; type: string; value: string } };
+
+export function CommercialSections({ tenantId, csrf }: { tenantId: string; csrf: string }) {
+  const [mfa, setMfa] = useState<{ enabled: boolean; verified: boolean } | null>(null), [setup, setSetup] = useState<{ secret: string; otpauth: string } | null>(null), [codes, setCodes] = useState<string[]>([]);
+  const [billing, setBilling] = useState<Billing | null>(null), [domains, setDomains] = useState<Domain[]>([]), [remove, setRemove] = useState<Domain | null>(null), [cancelPlan, setCancelPlan] = useState(false);
+  const { busy, error, notice, run } = useAction();
+  const api = (path: string, method = 'GET', body?: unknown) => call(path, { method, body, csrf });
+  async function load() { const s = await api('auth/session'); setMfa(s.mfa); setBilling(await api(`tenants/${tenantId}/billing`)); setDomains(await api(`tenants/${tenantId}/domains`)); }
+  const act = (task: () => Promise<unknown>, done: string) => run(async () => { await task(); await load(); }, done);
+  const submit = (task: (b: Record<string, string>) => Promise<unknown>, done: string) => (e: FormEvent<HTMLFormElement>) => { e.preventDefault(); const f = e.currentTarget, b = fields(f); void act(async () => { await task(b); f.reset(); }, done); };
+  useEffect(() => { if (csrf) void load().catch(() => undefined); }, [csrf, tenantId]);
+  const ent = billing?.plan.entitlements, usage = billing?.usage;
+  return <>
+    <Feedback error={error} notice={notice} />
+    <section className="surface section stack-sm" id="seguranca" aria-label="Verificação em duas etapas">
+      <h2>Verificação em duas etapas (MFA)</h2>
+      {!mfa ? <p className="small" role="status">Carregando…</p> : mfa.enabled ? <>
+        <p className="small">MFA ativo · {mfa.verified ? 'confirmado nesta sessão' : 'confirme para ações financeiras, de plano e de domínio'}.</p>
+        {!mfa.verified && <form className="cluster" style={{ alignItems: 'end' }} aria-label="Confirmar MFA" onSubmit={submit((b) => api('auth/mfa/verify', 'POST', b), 'MFA confirmado nesta sessão.')}><Field label="Código do autenticador ou de recuperação">{(a) => <input className="input" name="code" required autoComplete="one-time-code" {...a} />}</Field><button className="btn btn-primary" disabled={busy}>Confirmar</button></form>}
+      </> : setup ? <form className="form form-col" aria-label="Ativar MFA" onSubmit={submit(async (b) => { const r = await api('auth/mfa/enable', 'POST', b); setCodes(r.recovery_codes); setSetup(null); }, 'MFA ativado.')}>
+        <p className="small">Cadastre esta chave no aplicativo autenticador e informe o código de 6 dígitos gerado.</p>
+        <div className="copyable"><code>{setup.secret}</code><CopyButton value={setup.secret} label="Copiar chave" /></div>
+        <details className="disclosure small"><summary>Endereço otpauth (para aplicativos que aceitam colar)</summary><code>{setup.otpauth}</code></details>
+        <Field label="Código">{(a) => <input className="input" name="code" required inputMode="numeric" pattern="[0-9]{6}" autoComplete="one-time-code" {...a} />}</Field>
+        <div><button className="btn btn-primary" disabled={busy}>Ativar</button></div>
+      </form> : <><p className="small">Obrigatório para devoluções pela plataforma, plano, domínio e administração.</p><div><button className="btn btn-primary" disabled={busy} onClick={() => void act(async () => setSetup(await api('auth/mfa/setup', 'POST')), 'Chave gerada.')}>Configurar MFA</button></div></>}
+      {codes.length > 0 && <Alert tone="warning" title="Códigos de recuperação"><p>Uso único. Guarde agora: eles não serão exibidos de novo.</p><ul className="cluster-tight" style={{ listStyle: 'none', marginTop: 'var(--space-8)' }}>{codes.map((c) => <li key={c}><code>{c}</code></li>)}</ul></Alert>}
+    </section>
+    {billing && <section className="surface section stack-sm" id="plano" aria-label="Plano e faturas">
+      <div className="section-head" style={{ marginBottom: 0 }}><h2>Plano e faturas</h2><StatusBadge map={SUBSCRIPTION} value={billing.subscription.status} /></div>
+      <p><strong>{billing.plan.name}</strong> <span className="muted small">({billing.plan.code} v{billing.plan.version}){billing.subscription.current_period_end ? ` · período até ${formatDate(billing.subscription.current_period_end)}` : ''}{billing.subscription.cancel_at_period_end ? ' · cancelamento ao fim do período' : ''}{billing.pending_plan ? ` · muda para ${billing.pending_plan.name} no próximo ciclo` : ''}</span></p>
+      {billing.subscription.status === 'PAST_DUE' && <Alert tone="warning" title="Fatura em atraso">Tolerância até {billing.subscription.grace_until ? formatDate(billing.subscription.grace_until) : '—'}; depois, novas vendas são bloqueadas (pedidos existentes continuam).</Alert>}
+      {ent && usage && <dl className="summary small"><dt>Produtos ativos</dt><dd className="num">{String(usage.active_products)} de {String(ent.active_products)}</dd><dt>Variações ativas</dt><dd className="num">{String(usage.active_variants)} de {String(ent.active_variants)}</dd><dt>Equipe</dt><dd className="num">{String(usage.members)} de {String(ent.members)}</dd><dt>Mídia</dt><dd className="num">{bytes(Number(usage.media_bytes))} de {bytes(Number(ent.media_bytes))} ({String(ent.media_mode) === 'STRICT' ? 'cota rigorosa' : 'tolerância do piloto'})</dd></dl>}
+      {billing.available_plans.length === 0 ? <p className="small muted">Nenhum plano pago publicado pela plataforma. O preço depende de decisão comercial (D07).</p> :
+        <form className="cluster" style={{ alignItems: 'end' }} aria-label="Trocar plano" onSubmit={submit((b) => api(`tenants/${tenantId}/billing/plan`, 'POST', b), 'Plano atualizado; vale no próximo ciclo.')}><Field label="Plano">{(a) => <select className="select" name="plan_version_id" {...a}>{billing.available_plans.map((pl) => <option key={pl.id} value={pl.id}>{pl.name} — {pl.price_cents ? money(pl.price_cents) : 'sem preço'}/mês</option>)}</select>}</Field><button className="btn btn-secondary" disabled={busy}>Contratar ou trocar (próximo ciclo)</button></form>}
+      {billing.subscription.current_period_end && !billing.subscription.cancel_at_period_end && <div><button className="btn btn-quiet btn-sm" disabled={busy} onClick={() => setCancelPlan(true)}>Cancelar ao fim do período…</button></div>}
+      <h3>Faturas</h3>
+      {billing.invoices.length === 0 ? <p className="small muted">Nenhuma fatura.</p> : <div className="table-wrap"><table className="data stack"><thead><tr><th scope="col">Período</th><th scope="col" className="num">Valor</th><th scope="col">Vencimento</th><th scope="col">Situação</th></tr></thead><tbody>{billing.invoices.map((i) => <tr key={i.id}><td className="primary">{formatDate(i.period_start)}</td><td className="num" data-label="Valor"><span className="money">{money(i.amount_cents)}</span></td><td data-label="Vencimento">{formatDate(i.due_at)}</td><td data-label="Situação"><StatusBadge map={INVOICE} value={i.status} /></td></tr>)}</tbody></table></div>}
+    </section>}
+    <section className="surface section stack-sm" id="dominio" aria-label="Domínio próprio">
+      <h2>Domínio próprio</h2>
+      <ol className="steps-list small"><li><span>Cadastre o endereço (hostname).</span></li><li><span>No seu provedor de DNS, crie o registro TXT indicado e um CNAME para o endereço da plataforma.</span></li><li><span>Clique em verificar. O domínio só fica ativo quando o HTTPS entrega esta loja.</span></li></ol>
+      <form className="cluster" style={{ alignItems: 'end' }} aria-label="Cadastrar domínio" onSubmit={submit((b) => api(`tenants/${tenantId}/domains`, 'POST', b), 'Domínio cadastrado; configure o DNS.')}><Field label="Hostname">{(a) => <input className="input" name="hostname" required maxLength={253} placeholder="www.minhaloja.com.br" {...a} />}</Field><button className="btn btn-secondary" disabled={busy}>Cadastrar</button></form>
+      {domains.length > 0 && <ul className="stack" style={{ listStyle: 'none' }}>{domains.map((d) => <li key={d.id} className="stack-sm" style={{ borderTop: '1px solid var(--_border)', paddingTop: 'var(--space-12)' }}>
+        <div className="cluster-tight"><strong>{d.hostname}</strong><StatusBadge map={DOMAIN} value={d.status} />{d.canonical && <span className="badge badge-success">Endereço principal</span>}</div>
+        {d.failure_reason && <p className="error-text">{d.failure_reason}</p>}
+        {d.status !== 'ACTIVE' && <dl className="summary small"><dt>Registro TXT</dt><dd><span className="copyable"><code>{d.challenge.name}</code><CopyButton value={d.challenge.name} label="Copiar nome" /></span></dd><dt>Valor</dt><dd><span className="copyable"><code>{d.challenge.value}</code><CopyButton value={d.challenge.value} label="Copiar valor" /></span></dd></dl>}
+        <div className="cluster-tight">{d.status !== 'ACTIVE' && <button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void act(() => api(`tenants/${tenantId}/domains/${d.id}/verify`, 'POST'), 'Verificação executada.')}>Verificar</button>}{d.status === 'ACTIVE' && !d.canonical && <button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void act(() => api(`tenants/${tenantId}/domains/${d.id}/canonical`, 'POST'), 'Endereço principal definido.')}>Tornar endereço principal</button>}<button className="btn btn-quiet btn-sm" disabled={busy} onClick={() => setRemove(d)}>Remover…</button></div>
+      </li>)}</ul>}
+    </section>
+    <section className="surface section stack-sm" id="transportadora" aria-label="Transportadora">
+      <h2>Transportadora (cotação integrada)</h2>
+      <p className="small muted">Provedor real ainda não homologado (D09); neste ambiente só existe o simulador. Os produtos precisam de peso e dimensões.</p>
+      <form className="form form-col" aria-label="Configurar transportadora" onSubmit={submit((b) => api(`tenants/${tenantId}/operations/carrier`, 'POST', { origin_cep: b.origin_cep, enabled: b.enabled === 'true', provider: 'SIMULATED' }), 'Transportadora configurada.')}>
+        <div className="form-grid"><Field label="CEP de origem">{(a) => <input className="input" name="origin_cep" required inputMode="numeric" pattern="[0-9]{5}-?[0-9]{3}" {...a} />}</Field><Field label="Situação">{(a) => <select className="select" name="enabled" {...a}><option value="true">Ativa</option><option value="false">Desativada</option></select>}</Field></div>
+        <div><button className="btn btn-secondary" disabled={busy}>Salvar</button></div>
+      </form>
+    </section>
+    <ConfirmDialog open={!!remove} title={`Remover o domínio ${remove?.hostname ?? ''}?`} description={<p>O endereço deixa de levar à loja. Para usá-lo de novo será preciso nova verificação.</p>} confirmLabel="Remover domínio" busy={busy}
+      onClose={() => setRemove(null)} onConfirm={() => void act(async () => { await api(`tenants/${tenantId}/domains/${remove!.id}/disable`, 'POST'); setRemove(null); }, 'Domínio removido.')} />
+    <ConfirmDialog open={cancelPlan} title="Cancelar o plano ao fim do período?" description={<p>A loja continua no plano atual até o fim do período contratado. Pedidos e dados são preservados.</p>} confirmLabel="Agendar cancelamento" busy={busy}
+      onClose={() => setCancelPlan(false)} onConfirm={() => void act(async () => { await api(`tenants/${tenantId}/billing/cancel`, 'POST'); setCancelPlan(false); }, 'Cancelamento agendado para o fim do período.')} />
+  </>;
 }

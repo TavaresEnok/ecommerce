@@ -151,7 +151,7 @@ test('Fundação integrada — PostgreSQL real e app_user',async t=>{
         assert.equal(await page.getByRole('button',{name:'Loja B — Dono',exact:true}).count(),0);
         await page.getByRole('button',{name:'Loja A — Dono',exact:true}).click();
         await page.getByLabel('Nome de exibição',{exact:true}).fill('Loja A persistida');await page.getByRole('button',{name:'Salvar configuração',exact:true}).click();
-        await page.getByRole('status').filter({hasText:'Configuração salva no banco.'}).waitFor();
+        await page.getByRole('status').filter({hasText:'Configuração salva.'}).waitFor();
         await page.reload();await page.getByRole('button',{name:'Loja A — Dono',exact:true}).click();
         assert.equal(await page.getByLabel('Nome de exibição',{exact:true}).inputValue(),'Loja A persistida');
         const denied=await page.evaluate(async tenant=>{const r=await fetch(`/api/tenants/${tenant}/settings`);return r.status;},B);assert.equal(denied,404);

@@ -1,0 +1,15 @@
+  ✔ Produto simples, atributos explícitos, SKU único e estoque auditado (77.823515ms)
+  ✔ Ajustes concorrentes serializados e plano real de consulta por tenant (49.959196ms)
+  ✔ T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta (54.349486ms)
+  ✔ T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica (317.551207ms)
+  ✖ T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado (68.778148ms)
+  ✔ Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento (195.761257ms)
+  ✔ Frete com prioridade, retirada, CEP não atendido, validade e fingerprint (257.113086ms)
+  ✔ Arquivamento invalida oferta e carrinho, estoque continua auditável (61.994419ms)
+  ✔ Slug histórico redireciona sem reutilização e domínio não mistura lojas (127.251917ms)
+  ✔ T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE (722.770893ms)
+  ✔ Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel (3278.389604ms)
+ℹ tests 12
+ℹ pass 10
+ℹ fail 2
+  SyntaxError: Unexpected token 'I', "Internal S"... is not valid JSON
