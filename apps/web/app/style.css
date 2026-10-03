@@ -429,6 +429,9 @@ dialog.dialog[open] { animation: dialog-in var(--motion-duration-base) var(--mot
 @media (min-width: 1024px) {
   .store-header .store-wrap { grid-template-columns: auto minmax(0, 1fr) minmax(14rem, 20rem) auto; grid-template-areas: "name nav search cart"; }
 }
+/* Preview: sem busca nem carrinho, o menu usa a largura toda. */
+.store-header.is-preview .store-wrap { grid-template-columns: minmax(0, 1fr); grid-template-areas: "name" "nav"; }
+@media (min-width: 1024px) { .store-header.is-preview .store-wrap { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "name nav"; } }
 @media (max-width: 767px), (pointer: coarse) { .surface-store .store-nav a { min-height: var(--layout-touch-target); min-width: var(--layout-touch-target); justify-content: center; } }
 .store-intro { padding: var(--space-32) 0 var(--space-24); display: grid; gap: var(--space-8); max-width: 48rem; }
 .store-intro h2 { font-family: var(--_display); font-size: var(--font-size-24); }

@@ -468,9 +468,10 @@ await step('A-R03-10', async () => {
 // A-R04-01 protocolo atrasado (prazo movido para o passado por SQL no projeto isolado: simula a passagem de 6 dias)
 await step('A-R04-01b', async () => {
   psql(`update shop.consumer_requests set due_at = now() - interval '1 day' where id = '${demo.support.contact}'`);
-  for (const w of [390, 1440]) { const [ctx, page] = await open(w, owner); await page.goto(`${base}/painel/${A.id}/atendimento?filtro=atrasados`); await page.getByRole('heading', { level: 1 }).waitFor(); await sleep(800);
-    const late = await page.getByText(/atrasad/i).count(), current = await page.locator('[aria-current="page"], [aria-pressed="true"]').allTextContents(); await shot(page, `A-R04-01b-${w}`); await ctx.close();
-    check(`A-R04-01b ${w}`, late > 1, `filtro “atrasados” marcado (${current.join(' | ').slice(0, 60)}); protocolo vencido com selo/texto de atraso (${late} ocorrências)`); }
+  for (const w of [390, 1440]) { const [ctx, page] = await open(w, owner); await page.goto(`${base}/painel/${A.id}/atendimento`); await page.getByRole('heading', { level: 1 }).waitFor(); await page.waitForLoadState('networkidle');
+    await page.getByRole('group', { name: 'Filtrar protocolos' }).getByRole('button', { name: 'Atrasados' }).click(); await page.waitForURL(/filtro=overdue/); await sleep(800);
+    const pressed = await page.getByRole('button', { name: 'Atrasados' }).getAttribute('aria-pressed'), rows = await page.locator('tbody tr').count(), late = await page.locator('tbody tr').filter({ hasText: 'Atrasado' }).count(); await shot(page, `A-R04-01b-${w}`); await ctx.close();
+    check(`A-R04-01b ${w}`, pressed === 'true' && rows > 0 && rows === late, `filtro “Atrasados” com aria-pressed=${pressed}; ${rows} protocolo(s) listado(s), todos com selo “Atrasado” e texto (${late})`); }
 });
 // A-R04-03 concluir protocolo pela interface → somente leitura
 await step('A-R04-03', async () => {

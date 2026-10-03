@@ -133,7 +133,7 @@ export default function Storefront({data,path=[],preview=false,previewTenant,q='
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
     {preview && <div className="notice-bar store-notice"><div className="store-wrap cluster-tight"><Icon name="eye" size={16} /><strong>Preview privado do rascunho — não publicado.</strong><span>Início, páginas e produtos podem ser abertos aqui; busca, categorias, carrinho e atendimento só existem na loja publicada. Produtos e preços vêm do catálogo atual.</span>{previewTenant && <a href={`/painel/${previewTenant}?aba=vitrine`}>Voltar ao painel</a>}</div></div>}
     {!preview && supplier?.synthetic && <div className="notice-bar store-notice"><div className="store-wrap">Loja sintética de TESTE: produtos, contatos e políticas fictícios; nenhuma venda real é feita.</div></div>}
-    <header className="store-header"><div className="store-wrap">
+    <header className={`store-header${preview ? ' is-preview' : ''}`}><div className="store-wrap">
       {home && !q ? <h1 className="store-name">{link('/', theme.title)}</h1> : <p className="store-name">{link('/', theme.title)}</p>}
       <nav className="store-nav" aria-label="Navegação da loja"><ul>
         {menu.map((m) => <li key={m.path}>{link(m.path, m.label, { current: (m.path === '/' ? '/' : m.path) === here })}</li>)}

@@ -1,11 +1,196 @@
 {
-  "base": "http://localhost:3000",
-  "date": "2026-10-02T22:43:19.709Z",
+  "base": "http://localhost:3400",
+  "date": "2026-10-03T00:20:32.459Z",
   "results": [
+    {
+      "id": "CK-01",
+      "ok": true,
+      "detail": "resposta perdida após a criação: alerta “Não sabemos se a compra foi registrada”, nenhuma frase de inexistência (0); itens, entrega e dados travados: true; “Verificar compra” (duplo clique) abriu o pedido já criado: true; pedidos 4 → 5 → 5"
+    },
+    {
+      "id": "CK-02",
+      "ok": true,
+      "detail": "após recarregar: aviso de confirmação sem resposta, carrinho e entrega travados (true); verificação abriu o pedido já criado (true); pedidos 5 → 6; intenção pendente removida após o sucesso (true)"
+    },
+    {
+      "id": "CK-03",
+      "ok": true,
+      "detail": "400 “A loja recusou a confirmaçãoRevise comprador, método e total. Nenhum pedido foi criado por…” é conclusivo (pedidos 6 → 6); corrigir o e-mail e confirmar criou 1 pedido (7)"
+    },
+    {
+      "id": "CK-04",
+      "ok": true,
+      "detail": "sessionStorage bloqueado: true; repetição na mesma página abriu o pedido criado (true); após recarregar não há intenção salva (true) e a nova confirmação, com outra chave, devolveu o pedido já criado pela proteção de carrinho/versão do servidor (true); pedidos 7 → 9 (2 compras, nenhuma duplicada)"
+    },
+    {
+      "id": "CK-05",
+      "ok": true,
+      "detail": "falha antes de chegar ao servidor: mesmo aviso de resultado desconhecido (nada criado: true); “Verificar compra” criou 1 pedido (9 → 10)"
+    },
+    {
+      "id": "PV-01",
+      "ok": false,
+      "detail": "erro: rascunho 400 {\"statusCode\":400,\"error\":{\"message\":\"Menu deve apontar para página interna existente.\",\"error\":\"Bad Request\",\"statusCode\":400},\"requestId\":\"req-43\"}"
+    },
+    {
+      "id": "A-R01-03",
+      "ok": true,
+      "detail": "“Verificando sua sessão…” durante a espera; com a API inacessível, alerta “Serviço indisponível — Não foi possível conectar à API…”"
+    },
+    {
+      "id": "A-R01-05",
+      "ok": true,
+      "detail": "Funcionário: aviso “Somente o Dono altera a configuração”, sem botão de salvar e sem equipe (0); campos editáveis restantes na página: 4"
+    },
+    {
+      "id": "A-R02-06",
+      "ok": true,
+      "detail": "“Carregando dados autorizados do catálogo…” com a navegação do painel visível (1); depois a lista aparece"
+    },
+    {
+      "id": "A-R02-07 390",
+      "ok": true,
+      "detail": "erro no campo SKU (aria-invalid true; “ nesta loja. Já existe uma variação com este SKU nesta loja.”); endereço sem erro; nome mantido"
+    },
+    {
+      "id": "A-R02-07 1440",
+      "ok": true,
+      "detail": "erro no campo SKU (aria-invalid true; “ nesta loja. Já existe uma variação com este SKU nesta loja.”); endereço sem erro; nome mantido"
+    },
+    {
+      "id": "A-R02-10",
+      "ok": true,
+      "detail": "em estoque 38, reservado 9, ajuste -38: erro junto à quantidade (“nsuficiente: o estoque não pode ficar abaixo do que já está reservado.”); saldo inalterado (38)"
+    },
+    {
+      "id": "A-R02-12",
+      "ok": true,
+      "detail": "salvar rascunho por teclado → preview mostra a nova mensagem (1); falha de rede na publicação: “Não foi possível concluirNão foi possível conectar. Verifique a conexã” e a vitrine pública continua com a mensagem anterior (true); publicar de novo: “Vitrine publicada.” e a vitrine pública muda (true)"
+    },
+    {
+      "id": "A-R02-14 390",
+      "ok": true,
+      "detail": "100 produtos: “Mostrando 100 de 100 produtos carregados” + aviso do limite sem paginação; rolagem horizontal 0 px"
+    },
+    {
+      "id": "A-R02-14 1440",
+      "ok": true,
+      "detail": "100 produtos: “Mostrando 100 de 100 produtos carregados” + aviso do limite sem paginação; rolagem horizontal 0 px"
+    },
+    {
+      "id": "A-R03-02",
+      "ok": true,
+      "detail": "loja sem pedidos: “Nenhum pedido ainda”; filtro sem resultado: “Nenhum pedido com esses filtros” + “Limpar filtros”"
+    },
+    {
+      "id": "A-R01-06",
+      "ok": true,
+      "detail": "foco no diálogo: true; Esc devolve a “Encerrar todas as sessões…”; confirmar volta ao acesso e a sessão anterior responde 401"
+    },
+    {
+      "id": "A-R03-01",
+      "ok": true,
+      "detail": "filtro “Pagamento: Pago” mantido ao voltar pela trilha (payment_status=PAID) e pelo botão Voltar do navegador"
+    },
+    {
+      "id": "A-R03-05",
+      "ok": true,
+      "detail": "painel: “Resultado em verificação” (1), sem ação de nova cobrança (0); comprador: sem “Tentar pagar novamente” (0) e sem “Pago”"
+    },
+    {
+      "id": "A-R03-10 endereço 390",
+      "ok": true,
+      "detail": "endereço e e-mail longos quebram sem rolagem horizontal (0 px)"
+    },
+    {
+      "id": "A-R03-10 endereço 1440",
+      "ok": true,
+      "detail": "endereço e e-mail longos quebram sem rolagem horizontal (0 px)"
+    },
+    {
+      "id": "A-R03-10 anonimizado",
+      "ok": true,
+      "detail": "após anonimizar pela interface: selo “Dados pessoais anonimizados”, endereço anonimizado, nenhum marcador cru “ANONIMIZADO” (0) nem link para o e-mail fictício (0); comprovante do comprador também indica (1)"
+    },
+    {
+      "id": "A-R04-01b 390",
+      "ok": true,
+      "detail": "filtro “atrasados” marcado (Atendimento); protocolo vencido com selo/texto de atraso (2 ocorrências)"
+    },
+    {
+      "id": "A-R04-01b 1440",
+      "ok": true,
+      "detail": "filtro “atrasados” marcado (Atendimento); protocolo vencido com selo/texto de atraso (2 ocorrências)"
+    },
+    {
+      "id": "A-R04-03",
+      "ok": true,
+      "detail": "protocolo concluído pela interface; formulário de resposta deixa de existir (somente leitura): true"
+    },
+    {
+      "id": "A-R04-04",
+      "ok": true,
+      "detail": "loja sem protocolos: “Nenhum protocolo aberto”; mensagem de 6 linhas com white-space pre-wrap e rolagem 0 px"
+    },
+    {
+      "id": "A-R03-06b",
+      "ok": true,
+      "detail": "retirada: Separação iniciada. → pronto para retirada → Entrega registrada. (comprovação obrigatória)"
+    },
+    {
+      "id": "A-R02-09",
+      "ok": true,
+      "detail": "selo “Processando” na imagem recém-enviada (worker do projeto parado) e, com o worker de volta, a imagem passa a “Pronta” sem processamento pendente"
+    },
+    {
+      "id": "A-R05-05",
+      "ok": true,
+      "detail": "região “Plano e faturas”: “Nenhum plano pago publicado pela plataforma.”"
+    },
+    {
+      "id": "A-R08-04",
+      "ok": true,
+      "detail": "vitrine publicada sem produtos (HTTP 200): “Nenhum produto publicado ainda”"
+    },
+    {
+      "id": "A-R10-02 390",
+      "ok": true,
+      "detail": "“P · esgotada” desabilitada; M selecionada por padrão e compra habilitada"
+    },
+    {
+      "id": "A-R10-02 1440",
+      "ok": true,
+      "detail": "“P · esgotada” desabilitada; M selecionada por padrão e compra habilitada"
+    },
+    {
+      "id": "A-R10-04",
+      "ok": true,
+      "detail": "página mostrava 4 disponíveis; com o saldo já em 3, adicionar 4 devolve o erro do servidor junto à quantidade: “Quantidade maior que o saldo disponível.”"
+    },
+    {
+      "id": "A-R11-01",
+      "ok": true,
+      "detail": "página com 14 parágrafos: coluna de leitura 358 px (390) e 672 px (1440, limite ~42rem); página inexistente → HTTP 404 “Página não encontrada”"
+    },
+    {
+      "id": "G-09",
+      "ok": true,
+      "detail": "maior transição com movimento reduzido: 0.01 ms"
+    },
+    {
+      "id": "G-10",
+      "ok": true,
+      "detail": "IBM Plex Sans carregada: true; largura “111,11” 52.36 px vs “888,88” 52.36 px"
+    },
     {
       "id": "A-R02-08",
       "ok": true,
       "detail": "toCents: “1.234,56” → 123456; “64,9” → 6490; “12,345” → null"
+    },
+    {
+      "id": "A-R01-02",
+      "ok": true,
+      "detail": "alerta “Não foi possível concluirCredenciais inválidas.”; e-mail preservado: true"
     },
     {
       "id": "A-R01-04 390",
@@ -33,6 +218,16 @@
       "detail": "vazio da busca com “Limpar busca e filtros”; escopo da busca declarado no campo"
     },
     {
+      "id": "A-R13-02",
+      "ok": true,
+      "detail": "comprador vê “Pago”, “Enviado” e o código de rastreio"
+    },
+    {
+      "id": "A-R03-06",
+      "ok": true,
+      "detail": "uma ação principal por vez, por teclado, com mensagens: Separação iniciada. → Envio registrado → Entrega registrada."
+    },
+    {
       "id": "A-R03-07",
       "ok": true,
       "detail": "campo obrigatório no diálogo: 1; menciona devolução: true"
@@ -46,26 +241,6 @@
       "id": "A-R05-02",
       "ok": true,
       "detail": "motivo vazio bloqueado: true; estado “Novas vendas pausadas” exibido; retomada confirmada"
-    },
-    {
-      "id": "A-R07-02",
-      "ok": true,
-      "detail": "mensagem de acesso negado + “Entrar no painel”"
-    },
-    {
-      "id": "A-R10-04",
-      "ok": true,
-      "detail": "quantidade 8 com saldo 7: bloqueada junto ao campo pela validação do navegador (max = saldo); o envio não ocorre"
-    },
-    {
-      "id": "A-R14-02",
-      "ok": true,
-      "detail": "erro exibido (“Não foi possível concluirProtocolo não autorizado. Os dados digitados ”); dados mantidos"
-    },
-    {
-      "id": "A-R01-02",
-      "ok": true,
-      "detail": "alerta “Não foi possível concluirCredenciais inválidas.”; e-mail preservado: true"
     },
     {
       "id": "A-R06-02",
@@ -83,29 +258,9 @@
       "detail": "motivos de suspensão e reativação listados na auditoria"
     },
     {
-      "id": "G-09",
+      "id": "A-R07-02",
       "ok": true,
-      "detail": "maior transição com movimento reduzido: 0.01 ms"
-    },
-    {
-      "id": "G-10",
-      "ok": true,
-      "detail": "IBM Plex Sans carregada: true; largura “111,11” 54.00 px vs “888,88” 54.00 px"
-    },
-    {
-      "id": "A-R13-02",
-      "ok": true,
-      "detail": "comprador vê “Pago”, “Enviado” e o código de rastreio"
-    },
-    {
-      "id": "A-R03-06",
-      "ok": true,
-      "detail": "uma ação principal por vez, por teclado, com mensagens: Separação iniciada. → Envio registrado → Entrega registrada."
-    },
-    {
-      "id": "A-R12-05",
-      "ok": true,
-      "detail": "duplo clique em “Confirmar compra”: pedidos 8 → 9"
+      "detail": "mensagem de acesso negado + “Entrar no painel”"
     },
     {
       "id": "A-R12-04",
@@ -113,9 +268,54 @@
       "detail": "409 vira alerta e volta à entrega com endereço mantido; nenhum pedido criado; novo total R$ 45,90 exibido antes de confirmar"
     },
     {
+      "id": "A-R12-05",
+      "ok": true,
+      "detail": "duplo clique em “Confirmar compra”: pedidos 15 → 16"
+    },
+    {
       "id": "A-R12-06",
       "ok": true,
-      "detail": "alerta “O pedido não foi criadoO Dono precisa conectar a conta SIMULADA. Métodos reais desabilitados. Tentar de novo não gera co”; continua no carrinho"
+      "detail": "alerta “A loja recusou a confirmaçãoO Dono precisa conectar a conta SIMULADA. Métodos reais desabilitados. Nenhum pedido foi cri”; continua no carrinho"
+    },
+    {
+      "id": "A-R14-02",
+      "ok": true,
+      "detail": "erro exibido (“Não foi possível concluirProtocolo não autorizado. Os dados digitados ”); dados mantidos"
+    },
+    {
+      "id": "A-R05-04",
+      "ok": true,
+      "detail": "cadastrado com registro TXT legível; “Verificar” sem DNS real → continua pendente com motivo; removido pelo diálogo: true"
+    },
+    {
+      "id": "A-R12-06b",
+      "ok": true,
+      "detail": "com simulação desligada: “Pagamento indisponívelHomologação externa da Fase 0 pendente; sem movimentação financeira real. Nenhum pedido ”; sem formulário de dados nem botão de confirmar"
+    },
+    {
+      "id": "A-R13-04",
+      "ok": true,
+      "detail": "Tipo por seta (WITHDRAWAL), Tab até a mensagem e “Enviar solicitação”, Enter: “Protocolo 01a0ff21-969b-730f-af22-85a089bce3d9 registrado em 02/10/2026, 21:19. Solicitação recebida…”"
+    },
+    {
+      "id": "A-R13-05",
+      "ok": true,
+      "detail": "loja suspensa: vitrine responde 404; o pedido continua acessível ao comprador com o aviso “Loja com vendas suspensas · pedidos existentes continuam atendidos.”"
+    },
+    {
+      "id": "G-05/G-06 produto",
+      "ok": true,
+      "detail": "17 paradas de Tab até voltar ao início do ciclo (sem armadilha); primeira: “Ir para o conteúdo”; sem contorno ≥ 2 px: 0"
+    },
+    {
+      "id": "G-05/G-06 pedido",
+      "ok": true,
+      "detail": "30 paradas de Tab até voltar ao início do ciclo (sem armadilha); primeira: “Ir para o conteúdo”; sem contorno ≥ 2 px: 0"
+    },
+    {
+      "id": "A-R05-06",
+      "ok": true,
+      "detail": "plataforma desligada: “Recurso desligado pela plataforma” (1); provedor simulado com tempo esgotado: “Resultado incerto — a reserva fica retida…”, sem “Salvar no produto” (0) e sem aviso de rascunho gerado (0)"
     }
   ]
 }

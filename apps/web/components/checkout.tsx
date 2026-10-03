@@ -74,7 +74,11 @@ export function CartFlow({ slug }: { slug: string }) {
       writePending(slug, null); location.assign(`/lojas/${slug}/pedidos/${order.id}`); return;
     } catch (e) {
       const m = (e as Error).message;
-      if (!conclusive(e)) { setUnknown({ intent, detail: m, restored: false }); }
+      if (!conclusive(e)) {
+        // Causa em linguagem do comprador; a mensagem crua de rede (“tente novamente”) contradiria “não envie outra”.
+        const st = e instanceof StoreError ? e.status : 0;
+        setUnknown({ intent, restored: false, detail: st === 0 ? 'a conexão caiu antes da resposta' : st === 429 ? 'muitas tentativas em pouco tempo; aguarde alguns segundos antes de verificar' : st >= 500 ? `a loja teve um erro temporário (HTTP ${st})` : `resposta inesperada da loja (HTTP ${st})` });
+      }
       else {
         writePending(slug, null); const was = unknown; setUnknown(null);
         if (/pre[çc]o|frete|cota[çc][ãa]o|dispon|desatualiz|venc|expir/i.test(m)) { setQuote(null); setStep('delivery'); setInfo(''); setErrors({ changed: true }); }
@@ -89,7 +93,7 @@ export function CartFlow({ slug }: { slug: string }) {
     void submit({ key: intentKey(quote.id, body), body, total: quote.total_cents });
   }
   const pendingPanel = unknown && <Alert tone="warning" role="alert" title="Não sabemos se a compra foi registrada">
-    <p>{unknown.restored ? 'Uma confirmação de compra enviada nesta aba ficou sem resposta.' : `A resposta da loja não chegou${unknown.detail ? ` (${unknown.detail.replace(/\.$/, '')})` : ''}.`} A compra pode ter sido registrada. Não envie outra: “Verificar compra” reenvia exatamente a mesma confirmação de {money(unknown.intent.total)} — se ela já existir, você verá o pedido; se não existir, ela é registrada uma única vez.</p>
+    <p>{unknown.restored ? 'Uma confirmação de compra enviada nesta aba ficou sem resposta.' : `A resposta da loja não chegou${unknown.detail ? `: ${unknown.detail}` : ''}.`} A compra pode ter sido registrada. Não envie outra: “Verificar compra” reenvia exatamente a mesma confirmação de {money(unknown.intent.total)} — se ela já existir, você verá o pedido; se não existir, ela é registrada uma única vez.</p>
     <p className="small">Até a verificação terminar, itens, entrega e dados ficam travados para não mudar a compra pela metade.</p>
     <div className="cluster"><button type="button" className="btn btn-primary" disabled={busy} onClick={() => void submit(unknown.intent)}>{busy ? 'Verificando…' : 'Verificar compra'}</button></div>
   </Alert>;
