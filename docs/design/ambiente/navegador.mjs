@@ -20,3 +20,25 @@ export async function launch() {
 }
 // Base da aplicação: --base=… ou a gravada por gerar-dados.mjs em .local/demo-ui.json.
 export const baseOf = (demo) => (process.argv.find((a) => a.startsWith('--base=')) || '').slice(7) || demo.base || 'http://localhost:3400';
+
+// Zoom REAL do navegador (o de Ctrl +/−), não emulação de viewport: contexto persistente com a extensão local de
+// ./zoom-ext (chrome.tabs.setZoom). Retorna { context, setZoom(fator), close() }. Headless com extensão exige o
+// Chromium completo (o mesmo executável de launch()).
+export async function launchZoom(width, height = 900) {
+  const { mkdtempSync, rmSync } = await import('node:fs'); const { tmpdir } = await import('node:os');
+  const ext = join(import.meta.dirname, 'zoom-ext'), dir = mkdtempSync(join(tmpdir(), 'zoom-perfil-'));
+  const fallback = [process.env.PLAYWRIGHT_CHROMIUM, '/opt/pw-browsers/chromium'].find((p) => p && existsSync(p));
+  const args = [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`, `--window-size=${width},${height}`];
+  const errors = [];
+  for (const mod of [join(repo, 'node_modules/playwright'), '/opt/node22/lib/node_modules/playwright']) {
+    let pw; try { pw = require(mod); } catch { continue; }
+    for (const executablePath of [undefined, fallback]) {
+      try {
+        const context = await pw.chromium.launchPersistentContext(dir, { headless: true, viewport: null, args, ignoreDefaultArgs: ['--disable-extensions'], ...(executablePath ? { executablePath } : {}) });
+        let [sw] = context.serviceWorkers(); if (!sw) sw = await context.waitForEvent('serviceworker', { timeout: 10000 });
+        return { context, setZoom: (f) => sw.evaluate((x) => self.zoomAll(x), f), close: async () => { await context.close(); rmSync(dir, { recursive: true, force: true }); } };
+      } catch (e) { errors.push(String(e.message).split('\n')[0]); }
+    }
+  }
+  console.error(`Chromium com extensão indisponível:\n${errors.join('\n')}`); process.exit(2);
+}

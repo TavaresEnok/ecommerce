@@ -12,9 +12,11 @@
 // 1. imagens com a CA do proxy (NODE_EXTRA_CA_CERTS) — sem efeito fora de redes com inspeção TLS;
 // 2. estágio "browsers" a partir de mcr.microsoft.com/playwright:v1.63.0-noble (mesma versão do Playwright do lockfile)
 //    em vez de `npx playwright install --with-deps` (CDN e apt bloqueados); o estágio de testes roda como UID 1000;
-// 3. etapa reprovada não interrompe a execução; evidência gravada em verification.continuada[.simulado].json.
+// 3. `artifacts/` (montada em /app/artifacts) e a pasta de evidências da fase são criadas com permissão de escrita para
+//    todos: o contêiner de testes roda como UID 1000 e uma pasta criada pelo Docker (root) dá EACCES;
+// 4. etapa reprovada não interrompe a execução; evidência gravada em verification.continuada[.simulado].json.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync, chmodSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -65,4 +67,5 @@ if (i < 0) throw new Error('verify.mjs não reconhecido (saída)');
 v = v.slice(0, i) + "if(summary.continuedAfter)throw new Error('Etapas reprovadas (execução continuada): '+summary.continuedAfter.join('; '));" + v.slice(i);
 troca("verification${simulated?'.simulado':''}.json", "verification.continuada${simulated?'.simulado':''}.json", 'evidência');
 writeFileSync(join(dir, 'scripts', 'verify-continuada.mjs'), v);
+for (const d of ['artifacts', 'docs/execucao/evidencias']) { mkdirSync(join(dir, d), { recursive: true }); chmodSync(join(dir, d), 0o777); }
 console.log(`Pronto em ${dir}. Próximo: cd ${dir} && npm ci && node scripts/setup.mjs --test && node scripts/verify-continuada.mjs --phase=7 --externos-simulados`);

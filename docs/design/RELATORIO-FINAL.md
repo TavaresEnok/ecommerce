@@ -10,10 +10,10 @@
 | Eixo | Situação | Base |
 |---|---|---|
 | **Implementação** | Lotes A, B e C concluídos; rodada de correções da revisão de `7f5572d` concluída (§8). Nenhuma regra de negócio nem resposta de API alterada | §2–§3, §8 |
-| **Funcional** | **Não concluído.** `verificar-aceite.mjs` 65/65 e `verificar-teclado.mjs` 12/12 na rodada do zero (uma falha transitória do teste A-R01-06 aprovada na repetição, §8). `scripts/verify.mjs --phase=7` oficial não passa do build neste ambiente; a execução continuada reprova o pilot-flow “Interface” (429) na base e na branch — falha preexistente, não resolvida. Verificação continuada não reexecutada depois das correções de CSS de `ff73c7d` | §4, §8, [verificação](evidencias/verificacao/LEIA-ME.md) |
-| **Visual** | ACEITE: 88 critérios — **83 aprovados, 3 parciais** (G-04 zoom real do navegador, G-05/G-06 percurso de Tab só em parte das rotas), **1 reprovado preexistente** (G-13) e **1 alterado** (A-R12-07). Nenhum sem evidência. **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
+| **Funcional** | **Não concluído só pelo G-13 (preexistente).** `verificar-aceite.mjs` 65/65, `verificar-teclado.mjs` 12/12 e percurso de Tab 159/159. Verificação integrada no commit `deecdc1` (execução continuada): 15 de 16 etapas; reprova só o pilot-flow “Interface”, que reprova igual na base por limite de requisições (429) | §4, §8, [verificação](evidencias/verificacao/LEIA-ME.md) |
+| **Visual** | ACEITE: 88 critérios — **86 aprovados**, **1 reprovado preexistente** (G-13) e **1 alterado** (A-R12-07). Zoom real do navegador (200% e 400%) e Tab completo em todas as rotas executados. **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
 
-A entrega **não** está concluída como um todo: G-13 continua reprovado (preexistente) e G-04/G-05/G-06 estão parciais.
+A entrega **não** está concluída como um todo enquanto G-13 (falha preexistente das suítes: 429 no pilot-flow e T23 intermitente) seguir reprovado.
 
 ## 2. Rotas alteradas
 
@@ -122,7 +122,9 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 4. Teste: “pedido mais recente” lia `body[0]` de `purchase/orders`, que ordena o número como texto (defeito **preexistente da API**, não usado pela interface; tarefa separada sugerida). Teste: conexão keep-alive fechada durante reinício do worker → uma repetição só para erro de soquete.
 5. Fotos: moldura do produto acompanha a proporção da foto (entre 4:5 e 4:3), miniaturas e imagem do tema inteiras, sem corte nem distorção (D-16 revisada).
 
-**Zoom:** `--zoom=2` é simulação de reflow (viewport CSS 640 + `deviceScaleFactor` 2), não o zoom real do navegador, que o Playwright headless não aciona — por isso G-04 fica parcial. Texto em 200% usa a preferência real de fonte do Chromium (`Page.setFontSizes`).
+**Zoom:** `--zoom=2` é só simulação de reflow (viewport CSS 640 + `deviceScaleFactor` 2). O zoom **real** do navegador passou a ser testado com `--zoom-real` (extensão local que chama `chrome.tabs.setZoom`, o mesmo zoom de Ctrl +/−): 15 cenários em 200% e 400%, rolagem 0 px. O `screenshot` do Playwright ignora esse zoom (sai cortado); a captura é feita pelo CDP.
+
+**Tab completo:** `capturar-rotas.mjs --tab` percorre a página inteira em 159 cenários × largura (14 rotas, 390/768/1440): 3.102 paradas sem problema (nome, visibilidade, contorno ≥ 2 px, não encoberto, sem armadilha); saltos para cima só em troca de coluna no desktop. O script começava o Tab do último clique nos cenários com interação; corrigido antes da evidência final. Texto em 200% usa a preferência real de fonte do Chromium (`Page.setFontSizes`).
 
 **Tokens:** `tokens-css.mjs --check` normaliza só `\r\n` e grava no EOL do arquivo; `tokens-css.test.mjs` 8/8 (LF, CRLF, diferença real detectada em ambos, conteúdo preservado).
 
@@ -132,4 +134,4 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 
 **Defeito no script da rodada (encontrado depois, corrigido):** a primeira versão de `rodada-completa.sh` saía com 0 mesmo quando teclado e aceite falhavam (as falhas só eram impressas e o último comando era `grep`). Os resultados desta rodada foram lidos nos logs e em `aceite.json`, não no código de saída: a última rodada teve aceite com saída 1 (A-R01-06, registrado acima). Agora cada etapa tem o código de saída verificado e a rodada sai com 1 se alguma falhar; testado numa cópia isolada com `node` simulado (tudo passa → 0; teclado e aceite falham → 1; só aceite → 1; capturas → 1; preparação → 1 e interrompe) e a versão anterior reproduzida com saída 0 no mesmo cenário.
 
-**Pendências abertas:** G-13 (falhas preexistentes acima); verificação continuada sobre `ff73c7d`; zoom real do navegador; percurso de Tab nas demais rotas; leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).
+**Pendências abertas:** G-13 (429 do pilot-flow e T23, preexistentes, registrados como tarefas separadas); leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).

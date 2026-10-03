@@ -30,6 +30,8 @@ Executado em 03/10/2026, mesmo host, base primeiro e branch em seguida, com o ca
 | Regressões T01/T02, acesso, worker, UI da fundação | aprovado | aprovado |
 | Logs sanitizados, S3 após reinício, CLI do operador, backup, fatos após backup, restore, conferências, PITR | aprovado | aprovado |
 
+**Sobre o commit `deecdc1`** (depois das correções de CSS; [json](fase-7-continuada-branch-deecdc1.json), [saída](fase-7-continuada-branch-deecdc1.saida.txt)): 15 de 16 etapas aprovadas (inclusive Fase 2/T23, backup, restore e PITR); reprova só “Worker real: T21, interface e T27” — o pilot-flow “Interface” para ao esperar o link “Contato geral”, um passo antes do ponto da base (“Alertas”). Mesma causa: na sequência isolada `deecdc1` tem 4 respostas 429 novas, como a base; o pilot-flow sozinho passa 3/3 duas vezes com 0 respostas 429. Uma primeira tentativa nessa cópia falhou em várias suítes com `EACCES` em `/app/artifacts` ([saída](fase-7-continuada-branch-deecdc1-tentativa1-eacces.saida.txt)): a pasta montada fora criada como root e os testes rodam como UID 1000 — falha do procedimento, agora corrigida em `preparar-continuada.mjs` (a pasta é criada com permissão de escrita).
+
 As falhas da branch são um subconjunto das da base. Os commits da branch não alteram `next.config.mjs`, `proxy.ts`, a API nem o lockfile.
 
 ## T23 isolado
@@ -38,4 +40,4 @@ As falhas da branch são um subconjunto das da base. Os commits da branch não a
 
 ## 429 do `pilot-flow`
 
-Limite por IP de 1000/min em `APP_ENV=test`, janela fixa. Na ordem oficial das etapas e em pilhas limpas, a etapa de interface termina com 4 respostas 429 novas **na base e na branch** ([`limite-429-sequencia.txt`](limite-429-sequencia.txt), roteiro [`limite-429-sequencia.sh`](limite-429-sequencia.sh)). A casca do painel da branch chegou a fazer 42 requisições em 8 páginas (base: 26); o commit `d2d4742` reduziu para 33, com as páginas do painel iguais à base exceto as miniaturas do catálogo ([`requisicoes-por-pagina.json`](requisicoes-por-pagina.json), [`contar-requisicoes.mjs`](contar-requisicoes.mjs)).
+Limite por IP de 1000/min em `APP_ENV=test`, janela fixa. Na ordem oficial das etapas e em pilhas limpas, a etapa de interface termina com 4 respostas 429 novas **na base, em `d2d4742` e em `deecdc1`** ([`limite-429-sequencia.txt`](limite-429-sequencia.txt), roteiro [`limite-429-sequencia.sh`](limite-429-sequencia.sh)). A casca do painel da branch chegou a fazer 42 requisições em 8 páginas (base: 26); o commit `d2d4742` reduziu para 33, com as páginas do painel iguais à base exceto as miniaturas do catálogo ([`requisicoes-por-pagina.json`](requisicoes-por-pagina.json), [`contar-requisicoes.mjs`](contar-requisicoes.mjs)).

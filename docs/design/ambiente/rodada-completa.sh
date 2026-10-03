@@ -26,6 +26,10 @@ etapa 320 $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --wi
 etapa 1024 $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --widths=1024 --only=R02-produtos,R03-pedidos,R12-revisao
 etapa zoom $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --widths=1280 --zoom=2 --only=$R
 etapa texto $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --widths=1280 --texto=200 --only=$R
+etapa zoom-real-200 $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --widths=1280 --zoom-real=2 --only=$R
+etapa zoom-real-400 $L/rodada-capturas.log node docs/design/capturar-rotas.mjs depois --widths=1280 --zoom-real=4 --only=$R
+etapa tab $L/rodada-tab.log node docs/design/capturar-rotas.mjs depois --tab
+echo "   tab: $(grep -c 'Tab:' $L/rodada-tab.log) percursos"; grep -E "problemas [1-9]|LIMITE" $L/rodada-tab.log
 etapa teclado $L/rodada-teclado.log node docs/design/verificar-teclado.mjs
 echo "   teclado: $(grep -c '^ok' $L/rodada-teclado.log) ok, $(grep -c '^FALHA' $L/rodada-teclado.log) falhas"; grep '^FALHA' $L/rodada-teclado.log
 etapa pendente - node docs/design/ambiente/ambiente.mjs dados --so-pendente

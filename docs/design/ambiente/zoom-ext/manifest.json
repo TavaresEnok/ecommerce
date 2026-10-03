@@ -1,0 +1,1 @@
+{"manifest_version":3,"name":"zoom-teste","version":"1","permissions":["tabs"],"background":{"service_worker":"sw.js"}}

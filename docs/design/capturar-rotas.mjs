@@ -5,6 +5,12 @@
 // docs/design/ambiente/gerar-dados.mjs; Chromium via docs/design/ambiente/navegador.mjs (não instala nada).
 // --zoom=N SIMULA o zoom de N×: viewport CSS = largura/N com deviceScaleFactor N (o mesmo reflow de CSS que o zoom
 // produz; o zoom da interface do navegador não é acionado — Playwright não o expõe em modo headless).
+// --tab percorre a página INTEIRA só com Tab (sem capturar imagem) e grava `tab.json`: a primeira parada deve ser
+// “Ir para o conteúdo”; cada parada precisa de nome acessível, ficar visível dentro da janela, ter contorno ≥ 2 px
+// (ou sombra de foco), não estar encoberta por outro elemento e o ciclo precisa fechar (sem armadilha); conta saltos
+// para cima > 300 px (ordem de leitura).
+// --zoom-real=N aplica o zoom REAL do navegador (o de Ctrl +/−, via chrome.tabs.setZoom numa extensão local de
+// ambiente/zoom-ext): a janela tem a largura de --widths e o navegador a reduz a largura/N em px CSS. Arquivo `-zrN00`.
 // --texto=P muda o tamanho de fonte padrão do navegador para P% (CDP Page.setFontSizes — a mesma preferência
 // “tamanho da fonte” das configurações do Chrome): textos, espaços e controles em rem crescem e os pontos de quebra
 // em em (48em/64em) passam a valer na largura proporcional, como para quem usa fonte grande. Saída: docs/design/evidencias/<rótulo>/*.jpg e resultado.json.
@@ -15,12 +21,13 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = join(here, '../..');
-import { launch, baseOf } from './ambiente/navegador.mjs';
+import { launch, launchZoom, baseOf } from './ambiente/navegador.mjs';
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=').slice(1).join('=') || d;
 const label = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 'depois';
 const widths = arg('widths', '390,768,1440').split(',').map(Number);
 const only = arg('only', '').split(',').filter(Boolean);
-const zoom = Number(arg('zoom', '1')), texto = Number(arg('texto', '100'));
+const tabMode = process.argv.includes('--tab');
+const zoom = Number(arg('zoom', '1')), texto = Number(arg('texto', '100')), zoomReal = Number(arg('zoom-real', '1'));
 const demo = JSON.parse(readFileSync(join(repo, '.local/demo-ui.json'), 'utf8')), base = baseOf(demo);
 const out = join(here, 'evidencias', label);
 mkdirSync(out, { recursive: true });
@@ -118,19 +125,48 @@ const scenarios = [
   { id: 'R14-atendimento', route: 'R14', persona: 'anon', path: `/lojas/${A.slug}/atendimento` },
 ].filter((s) => !only.length || only.includes(s.route) || only.includes(s.id));
 
+// Percurso de Tab até o ciclo fechar (ou sair da página); devolve as violações por parada.
+async function walkTab(page) {
+  await page.evaluate(() => { document.querySelectorAll('[data-tabseen]').forEach((e) => e.removeAttribute('data-tabseen')); (document.activeElement || document.body).blur?.(); window.scrollTo(0, 0); /* o ponto de partida do Tab segue o último foco/clique: foca um nó temporário no início do documento e o remove */ const t = document.createElement('span'); t.tabIndex = -1; document.body.prepend(t); t.focus(); t.remove(); });
+  const stops = [], problems = [], jumps = []; let prevKey = ''; let first = '', closed = false, left = false, lastTop = null, back = 0;
+  for (let i = 0; i < 250; i++) {
+    await page.keyboard.press('Tab');
+    const f = await page.evaluate(() => {
+      const e = document.activeElement; if (!e || e === document.body || e === document.documentElement) return null;
+      if (e.hasAttribute('data-tabseen')) return { repeat: true };
+      e.setAttribute('data-tabseen', '1');
+      const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
+      const name = (e.getAttribute('aria-label') || e.labels?.[0]?.textContent || (e.getAttribute('aria-labelledby') && document.getElementById(e.getAttribute('aria-labelledby'))?.textContent) || e.textContent || e.getAttribute('title') || e.getAttribute('placeholder') || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+      const outline = cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) >= 2, shadow = cs.boxShadow && cs.boxShadow !== 'none';
+      const top = r.top + window.scrollY, cx = Math.min(Math.max(r.left + r.width / 2, 0), innerWidth - 1), cy = Math.min(Math.max(r.top + r.height / 2, 0), innerHeight - 1);
+      const hit = document.elementFromPoint(cx, cy);
+      return { key: `${e.tagName.toLowerCase()}${e.getAttribute('type') ? `[${e.getAttribute('type')}]` : ''} “${name}”`, name: !!name, visible: r.width > 0 && r.height > 0 && r.left >= -1 && r.right <= innerWidth + 1, ring: outline || !!shadow, obscured: !hit || !(e === hit || e.contains(hit) || hit.contains(e)), top };
+    });
+    if (!f) { left = true; break; }
+    if (f.repeat) { closed = true; break; }
+    if (!first) first = f.key;
+    stops.push(f.key);
+    const bad = [!f.name && 'sem nome', !f.visible && 'fora da janela/oculto', !f.ring && 'sem contorno ≥ 2 px', f.obscured && 'encoberto'].filter(Boolean);
+    if (bad.length) problems.push(`${f.key}: ${bad.join(', ')}`);
+    if (lastTop !== null && f.top < lastTop - 300) { back++; jumps.push(`${prevKey} → ${f.key}`); } lastTop = f.top; prevKey = f.key;
+  }
+  return { stops: stops.length, first, closed, left, problems, backJumps: back, jumps, skipFirst: /Ir para o conteúdo/.test(first) };
+}
+
 const browser = await launch();
-let results = [];
-try { const prev = JSON.parse(readFileSync(join(out, 'resultado.json'), 'utf8')).results; results = prev.filter((r) => !scenarios.some((s) => s.id === r.id && widths.includes(r.width) && (r.zoom || 1) === zoom && (r.texto || 100) === texto)); } catch { /* primeira execução */ }
+let results = []; const tabResults = [];
+try { const prev = JSON.parse(readFileSync(join(out, 'resultado.json'), 'utf8')).results; results = prev.filter((r) => !scenarios.some((s) => s.id === r.id && widths.includes(r.width) && (r.zoom || 1) === zoom && (r.zoomReal || 1) === zoomReal && (r.texto || 100) === texto)); } catch { /* primeira execução */ }
 const cookies = {};
 for (const s of scenarios) {
   cookies[s.persona] ??= await personas[s.persona]();
   for (const width of widths) {
-    const context = await browser.newContext({ viewport: { width: Math.round(width / zoom), height: Math.round(900 / zoom) }, deviceScaleFactor: zoom });
+    const zr = zoomReal !== 1 ? await launchZoom(width) : null;
+    const context = zr ? zr.context : await browser.newContext({ viewport: { width: Math.round(width / zoom), height: Math.round(900 / zoom) }, deviceScaleFactor: zoom });
     if (cookies[s.persona].length) await context.addCookies(cookies[s.persona]);
-    const page = await context.newPage();
+    const page = zr ? (context.pages()[0] || await context.newPage()) : await context.newPage();
     if (texto !== 100) { const cdp = await context.newCDPSession(page); await cdp.send('Page.setFontSizes', { fontSizes: { standard: Math.round(16 * texto / 100), fixed: Math.round(13 * texto / 100) } }); }
     const errors = [];
-    page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
+    page.on('console', (m) => { if (m.type() === 'error' && !m.location().url.endsWith('/favicon.ico')) errors.push(m.text().slice(0, 200)); }); // favicon: só o Chromium completo (--zoom-real) o pede
     page.on('pageerror', (e) => errors.push(`pageerror: ${e.message.slice(0, 200)}`));
     let status = 0;
     try {
@@ -139,6 +175,8 @@ for (const s of scenarios) {
       await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {}); await page.waitForTimeout(600);
       if (s.legacy && process.argv.includes('--legacy')) await s.legacy(page);
       if (s.act && !process.argv.includes('--legacy')) await s.act(page);
+      if (zr) { await zr.setZoom(zoomReal); await page.waitForTimeout(800); }
+      if (tabMode) { const t = await walkTab(page); tabResults.push({ id: s.id, route: s.route, width, status, ...t }); console.log(`${s.id} ${width}px · Tab: ${t.stops} paradas · ${t.closed ? 'ciclo fechou' : t.left ? 'saiu da página' : 'LIMITE'} · 1ª “${t.first.slice(0, 28)}” · problemas ${t.problems.length} · saltos p/ cima ${t.backJumps}${t.problems.length ? ' · ' + t.problems.slice(0, 2).join('; ') : ''}`); if (zr) await zr.close(); else await context.close(); continue; }
       await page.evaluate(() => document.fonts.ready);
       const report = await page.evaluate(() => {
         const overflow = document.documentElement.scrollWidth - window.innerWidth;
@@ -150,20 +188,27 @@ for (const s of scenarios) {
         const small = [...document.querySelectorAll('main button, main a.btn, main [role=button], main input[type=radio]+label, main input[type=checkbox]')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 24 || r.width < 24); }).length;
         // Ações principais de toque abaixo de 44×44 px em telas estreitas (meta layout.touch-target).
         const small44 = window.innerWidth < 768 ? [...document.querySelectorAll('main .btn:not(.btn-sm), main input[type=radio]+label, .store-nav a, .category-nav a, .thumbs button')].filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.height < 43.5 || r.width < 43.5); }).map((e) => (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30)) : [];
-        return { overflow, unnamed, small, small44, fonteRaiz: getComputedStyle(document.documentElement).fontSize, layoutLargo: matchMedia('(min-width: 64em)').matches, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
+        return { overflow, unnamed, small, small44, janelaCss: `${innerWidth}x${innerHeight}@${devicePixelRatio}`, fonteRaiz: getComputedStyle(document.documentElement).fontSize, layoutLargo: matchMedia('(min-width: 64em)').matches, title: document.title, h1: document.querySelector('h1')?.textContent?.trim() || '' };
       });
       // fullPage do Playwright redefine as preferências de fonte durante a captura (a imagem sairia com 16 px):
       // com --texto, a página inteira é capturada aumentando a altura da janela.
       if (texto !== 100) await page.setViewportSize({ width, height: Math.min(16000, await page.evaluate(() => document.documentElement.scrollHeight)) });
-      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}${texto !== 100 ? `-t${texto}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: texto === 100 });
-      results.push({ ...s, legacy: undefined, act: undefined, width, zoom, texto, status, ...report, errors });
+      if (zr) { // o screenshot do Playwright ignora o zoom do navegador (sai cortado): captura pelo CDP; sob zoom o recorte é em px CSS × fator, escala 1
+        const cdp = await context.newCDPSession(page);
+        const m = await page.evaluate(() => ({ w: document.documentElement.clientWidth, h: Math.min(16000, document.documentElement.scrollHeight) }));
+        const { data } = await cdp.send('Page.captureScreenshot', { format: 'jpeg', quality: 60, captureBeyondViewport: true, clip: { x: 0, y: 0, width: m.w * zoomReal, height: m.h * zoomReal, scale: 1 } });
+        writeFileSync(join(out, `${s.id}-${width}-zr${zoomReal * 100}.jpg`), Buffer.from(data, 'base64'));
+      } else
+      await page.screenshot({ path: join(out, `${s.id}-${width}${zoom !== 1 ? `-z${zoom * 100}` : ''}${zoomReal !== 1 ? `-zr${zoomReal * 100}` : ''}${texto !== 100 ? `-t${texto}` : ''}.jpg`), type: 'jpeg', quality: 60, fullPage: texto === 100 });
+      results.push({ ...s, legacy: undefined, act: undefined, width, zoom, zoomReal, texto, status, ...report, errors });
       console.log(`${s.id} ${width}px · HTTP ${status} · overflow ${report.overflow}px · sem nome ${report.unnamed} · alvos<24 ${report.small} · <44 ${report.small44.length} · erros ${errors.length} · h1 "${report.h1.slice(0, 50)}"`);
     } catch (e) {
       results.push({ ...s, legacy: undefined, act: undefined, width, status, failure: e.message.slice(0, 300), errors });
       console.log(`${s.id} ${width}px · FALHA ${e.message.slice(0, 120)}`);
     }
-    await context.close();
+    if (zr) await zr.close(); else await context.close();
   }
 }
 await browser.close();
+if (tabMode) { writeFileSync(join(out, 'tab.json'), JSON.stringify({ label, base, date: new Date().toISOString(), zoomReal, results: tabResults }, null, 2)); process.exit(tabResults.every((t) => (t.skipFirst || t.stops <= 1) && t.problems.length === 0 && (t.closed || t.left)) ? 0 : 1); }
 writeFileSync(join(out, 'resultado.json'), JSON.stringify({ label, base, date: new Date().toISOString(), note: 'Dados sintéticos (example.test); pagamentos SIMULADOS.', results }, null, 2));

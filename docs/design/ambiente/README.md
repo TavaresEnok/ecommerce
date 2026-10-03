@@ -9,7 +9,7 @@ Reproduz, numa sessão nova, os dados e as rotas usados por [`capturar-rotas.mjs
 | Docker Engine + Compose v2 (≥ 2.17, `additional_contexts`) | serviços (Postgres 17.9, Redis, SeaweedFS, API, worker, web) | imagens do Docker Hub e build com `npm ci` (registro npm). Em rede com inspeção TLS, `subir` gera fora do git um Dockerfile derivado com a CA de `DESIGN_BUILD_CA` (ou `/root/.ccr/ca-bundle.crt`); o Dockerfile versionado não muda |
 | Node ≥ 22 no host + `npm ci` na raiz | `gerar-dados.mjs` (usa `scripts/seed.mjs` e `sharp` de `packages/media`) e os scripts de captura | não instala nada globalmente |
 | `.local/test.env` | segredos locais do ambiente de teste | `node scripts/setup.mjs --test` (gera sem exibir; não sobrescreve) |
-| Chromium | capturas e verificações | [`navegador.mjs`](navegador.mjs): Playwright do repositório; se o navegador dele não estiver baixado, `PLAYWRIGHT_CHROMIUM=<executável>` ou `/opt/pw-browsers/chromium`; ou rode o script no contêiner `mcr.microsoft.com/playwright:v1.63.0-noble` (abaixo) |
+| Chromium | capturas e verificações (zoom real e Tab usam o Chromium completo; o headless puro não carrega a extensão de zoom) | [`navegador.mjs`](navegador.mjs): Playwright do repositório; se o navegador dele não estiver baixado, `PLAYWRIGHT_CHROMIUM=<executável>` ou `/opt/pw-browsers/chromium`; ou rode o script no contêiner `mcr.microsoft.com/playwright:v1.63.0-noble` (abaixo) |
 | Fotos (opcional) | testar fotos reais na caneca | `--fotos=<pasta>` com `.png/.jpg`; sem a opção, são gerados gráficos rotulados “IMAGEM DE TESTE” |
 
 ## Preparação e execução
@@ -19,7 +19,9 @@ npm ci                                              # dependências do host (uma
 node scripts/setup.mjs --test                       # .local/test.env (uma vez)
 node docs/design/ambiente/ambiente.mjs subir        # projeto Compose ecommerce-design-demo, web em http://localhost:3400
 node docs/design/ambiente/ambiente.mjs dados        # cria lojas, pedidos, protocolos, funcionário e admin com MFA → .local/demo-ui.json
-node docs/design/capturar-rotas.mjs depois          # capturas 390/768/1440 (+ --widths=320; --widths=1280 --zoom=2 simula o reflow do zoom; --texto=200 aumenta a fonte-raiz)
+node docs/design/capturar-rotas.mjs depois          # capturas 390/768/1440 (+ --widths=320; --widths=1280 --zoom=2 SIMULA o reflow do zoom; --texto=200 usa a fonte do navegador em 200%)
+node docs/design/capturar-rotas.mjs depois --widths=1280 --zoom-real=2   # zoom REAL do navegador (Ctrl +/−) por extensão local (ambiente/zoom-ext); 4 = 400%
+node docs/design/capturar-rotas.mjs depois --tab    # percurso completo só com Tab em todos os cenários → depois/tab.json (sai 1 se houver problema)
 node docs/design/verificar-teclado.mjs              # foco, diálogo, variação por setas, etapas do checkout
 node docs/design/verificar-aceite.mjs               # cenários do ACEITE fora das suítes (ALTERA os dados sintéticos)
 ```

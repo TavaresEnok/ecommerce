@@ -2,3 +2,4 @@ head-limpo-1: API ℹ pass 57 ℹ fail 0  | UI ℹ pass 6 ℹ fail 2  | resposta
 base-limpo-1: API ℹ pass 57 ℹ fail 0  | UI ℹ pass 6 ℹ fail 2  | respostas 429 novas: 4
 head-limpo-2: API ℹ pass 57 ℹ fail 0  | UI ℹ pass 6 ℹ fail 2  | respostas 429 novas: 4
 base-limpo-2: API ℹ pass 57 ℹ fail 0  | UI ℹ pass 6 ℹ fail 2  | respostas 429 novas: 4
+deecdc1-limpo-1: API ℹ pass 57 ℹ fail 0  | UI ℹ pass 6 ℹ fail 2  | respostas 429 novas: 4   (03/10, commit deecdc1; falha em “Contato geral”, um passo antes de “Alertas”)

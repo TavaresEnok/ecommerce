@@ -1,0 +1,957 @@
+
+=== Preparação isolada ===
+ Container ecommerce-phase7-test-web-1 Stopping 
+ Container ecommerce-phase7-test-worker-1 Stopping 
+ Container ecommerce-phase7-test-web-1 Stopped 
+ Container ecommerce-phase7-test-web-1 Removing 
+ Container ecommerce-phase7-test-worker-1 Stopped 
+ Container ecommerce-phase7-test-worker-1 Removing 
+ Container ecommerce-phase7-test-web-1 Removed 
+ Container ecommerce-phase7-test-api-1 Stopping 
+ Container ecommerce-phase7-test-worker-1 Removed 
+ Container ecommerce-phase7-test-api-1 Stopped 
+ Container ecommerce-phase7-test-api-1 Removing 
+ Container ecommerce-phase7-test-api-1 Removed 
+ Container ecommerce-phase7-test-storage-init-1 Stopping 
+ Container ecommerce-phase7-test-migrate-1 Stopping 
+ Container ecommerce-phase7-test-redis-1 Stopping 
+ Container ecommerce-phase7-test-storage-init-1 Stopped 
+ Container ecommerce-phase7-test-storage-init-1 Removing 
+ Container ecommerce-phase7-test-migrate-1 Stopped 
+ Container ecommerce-phase7-test-migrate-1 Removing 
+ Container ecommerce-phase7-test-migrate-1 Removed 
+ Container ecommerce-phase7-test-postgres-1 Stopping 
+ Container ecommerce-phase7-test-storage-init-1 Removed 
+ Container ecommerce-phase7-test-storage-1 Stopping 
+ Container ecommerce-phase7-test-redis-1 Stopped 
+ Container ecommerce-phase7-test-redis-1 Removing 
+ Container ecommerce-phase7-test-redis-1 Removed 
+ Container ecommerce-phase7-test-storage-1 Stopped 
+ Container ecommerce-phase7-test-storage-1 Removing 
+ Container ecommerce-phase7-test-storage-1 Removed 
+ Container ecommerce-phase7-test-postgres-1 Stopped 
+ Container ecommerce-phase7-test-postgres-1 Removing 
+ Container ecommerce-phase7-test-postgres-1 Removed 
+ Volume ecommerce-phase7-test_postgres-data Removing 
+ Volume ecommerce-phase7-test_storage-data Removing 
+ Volume ecommerce-phase7-test_pg-wal-archive Removing 
+ Volume ecommerce-phase7-test_redis-data Removing 
+ Network ecommerce-phase7-test_default Removing 
+ Network ecommerce-phase7-test_default Removed 
+ Volume ecommerce-phase7-test_postgres-data Removed 
+ Volume ecommerce-phase7-test_storage-data Removed 
+ Volume ecommerce-phase7-test_redis-data Removed 
+ Volume ecommerce-phase7-test_pg-wal-archive Removed 
+
+=== Build em Node LTS ===
+ Image ecommerce-foundation:local Building 
+ Image ecommerce-postgres:17.9 Building 
+ Image ecommerce-foundation-tests:local Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 5.20kB done
+#1 DONE 0.0s
+
+#2 [postgres internal] load build definition from Dockerfile
+#2 transferring dockerfile: 400B done
+#2 DONE 0.0s
+
+#3 [tests internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.19kB done
+#3 DONE 0.0s
+
+#4 [tests context ca] load .dockerignore
+#4 transferring ca: 2B done
+#4 DONE 0.0s
+
+#5 [tests internal] load metadata for mcr.microsoft.com/playwright:v1.63.0-noble
+#5 DONE 0.0s
+
+#6 [api internal] load metadata for docker.io/library/node:24.21.0-bookworm-slim
+#6 ...
+
+#7 [postgres internal] load metadata for docker.io/library/postgres:17.9-bookworm
+#7 DONE 1.0s
+
+#6 [api internal] load metadata for docker.io/library/node:24.21.0-bookworm-slim
+#6 DONE 1.0s
+
+#8 [postgres internal] load .dockerignore
+#8 transferring context: 188B done
+#8 DONE 0.0s
+
+#9 [postgres 1/3] FROM docker.io/library/postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641
+#9 resolve docker.io/library/postgres:17.9-bookworm@sha256:47f917f7409eacd22fc5dfb1dee634e1b55cf0c01d1a7eb701be2227a03e0641 0.0s done
+#9 DONE 0.0s
+
+#10 [api dependencies  1/11] FROM docker.io/library/node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6
+#10 resolve docker.io/library/node:24.21.0-bookworm-slim@sha256:0e0ff40c39bc087845bfb27465a0df4ea419520094bc35842ff83dd8cbe6f9b6 0.0s done
+#10 DONE 0.0s
+
+#11 [tests browsers 1/3] FROM mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27
+#11 resolve mcr.microsoft.com/playwright:v1.63.0-noble@sha256:eff16c30e6f3f4af0a03fa4b706120d5e9b0891c344a27d64559aff5900a4a27 0.0s done
+#11 DONE 0.0s
+
+#12 [tests context ca] load from client
+#12 transferring ca: 197.24kB 0.0s done
+#12 DONE 0.1s
+
+#13 [postgres internal] load build context
+#13 transferring context: 1.12kB 0.0s done
+#13 DONE 0.0s
+
+#14 [postgres 2/3] COPY infra/postgres/init.sh /docker-entrypoint-initdb.d/01-roles.sh
+#14 CACHED
+
+#15 [postgres 3/3] RUN sed -i 's/\r$//' /docker-entrypoint-initdb.d/01-roles.sh && chmod 755 /docker-entrypoint-initdb.d/01-roles.sh  && mkdir -p /var/lib/postgresql/wal-archive && chown postgres:postgres /var/lib/postgresql/wal-archive && chmod 700 /var/lib/postgresql/wal-archive
+#15 CACHED
+
+#16 [postgres] exporting to image
+#16 exporting layers
+#16 exporting layers 0.0s done
+#16 exporting manifest sha256:ae8318c82b5135b4862b45e9c522e3684eb127f5f10fb8725e2e0c0d60136785 done
+#16 exporting config sha256:3d78dbf3668c2b5b88dc2404831f3b2b9c6b30c65558dc95b8690c2cd1cf92aa done
+#16 exporting attestation manifest sha256:cb15aebe0afc6751233752b3d5217c4fb00d14ed7f05e4eca3dc48df4d51550b 0.0s done
+#16 exporting manifest list sha256:783562fdf803c7a36732e40a5525d8870f67d15cf33dfe05730dea2a821f3fad done
+#16 naming to docker.io/library/ecommerce-postgres:17.9 done
+#16 unpacking to docker.io/library/ecommerce-postgres:17.9 0.0s done
+#16 DONE 0.2s
+
+#17 [tests internal] load build context
+#17 transferring context: 44.79MB 0.5s done
+#17 DONE 0.5s
+
+#18 [tests dependencies  9/11] COPY packages/media/package.json packages/media/package.json
+#18 CACHED
+
+#19 [tests dependencies 10/11] COPY packages/purchase/package.json packages/purchase/package.json
+#19 CACHED
+
+#20 [tests dependencies  2/11] COPY --from=ca ca.crt /usr/local/share/ca-certificates/override-ca.crt
+#20 CACHED
+
+#21 [tests dependencies  6/11] COPY apps/web/package.json apps/web/package.json
+#21 CACHED
+
+#22 [tests dependencies  7/11] COPY apps/worker/package.json apps/worker/package.json
+#22 CACHED
+
+#23 [tests dependencies  8/11] COPY packages/database/package.json packages/database/package.json
+#23 CACHED
+
+#24 [tests dependencies  3/11] WORKDIR /app
+#24 CACHED
+
+#25 [tests dependencies  4/11] COPY package.json package-lock.json tsconfig.base.json ./
+#25 CACHED
+
+#26 [tests dependencies  5/11] COPY apps/api/package.json apps/api/package.json
+#26 CACHED
+
+#27 [tests dependencies 11/11] RUN npm install --global npm@11.6.2 --no-audit --no-fund && npm ci --no-audit --no-fund
+#27 CACHED
+
+#28 [tests app 1/2] COPY . .
+#28 ...
+
+#29 [postgres] resolving provenance for metadata file
+#29 DONE 0.0s
+
+#28 [tests app 1/2] COPY . .
+#28 DONE 0.5s
+
+#30 [api app 2/2] RUN npm run build
+#30 1.445 
+#30 1.445 > ecommerce-foundation@0.1.0 build
+#30 1.445 > npm run build -w @ecommerce/database && npm run build -w @ecommerce/media && npm run build -w @ecommerce/purchase && npm run build -w @ecommerce/api && npm run build -w @ecommerce/worker && npm run build -w @ecommerce/web
+#30 1.445 
+#30 1.668 
+#30 1.668 > @ecommerce/database@0.1.0 build
+#30 1.668 > tsc -p tsconfig.json
+#30 1.668 
+#30 7.330 
+#30 7.330 > @ecommerce/media@0.1.0 build
+#30 7.330 > tsc -p tsconfig.json
+#30 7.330 
+#30 10.88 
+#30 10.88 > @ecommerce/purchase@0.1.0 build
+#30 10.88 > tsc -p tsconfig.json
+#30 10.88 
+#30 13.67 
+#30 13.67 > @ecommerce/api@0.1.0 build
+#30 13.67 > tsc -p tsconfig.json
+#30 13.67 
+#30 18.32 
+#30 18.32 > @ecommerce/worker@0.1.0 build
+#30 18.32 > tsc -p tsconfig.json
+#30 18.32 
+#30 20.60 
+#30 20.60 > @ecommerce/web@0.1.0 build
+#30 20.60 > next build --webpack
+#30 20.60 
+#30 22.25 ▲ Next.js 16.3.8 (webpack)
+#30 22.27 ✓ Running next.config.mjs took 20ms
+#30 22.30   Downloading swc package @next/swc-linux-x64-gnu... to /root/.cache/next-swc
+#30 23.58   Downloading swc package @next/swc-linux-x64-musl... to /root/.cache/next-swc
+#30 25.42 
+#30 25.45   Creating an optimized production build ...
+#30 37.15 ✓ Compiled successfully in 9.1s
+#30 37.16   Running TypeScript ...
+#30 43.27   Finished TypeScript in 6.1s ...
+#30 43.27   Collecting page data using 3 workers ...
+#30 45.23   Generating static pages using 3 workers (0/5) ...
+#30 45.58   Generating static pages using 3 workers (1/5) 
+#30 45.58   Generating static pages using 3 workers (2/5) 
+#30 45.58   Generating static pages using 3 workers (3/5) 
+#30 45.58 ✓ Generating static pages using 3 workers (5/5) in 351ms
+#30 46.42   Finalizing page optimization ...
+#30 46.42   Collecting build traces ...
+#30 58.07 
+#30 58.07 Route (app)
+#30 58.07 ┌ ○ /
+#30 58.07 ├ ○ /_not-found
+#30 58.07 ├ ƒ /lojas/[slug]/[[...path]]
+#30 58.07 ├ ƒ /lojas/[slug]/robots.txt
+#30 58.07 ├ ƒ /lojas/-/sitemap.xml
+#30 58.07 ├ ƒ /painel/[tenantId]
+#30 58.07 ├ ƒ /painel/[tenantId]/atendimento
+#30 58.07 ├ ƒ /painel/[tenantId]/operacao
+#30 58.07 ├ ƒ /painel/[tenantId]/pedidos
+#30 58.07 ├ ○ /plataforma
+#30 58.07 └ ƒ /preview/[tenantId]/[[...path]]
+#30 58.07 
+#30 58.07 
+#30 58.07 ƒ Proxy (Middleware)
+#30 58.07 
+#30 58.07 ○  (Static)   prerendered as static content
+#30 58.07 ƒ  (Dynamic)  server-rendered on demand
+#30 58.07 
+#30 DONE 58.4s
+
+#31 [api] exporting to image
+#31 exporting layers
+#31 ...
+
+#32 [tests browsers 2/3] WORKDIR /app
+#32 CACHED
+
+#33 [tests browsers 3/3] RUN chmod -R a+rX /ms-playwright
+#33 CACHED
+
+#34 [tests tests 1/1] COPY --from=app /app /app
+#34 ...
+
+#31 [api] exporting to image
+#31 exporting layers 16.5s done
+#31 exporting manifest sha256:829b1858dd5e7848bd6d3596886dc34ce6b8b868f884511cfc1f1c3035d117ab done
+#31 exporting config sha256:6cf7c93df38521f93df68875926cf9aff57c03ce8c21351ddcd452563350e91b done
+#31 exporting attestation manifest sha256:7b1d5a22ebb043ef1e9781e6377c25c9850e55ef7001078bec2c8ddf0eef88eb 0.0s done
+#31 exporting manifest list sha256:9f768923df2b5bad3f4e068fd81c20d9d59b17133067fb00e1ee68850a70bee4 done
+#31 naming to docker.io/library/ecommerce-foundation:local done
+#31 unpacking to docker.io/library/ecommerce-foundation:local
+#31 ...
+
+#34 [tests tests 1/1] COPY --from=app /app /app
+#34 DONE 8.1s
+
+#35 [tests] exporting to image
+#35 exporting layers
+#35 ...
+
+#31 [api] exporting to image
+#31 unpacking to docker.io/library/ecommerce-foundation:local 5.8s done
+#31 DONE 22.5s
+
+#36 [api] resolving provenance for metadata file
+#36 DONE 0.0s
+
+#35 [tests] exporting to image
+#35 exporting layers 31.0s done
+#35 exporting manifest sha256:c45431b332ae14d9d87a211f75075160cd769f48ad0aa2e9ff35c0b897d47fb3 done
+#35 exporting config sha256:4352386fb56cd7f1dc0fca40929a62e5941a60a62cdc7a2103f031d329e1ff46 done
+#35 exporting attestation manifest sha256:448f5344b1e571473b1e298a6eba62e9addf0ece98a48b1451823748014968c6 done
+#35 exporting manifest list sha256:2c3a1084d782bc5cfd085b9357baf9507971b00cd38fd6fd17c3d81a0fcc4ed5 done
+#35 naming to docker.io/library/ecommerce-foundation-tests:local done
+#35 unpacking to docker.io/library/ecommerce-foundation-tests:local
+#35 unpacking to docker.io/library/ecommerce-foundation-tests:local 11.3s done
+#35 DONE 42.4s
+
+#37 [tests] resolving provenance for metadata file
+#37 DONE 0.0s
+ Image ecommerce-foundation-tests:local Built 
+ Image ecommerce-foundation:local Built 
+ Image ecommerce-postgres:17.9 Built 
+
+=== Migrations, S3 privado e saúde ===
+ Network ecommerce-phase7-test_default Creating 
+ Network ecommerce-phase7-test_default Created 
+ Volume ecommerce-phase7-test_storage-data Creating 
+ Volume ecommerce-phase7-test_storage-data Created 
+ Volume ecommerce-phase7-test_redis-data Creating 
+ Volume ecommerce-phase7-test_redis-data Created 
+ Volume ecommerce-phase7-test_postgres-data Creating 
+ Volume ecommerce-phase7-test_postgres-data Created 
+ Volume ecommerce-phase7-test_pg-wal-archive Creating 
+ Volume ecommerce-phase7-test_pg-wal-archive Created 
+ Container ecommerce-phase7-test-postgres-1 Creating 
+ Container ecommerce-phase7-test-storage-1 Creating 
+ Container ecommerce-phase7-test-redis-1 Creating 
+ Container ecommerce-phase7-test-redis-1 Created 
+ Container ecommerce-phase7-test-storage-1 Created 
+ Container ecommerce-phase7-test-storage-init-1 Creating 
+ Container ecommerce-phase7-test-postgres-1 Created 
+ Container ecommerce-phase7-test-migrate-1 Creating 
+ Container ecommerce-phase7-test-storage-init-1 Created 
+ Container ecommerce-phase7-test-migrate-1 Created 
+ Container ecommerce-phase7-test-worker-1 Creating 
+ Container ecommerce-phase7-test-api-1 Creating 
+ Container ecommerce-phase7-test-worker-1 Created 
+ Container ecommerce-phase7-test-api-1 Created 
+ Container ecommerce-phase7-test-web-1 Creating 
+ Container ecommerce-phase7-test-web-1 Created 
+ Container ecommerce-phase7-test-storage-1 Starting 
+ Container ecommerce-phase7-test-redis-1 Starting 
+ Container ecommerce-phase7-test-postgres-1 Starting 
+ Container ecommerce-phase7-test-redis-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Started 
+ Container ecommerce-phase7-test-storage-init-1 Starting 
+ Container ecommerce-phase7-test-storage-init-1 Started 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Starting 
+ Container ecommerce-phase7-test-migrate-1 Started 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Starting 
+ Container ecommerce-phase7-test-api-1 Starting 
+ Container ecommerce-phase7-test-worker-1 Started 
+ Container ecommerce-phase7-test-api-1 Started 
+ Container ecommerce-phase7-test-api-1 Waiting 
+ Container ecommerce-phase7-test-api-1 Healthy 
+ Container ecommerce-phase7-test-web-1 Starting 
+ Container ecommerce-phase7-test-web-1 Started 
+ Container ecommerce-phase7-test-api-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Waiting 
+ Container ecommerce-phase7-test-web-1 Waiting 
+ Container ecommerce-phase7-test-storage-init-1 Waiting 
+ Container ecommerce-phase7-test-worker-1 Waiting 
+ Container ecommerce-phase7-test-api-1 Healthy 
+ Container ecommerce-phase7-test-storage-1 Healthy 
+ Container ecommerce-phase7-test-storage-init-1 Exited 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Healthy 
+ Container ecommerce-phase7-test-web-1 Healthy 
+
+=== Tipos ===
+ Container ecommerce-phase7-test-tests-run-673bbaa95cb6 Creating 
+ Container ecommerce-phase7-test-tests-run-673bbaa95cb6 Created 
+
+> ecommerce-foundation@0.1.0 typecheck
+> npm run typecheck --workspaces --if-present
+
+
+> @ecommerce/api@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/web@0.1.0 typecheck
+> tsc --noEmit --incremental false
+
+
+> @ecommerce/worker@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/database@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/media@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @ecommerce/purchase@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+=== Fase 3+4: núcleo transacional e operação do piloto com worker parado ===
+ Container ecommerce-phase7-test-worker-1 Stopping 
+ Container ecommerce-phase7-test-worker-1 Stopped 
+ Container ecommerce-phase7-test-tests-run-13aa94484e3c Creating 
+ Container ecommerce-phase7-test-tests-run-13aa94484e3c Created 
+▶ Fase 7: rascunho de descrição com IA sob orçamento
+  ✔ Desligado por padrão e sem provedor: geração recusada, cadastro manual e compra seguem (103.312229ms)
+  ✔ Autorização: só o Dono liga na loja; funcionário gera; outra loja não lê a geração (158.847733ms)
+  ✔ Reserva antes da chamada, custo conciliado, idempotência e salvamento explícito sem publicar (109.521727ms)
+  ✔ Edição concorrente: produto alterado depois da geração não é sobrescrito (85.7606ms)
+  ✔ Sanitização: HTML/script removidos; instrução no conteúdo do produto é tratada como dado (57.265987ms)
+  ✔ T34: concorrência na mesma loja limitada e orçamento nunca ultrapassado (520.468545ms)
+  ✔ T34: timeout mantém reserva (UNKNOWN) até expiração controlada; saída excessiva limitada por max_tokens (127.281915ms)
+  ✔ Teto global entre lojas e desligamento global/loja preservam cadastro e venda (190.403244ms)
+✖ Fase 7: rascunho de descrição com IA sob orçamento (3677.980541ms)
+▶ Fase 6: comercialização preparada sem terceiros
+  ✔ MFA (TOTP): ativação, códigos de recuperação, nova sessão exige verificação, replay recusado (389.227483ms)
+  ✔ Administração da plataforma: papel concedido só pelo operador, MFA obrigatório, motivo e auditoria (592.263087ms)
+  ✔ Planos versionados: pago só ativa com preço; PILOT não se aposenta; versão é imutável (89.611926ms)
+  ✔ T29: contratação, cobrança simulada, webhook assinado/deduplicado, renovação sem fatura duplicada (168.519449ms)
+  ✔ T29: falha de cobrança → PAST_DUE com 7 dias de tolerância → SUSPENDED bloqueia só vendas novas; pagamento reabre (364.832664ms)
+  ✔ T29: troca de plano no próximo ciclo, cancelamento ao fim do período; sem MFA/funcionário recusados (449.469893ms)
+  ✔ Cotas do plano: produtos/variações/equipe no servidor, concorrência na última vaga, downgrade preserva dados (158.537905ms)
+  ✔ T38: cota rigorosa de mídia com reserva atômica, concorrência, expiração e conciliação dos contadores (561.859143ms)
+  ✔ T18: devolução pela plataforma — MFA, idempotência, saldo serializado, recusa, resposta perdida e retomada sem duplicar (1011.306873ms)
+  ✔ T28/T37: domínio próprio — prova TXT, rota HTTPS para a loja certa, canônico com 301, remoção e nova prova para outra loja (607.095963ms)
+  ✔ T31: frete por provedor — cotação válida, mudança de regra/expiração invalidam, falha não gera frete grátis (444.267983ms)
+✖ Fase 6: comercialização preparada sem terceiros (6575.744625ms)
+▶ Fase 4: operação do piloto com PostgreSQL real e provedores SIMULADOS
+  ✔ Expedição por transportadora: funcionário separa, envia e entrega; pedido concluído e notificações enfileiradas (512.020822ms)
+  ✔ Retirada comprovada sem transportadora; bloqueios revalidados no backend (928.247448ms)
+  ✔ T35/T05: revisão não financeira só pelo Dono; devolução pendente só encerra com confirmação do gateway (546.873849ms)
+  ✔ T36: atendimento vinculado — protocolo, resposta, comunicação financeira antes do aceite, horário original preservado (362.595975ms)
+  ✔ T36: contato geral sem compra — protocolo e código; acesso somente com o código e na loja certa (92.878422ms)
+  ✔ Notificações: falha do provedor não apaga protocolo; esgota em FAILED, reenvio pelo Dono; link de acesso por fragmento (316.094284ms)
+  ✔ T25: suspensão e pausa bloqueiam novas vendas; pedidos, pagamentos, devoluções e atendimento anteriores continuam (758.501564ms)
+  ✔ T32 (parte 1): exportação privada com expiração e permissão; eliminação bloqueada em pedido aberto (148.251512ms)
+  ✖ Fixtures de recuperação (antes do backup): T26 pagamento pendente/PREPARED e T32 pedido concluído com dados pessoais (330.310299ms)
+✖ Fase 4: operação do piloto com PostgreSQL real e provedores SIMULADOS (5887.673901ms)
+▶ Fase 5: instrumentos de observação
+  ✔ Falhas de checkout registradas por motivo, sem carrinho/comprador, isoladas por loja (201.259205ms)
+  ✔ Relatório por loja agrega pedidos, falhas, atendimento e tempo de suporte sem dados pessoais (22.813951ms)
+✖ Fase 5: instrumentos de observação (1825.431084ms)
+▶ Fase 3: compra, estoque e pagamentos com PostgreSQL real e provedor SIMULADO
+  ✔ Fluxo principal: checkout, snapshots, reserva integral, outbox e baixa única após confirmação autoritativa (199.377597ms)
+  ✔ T03: FKs compostas e RLS impedem vínculos de compra entre lojas (33.170708ms)
+  ✔ T04: comprador só acessa o pedido do próprio carrinho; número/ID não autorizam (85.912486ms)
+  ✔ T05: funcionário lê pedidos, mas não configura gateway, cancela pago, resolve incidente ou simula (111.759523ms)
+  ✔ T06: duas compras concorrentes da última unidade — uma reserva integral vence (138.464098ms)
+  ✔ T07: carrinho com item indisponível não deixa pedido nem reserva parcial (92.966424ms)
+  ✔ T08/T09: mesma chave e nova chave retornam o mesmo pedido; conteúdo diferente gera conflito (132.51234ms)
+  ✔ T10: preço/frete alterados ou total adulterado exigem nova confirmação (218.616246ms)
+  ✔ T11: criação recebida com resposta perdida e criação nunca entregue — mesma operação, sem duplicar (319.224763ms)
+  ✔ T12: webhook repetido, consulta repetida e fato fora de ordem — um reconhecimento, sem regressão (89.256341ms)
+  ✔ T13: assinatura inválida, vendedor/moeda/valor incompatíveis não confirmam pagamento (482.496875ms)
+  ✔ T14: confirmação concorrente com expiração — estado serializado, sem baixa ou liberação dupla (420.296866ms)
+  ✔ Expiração: gateway confirma encerramento → libera e cancela; incerteza só libera após 60 min sem declarar não pago (250.257907ms)
+  ✔ T15: aprovação após liberação — realoca com saldo; sem saldo abre PAID_WITHOUT_STOCK e bloqueia até realocação do Dono (344.834925ms)
+  ✔ T16: duas tentativas pagas — dois recebimentos, uma baixa, excedente acompanhado até devolução confirmada (398.229011ms)
+  ✔ T17/T35: aprovação em pedido cancelado não reabre; devolução externa repetida/atrasada concilia uma vez; anotação não fabrica status (391.671521ms)
+  ✔ T19: devolução parcial e disputa preservam fatos sem apagar pagamento ou entrega (273.122299ms)
+  ✔ T20: falha entre commit e publicação — evento durável, consumo repetido/concorrente sem efeito duplicado (70.747913ms)
+  ✔ T24: alterar produto, fornecedor e tema após compra preserva snapshots; correção de endereço auditada (97.548947ms)
+  ✔ T36 (protocolo): solicitação durável, confirmação imediata, idempotente e com acesso autorizado (70.078123ms)
+  ✔ Conta revogada bloqueia novas cobranças; pedidos anteriores continuam consultáveis (199.498095ms)
+  ✔ EXPLAIN ANALYZE das consultas de reconciliação como app_user (7.469565ms)
+✖ Fase 3: compra, estoque e pagamentos com PostgreSQL real e provedor SIMULADO (6536.094522ms)
+ℹ tests 57
+ℹ suites 0
+ℹ pass 51
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28697.994591
+
+✖ failing tests:
+
+test at tests/ai.test.mjs:15:1
+✖ Fase 7: rascunho de descrição com IA sob orçamento (3677.980541ms)
+  Error: EACCES: permission denied, open '/app/artifacts/ai.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/ai.test.mjs:92:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/ai.json'
+  }
+
+test at tests/commercial.test.mjs:23:1
+✖ Fase 6: comercialização preparada sem terceiros (6575.744625ms)
+  Error: EACCES: permission denied, open '/app/artifacts/commercial.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/commercial.test.mjs:182:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/commercial.json'
+  }
+
+test at tests/operations.test.mjs:17:57
+✖ Fixtures de recuperação (antes do backup): T26 pagamento pendente/PREPARED e T32 pedido concluído com dados pessoais (330.310299ms)
+  Error: EACCES: permission denied, open '/app/artifacts/recovery-fixture.json'
+      at writeFileSync (node:fs:2483:20)
+      at file:///app/tests/operations.test.mjs:134:7
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async TestContext.<anonymous> (file:///app/tests/operations.test.mjs:17:77)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/operations.test.mjs:17:49)
+      at async TestContext.<anonymous> (file:///app/tests/operations.test.mjs:128:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/recovery-fixture.json'
+  }
+
+test at tests/operations.test.mjs:15:1
+✖ Fase 4: operação do piloto com PostgreSQL real e provedores SIMULADOS (5887.673901ms)
+  Error: EACCES: permission denied, open '/app/artifacts/operations.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/operations.test.mjs:137:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/operations.json'
+  }
+
+test at tests/pilot-observation.test.mjs:13:1
+✖ Fase 5: instrumentos de observação (1825.431084ms)
+  Error: EACCES: permission denied, open '/app/artifacts/pilot-observation.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/pilot-observation.test.mjs:38:31)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/pilot-observation.json'
+  }
+
+test at tests/purchase.test.mjs:14:1
+✖ Fase 3: compra, estoque e pagamentos com PostgreSQL real e provedor SIMULADO (6536.094522ms)
+  Error: EACCES: permission denied, open '/app/artifacts/purchase.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/purchase.test.mjs:248:38)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/purchase.json'
+  }
+
+
+=== Worker real: T21, interface e T27 em duas lojas ===
+ Container ecommerce-phase7-test-redis-1 Running 
+ Container ecommerce-phase7-test-postgres-1 Running 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Starting 
+ Container ecommerce-phase7-test-migrate-1 Started 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Starting 
+ Container ecommerce-phase7-test-worker-1 Started 
+ Container ecommerce-phase7-test-worker-1 Waiting 
+ Container ecommerce-phase7-test-redis-1 Waiting 
+ Container ecommerce-phase7-test-migrate-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Waiting 
+ Container ecommerce-phase7-test-postgres-1 Healthy 
+ Container ecommerce-phase7-test-migrate-1 Exited 
+ Container ecommerce-phase7-test-redis-1 Healthy 
+ Container ecommerce-phase7-test-worker-1 Healthy 
+ Container ecommerce-phase7-test-tests-run-e7465f806104 Creating 
+ Container ecommerce-phase7-test-tests-run-e7465f806104 Created 
+✖ Fase 6: interface do Dono (MFA, plano, domínio, frete) e da plataforma (5220.249203ms)
+▶ T27: fluxo completo em duas lojas com worker real
+  ✔ Duas lojas: compra, recebimento na conta correta, estoque, e-mails e entrega (6374.323769ms)
+  ✖ Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel) (836.203047ms)
+✖ T27: fluxo completo em duas lojas com worker real (9166.217215ms)
+▶ Fase 3 com worker real: outbox, perda do Redis e interface
+  ✔ T21: jobs publicados e perdidos no Redis são reconstruídos do PostgreSQL e executados uma vez (3116.215463ms)
+  ✔ Webhook simulado → inbox durável → consulta autoritativa pelo worker → pago com baixa única (4159.134785ms)
+  ✖ Interface: comprador revisa, confirma, recebe comprovante e protocolo; lojista vê pedido (desktop/móvel) (7018.086265ms)
+✖ Fase 3 com worker real: outbox, perda do Redis e interface (15902.517138ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 3
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 33435.285576
+
+✖ failing tests:
+
+test at tests/commercial-ui.test.mjs:12:1
+✖ Fase 6: interface do Dono (MFA, plano, domínio, frete) e da plataforma (5220.249203ms)
+  Error: EACCES: permission denied, open '/app/artifacts/commercial-ui.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/commercial-ui.test.mjs:36:33)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/commercial-ui.json'
+  }
+
+test at tests/pilot-flow.test.mjs:16:56
+✖ Interface: atendimento público, painel de pedidos/atendimento/operação (desktop e móvel) (836.203047ms)
+  Error: EACCES: permission denied, open '/app/artifacts/phase4-contact-1440.png'
+      at async open (node:internal/fs/promises:1345:25)
+      at async Object.writeFile (node:internal/fs/promises:1965:14)
+      at async _Page.screenshot (/app/node_modules/playwright-core/lib/coreBundle.js:61797:11)
+      at async file:///app/tests/pilot-flow.test.mjs:40:166
+      at async TestContext.<anonymous> (file:///app/tests/pilot-flow.test.mjs:16:76)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/pilot-flow.test.mjs:16:48)
+      at async TestContext.<anonymous> (file:///app/tests/pilot-flow.test.mjs:36:3)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/phase4-contact-1440.png'
+  }
+
+test at tests/pilot-flow.test.mjs:14:1
+✖ T27: fluxo completo em duas lojas com worker real (9166.217215ms)
+  Error: EACCES: permission denied, open '/app/artifacts/pilot-flow.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/pilot-flow.test.mjs:51:59)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/pilot-flow.json'
+  }
+
+test at tests/purchase-worker.test.mjs:17:72
+✖ Interface: comprador revisa, confirma, recebe comprovante e protocolo; lojista vê pedido (desktop/móvel) (7018.086265ms)
+  Error: EACCES: permission denied, open '/app/artifacts/phase3-order-1440.png'
+      at async open (node:internal/fs/promises:1345:25)
+      at async Object.writeFile (node:internal/fs/promises:1965:14)
+      at async _Page.screenshot (/app/node_modules/playwright-core/lib/coreBundle.js:61797:11)
+      at async file:///app/tests/purchase-worker.test.mjs:51:111
+      at async TestContext.<anonymous> (file:///app/tests/purchase-worker.test.mjs:17:92)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/purchase-worker.test.mjs:17:64)
+      at async TestContext.<anonymous> (file:///app/tests/purchase-worker.test.mjs:38:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/phase3-order-1440.png'
+  }
+
+test at tests/purchase-worker.test.mjs:15:1
+✖ Fase 3 com worker real: outbox, perda do Redis e interface (15902.517138ms)
+  Error: EACCES: permission denied, open '/app/artifacts/purchase-worker.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/purchase-worker.test.mjs:60:80)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/purchase-worker.json'
+  }
+
+
+=== Fase 2: catálogo/T22/T23/T37/carrinho/frete e Playwright desktop/móvel ===
+ Container ecommerce-phase7-test-tests-run-28edb70d8821 Creating 
+ Container ecommerce-phase7-test-tests-run-28edb70d8821 Created 
+▶ Fase 2 integrada: duas lojas navegáveis, banco e S3 reais
+  ✔ Produto simples, atributos explícitos, SKU único e estoque auditado (74.066967ms)
+  ✔ Ajustes concorrentes serializados e plano real de consulta por tenant (60.81658ms)
+  ✔ T01/T02: autorização de catálogo, FORCE RLS, contexto sem vazamento e FK composta (60.85876ms)
+  ✔ T22: busca com acentos/SKU, cache por loja, rascunho não vaza e publicação atômica (310.477034ms)
+  ✔ T23: conteúdo inválido, concorrência limitada, processamento WebP e S3 privado (1571.608124ms)
+  ✔ Carrinho visitante persistente, preço canônico, nenhuma reserva e isolamento (148.237874ms)
+  ✔ Frete com prioridade, retirada, CEP não atendido, validade e fingerprint (268.043188ms)
+  ✔ Arquivamento invalida oferta e carrinho, estoque continua auditável (61.03657ms)
+  ✔ Slug histórico redireciona sem reutilização e domínio não mistura lojas (164.765301ms)
+  ✔ T37: canonical/sitemap/robots/JSON-LD isolados, preview privado, fornecedor TESTE (1229.209564ms)
+  ✖ Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel (1667.128097ms)
+✖ Fase 2 integrada: duas lojas navegáveis, banco e S3 reais (7320.822127ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 10
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8837.402705
+
+✖ failing tests:
+
+test at tests/storefront.test.mjs:21:57
+✖ Playwright desktop/móvel: vitrine, busca, produto, carrinho/frete e painel (1667.128097ms)
+  Error: EACCES: permission denied, open '/app/artifacts/phase2-store-1440.png'
+      at async open (node:internal/fs/promises:1345:25)
+      at async Object.writeFile (node:internal/fs/promises:1965:14)
+      at async _Page.screenshot (/app/node_modules/playwright-core/lib/coreBundle.js:61797:11)
+      at async file:///app/tests/storefront.test.mjs:192:111
+      at async TestContext.<anonymous> (file:///app/tests/storefront.test.mjs:21:77)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/storefront.test.mjs:21:49)
+      at async TestContext.<anonymous> (file:///app/tests/storefront.test.mjs:184:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/phase2-store-1440.png'
+  }
+
+test at tests/storefront.test.mjs:17:1
+✖ Fase 2 integrada: duas lojas navegáveis, banco e S3 reais (7320.822127ms)
+  Error: EACCES: permission denied, open '/app/artifacts/storefront.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/storefront.test.mjs:201:101)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/storefront.json'
+  }
+
+
+=== Regressões T01/T02, acesso, worker e UI da fundação ===
+ Container ecommerce-phase7-test-tests-run-872fc9a81b89 Creating 
+ Container ecommerce-phase7-test-tests-run-872fc9a81b89 Created 
+▶ Fundação integrada — PostgreSQL real e app_user
+  ✔ UUIDv7, papéis reais e FORCE RLS em todas as tabelas de loja (52.499603ms)
+  ✔ T01: endpoints negam leitura/escrita cruzada, IDs/Host não autorizam (85.950186ms)
+  ✔ T01: RLS bloqueia SELECT/INSERT/UPDATE cruzados no banco (12.330567ms)
+  ✔ T02: mesma conexão alterna A/B e perde contexto após commit/rollback (8.723952ms)
+  ✔ FK composta rejeita autoria por vínculo de outra loja (13.785428ms)
+  ✔ Convite de Funcionário vinculado ao e-mail, expiração/uso único e revogação (104.404684ms)
+  ✔ Sessões/tokens somente como hash, e-mail verificado e recuperação revoga sessões (1277.450505ms)
+  ✔ Worker confirma recurso/ator e bloqueia job adulterado (275.504784ms)
+  ✖ Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais (2211.364196ms)
+  ✔ Revogar vínculo e todas as sessões tem efeito imediato (538.938016ms)
+  ✔ Rate limiting e sanitização de campos sensíveis (2996.262705ms)
+  ✖ EXPLAIN ANALYZE das consultas mínimas sem índices especulativos (4.36325ms)
+✖ Fundação integrada — PostgreSQL real e app_user (9131.115724ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 10
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10297.183152
+
+✖ failing tests:
+
+test at tests/foundation.test.mjs:35:43
+✖ Interface Playwright: login, configuração persistida, duas lojas isoladas e erros reais (2211.364196ms)
+  Error: EACCES: permission denied, open '/app/artifacts/panel.png'
+      at async open (node:internal/fs/promises:1345:25)
+      at async Object.writeFile (node:internal/fs/promises:1965:14)
+      at async _Page.screenshot (/app/node_modules/playwright-core/lib/coreBundle.js:61797:11)
+      at async TestContext.<anonymous> (file:///app/tests/foundation.test.mjs:146:9)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/foundation.test.mjs:35:35)
+      at async TestContext.<anonymous> (file:///app/tests/foundation.test.mjs:130:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/panel.png'
+  }
+
+test at tests/foundation.test.mjs:35:43
+✖ EXPLAIN ANALYZE das consultas mínimas sem índices especulativos (4.36325ms)
+  Error: EACCES: permission denied, open '/app/artifacts/query-plans.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/foundation.test.mjs:174:7)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async check (file:///app/tests/foundation.test.mjs:35:35)
+      at async TestContext.<anonymous> (file:///app/tests/foundation.test.mjs:172:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/query-plans.json'
+  }
+
+test at tests/foundation.test.mjs:25:1
+✖ Fundação integrada — PostgreSQL real e app_user (9131.115724ms)
+  Error: EACCES: permission denied, open '/app/artifacts/restore-fixture.json'
+      at writeFileSync (node:fs:2483:20)
+      at TestContext.<anonymous> (file:///app/tests/foundation.test.mjs:181:50)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1404:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -13,
+    code: 'EACCES',
+    syscall: 'open',
+    path: '/app/artifacts/restore-fixture.json'
+  }
+
+
+=== Logs sanitizados ===
+
+=== Persistência S3 após reinício local ===
+ Container ecommerce-phase7-test-storage-1 Restarting 
+ Container ecommerce-phase7-test-storage-1 Started 
+ Container ecommerce-phase7-test-storage-1 Running 
+ Container ecommerce-phase7-test-storage-1 Waiting 
+ Container ecommerce-phase7-test-storage-1 Healthy 
+ Container ecommerce-phase7-test-tests-run-4ebc21e69a0f Creating 
+ Container ecommerce-phase7-test-tests-run-4ebc21e69a0f Created 
+S3 autenticado pronto; bucket existente preservado.
+
+=== CLI do operador: status e alertas por loja ===
+
+=== Backup PostgreSQL 17 ===
+Backup lógico criado em /tmp/foundation.dump no container PostgreSQL; copie-o para destino seguro antes de recriar o container.
+
+=== Fatos após o backup: pagamentos/devolução e eliminação com ledger externo ===
+ Container ecommerce-phase7-test-tests-run-20827728dd30 Creating 
+ Container ecommerce-phase7-test-tests-run-20827728dd30 Created 
+✖ Fatos posteriores ao backup: pagamento/devolução no provedor e eliminação de dados pessoais (1.252544ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 881.680911
+
+✖ failing tests:
+
+test at tests/post-backup.test.mjs:13:1
+✖ Fatos posteriores ao backup: pagamento/devolução no provedor e eliminação de dados pessoais (1.252544ms)
+  Error: ENOENT: no such file or directory, open '/app/artifacts/recovery-fixture.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///app/tests/post-backup.test.mjs:14:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/app/artifacts/recovery-fixture.json'
+  }
+
+
+=== Restore separado ===
+REVOKE
+GRANT
+Restauração concluída em ecommerce_restore. Conferências de dados/RLS são feitas pelo runner de verificação.
+
+=== Conferências após restore ===
+ Container ecommerce-phase7-test-tests-run-05649eeb468b Creating 
+ Container ecommerce-phase7-test-tests-run-05649eeb468b Created 
+✖ Restore preserva pedidos, recebimentos, incidentes e estado da outbox sem reemitir cobranças (1.553069ms)
+✖ T26/T32: restauração antiga, conciliação sem nova cobrança e reaplicação das eliminações (1.260378ms)
+✖ Backup restaurado preserva configurações, vínculos e isolamento como app_user (1.779309ms)
+✖ Restore preserva catálogo/estoque/tema/carrinhos e objetos S3 locais existentes (1.872125ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2873.971764
+
+✖ failing tests:
+
+test at tests/purchase-restore.test.mjs:6:1
+✖ Restore preserva pedidos, recebimentos, incidentes e estado da outbox sem reemitir cobranças (1.553069ms)
+  Error: ENOENT: no such file or directory, open '/app/artifacts/purchase-fixture.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///app/tests/purchase-restore.test.mjs:7:135)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/app/artifacts/purchase-fixture.json'
+  }
+
+test at tests/recovery.test.mjs:10:1
+✖ T26/T32: restauração antiga, conciliação sem nova cobrança e reaplicação das eliminações (1.260378ms)
+  Error: ENOENT: no such file or directory, open '/app/artifacts/recovery-fixture.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///app/tests/recovery.test.mjs:11:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/app/artifacts/recovery-fixture.json'
+  }
+
+test at tests/restore.test.mjs:7:1
+✖ Backup restaurado preserva configurações, vínculos e isolamento como app_user (1.779309ms)
+  Error: ENOENT: no such file or directory, open '/app/artifacts/restore-fixture.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///app/tests/restore.test.mjs:10:28)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/app/artifacts/restore-fixture.json'
+  }
+
+test at tests/storefront-restore.test.mjs:7:1
+✖ Restore preserva catálogo/estoque/tema/carrinhos e objetos S3 locais existentes (1.872125ms)
+  Error: ENOENT: no such file or directory, open '/app/artifacts/phase2-fixture.json'
+      at readFileSync (node:fs:484:20)
+      at TestContext.<anonymous> (file:///app/tests/storefront-restore.test.mjs:8:142)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1397:25)
+      at Test.start (node:internal/test_runner/test:1257:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/app/artifacts/phase2-fixture.json'
+  }
+
+
+=== PITR: base física + WAL, recuperação a um ponto no tempo em container limpo (RPO/RTO) ===
+{"passed":true,"rpoObservedSeconds":59.8,"rtoDrillSeconds":2.8}
+Evidência obrigatória ausente: foundation.json
+
+Fase 7: código 2 (externos SIMULADOS — não equivale a homologação real). Evidência: docs/execucao/evidencias/fase-7/verification.continuada.simulado.json
+
+real	6m15.377s
+user	0m6.510s
+sys	0m4.627s
