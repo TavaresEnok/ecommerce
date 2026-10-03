@@ -24,6 +24,7 @@ node docs/design/verificar-teclado.mjs              # foco, diálogo, variação
 node docs/design/verificar-aceite.mjs               # cenários do ACEITE fora das suítes (ALTERA os dados sintéticos)
 ```
 
+- Tudo de uma vez, do zero: `bash docs/design/ambiente/rodada-completa.sh [pasta-de-fotos]`. Sai com **0 só se todas as etapas passarem** e com 1 se qualquer captura, `verificar-teclado.mjs`, `--so-pendente` ou `verificar-aceite.mjs` falhar (o resumo final lista as etapas); falha em `limpar`/`subir`/`dados` interrompe na hora. Logs em `.local/rodada-*.log`.
 - O pedido “aguardando pagamento” vence em 40 minutos (reserva real do domínio). Para recriá-lo sem refazer o resto: `node docs/design/ambiente/ambiente.mjs dados --so-pendente`.
 - `verificar-aceite.mjs --only=ID,ID` executa só alguns cenários; ele expede pedidos, pausa e retoma vendas, suspende e reativa uma loja de teste e cria pedidos. Para recomeçar do zero: `limpar`, `subir`, `dados`.
 - No contêiner do Playwright (sem Chromium no host): `docker run --rm --network host -v "$PWD":/w -w /w mcr.microsoft.com/playwright:v1.63.0-noble node docs/design/capturar-rotas.mjs depois`.

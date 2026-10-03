@@ -130,4 +130,6 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 
 **Verificação por fase:** [evidências e procedimento](evidencias/verificacao/LEIA-ME.md). T23 (upload de 10 MB pelo proxy do Next, ~15% de 500 por EPIPE) e o 429 do pilot-flow reproduzem na base com o mesmo procedimento; ficaram como tarefas separadas. Nenhuma integração externa refeita; nada aqui é homologação real.
 
+**Defeito no script da rodada (encontrado depois, corrigido):** a primeira versão de `rodada-completa.sh` saía com 0 mesmo quando teclado e aceite falhavam (as falhas só eram impressas e o último comando era `grep`). Os resultados desta rodada foram lidos nos logs e em `aceite.json`, não no código de saída: a última rodada teve aceite com saída 1 (A-R01-06, registrado acima). Agora cada etapa tem o código de saída verificado e a rodada sai com 1 se alguma falhar; testado numa cópia isolada com `node` simulado (tudo passa → 0; teclado e aceite falham → 1; só aceite → 1; capturas → 1; preparação → 1 e interrompe) e a versão anterior reproduzida com saída 0 no mesmo cenário.
+
 **Pendências abertas:** G-13 (falhas preexistentes acima); verificação continuada sobre `ff73c7d`; zoom real do navegador; percurso de Tab nas demais rotas; leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).
