@@ -65,7 +65,7 @@ test('Fase 6: comercialização preparada sem terceiros',async t=>{
    let v=expect(await api(`tenants/${a.id}/billing`,{actor:a.actor}),200);assert.equal(v.plan.code,'PROFISSIONAL');assert.equal(v.invoices.length,1);assert.equal(v.invoices[0].amount_cents,'4990');firstInvoice=v.invoices[0];
    const provider=new SimulatedBillingProvider(db);await billingCycle(db,a.id,provider);
    await tx(a.id,t=>t.execute(sql`update shop.simulated_saas_charges set status='PAID' where invoice_id=${firstInvoice.id}`));
-   const event={tenant_id:a.id,event_id:'evt-1',invoice_id:firstInvoice.id},sig=billingSignature(a.id,'evt-1',firstInvoice.id);
+   const eventId=`evt-${randomUUID()}`,event={tenant_id:a.id,event_id:eventId,invoice_id:firstInvoice.id},sig=billingSignature(a.id,eventId,firstInvoice.id); // ID único por execução: a deduplicação é global, como no provedor
    expect(await api('billing/simulated/webhook',{method:'POST',headers:{'x-billing-signature':'0'.repeat(64)},body:event}),401);
    assert.equal(expect(await api('billing/simulated/webhook',{method:'POST',headers:{'x-billing-signature':sig},body:event})).duplicate,false);assert.equal(expect(await api('billing/simulated/webhook',{method:'POST',headers:{'x-billing-signature':sig},body:event})).duplicate,true);
    await billingCycle(db,a.id,provider);v=expect(await api(`tenants/${a.id}/billing`,{actor:a.actor}),200);assert.equal(v.invoices[0].status,'PAID');assert.equal(v.subscription.status,'ACTIVE');
