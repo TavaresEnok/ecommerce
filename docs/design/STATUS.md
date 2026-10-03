@@ -1,7 +1,7 @@
 # Status dos materiais de design
 
 **Data:** 03/10/2026 · **Base:** `0179f4d` (produto, fases 0 a 7) + `831d9a2` (materiais) · **Branch:** `claude/gallant-fermat-6x20fs`
-**Estado:** redesign **implementado nas rotas reais R01–R14** (lotes A, B e C) + rodada de correções de 03/10. ACEITE: 86 aprovados, 1 reprovado preexistente (G-13), 1 alterado. **Entrega não concluída como um todo** enquanto G-13 (429 do pilot-flow e T23, preexistentes) seguir reprovado — detalhes, resultados e pendências em [RELATORIO-FINAL.md](RELATORIO-FINAL.md); critérios em [ACEITE.md](ACEITE.md). **Não houve aprovação visual do responsável.** O redesign **não** torna o sistema pronto para produção.
+**Estado:** redesign **implementado nas rotas reais R01–R14** (lotes A, B e C) + rodada de correções de 03/10. ACEITE: 86 aprovados, 1 parcial (G-13: 429 resolvido em `6a0d195`; falta o T23 intermitente), 1 alterado. **Entrega não concluída como um todo** enquanto o T23 seguir intermitente — detalhes, resultados e pendências em [RELATORIO-FINAL.md](RELATORIO-FINAL.md); critérios em [ACEITE.md](ACEITE.md). **Não houve aprovação visual do responsável.** O redesign **não** torna o sistema pronto para produção.
 
 ## 0. Implementação (prompt 2) — registro de progresso
 
@@ -73,6 +73,6 @@ Revisão crítica (registrada):
 ## 5. Próximos passos sugeridos
 
 1. Revisão visual do responsável sobre [`evidencias/depois/`](evidencias/depois/) comparando com [`evidencias/antes/`](evidencias/antes/).
-2. Resolver G-13 (429 do pilot-flow e T23, preexistentes; tarefas separadas).
+2. Resolver o T23 (upload pelo proxy do Next) e o limite por IP de produção atrás do proxy (tarefas separadas).
 3. Decidir as pendências de produto listadas no RELATORIO-FINAL.md §6 (proporção de foto por loja, links do preview, distinção endereço/SKU no 409, sinal de pagamento por loja, campos do checkout).
 4. Teste com leitor de tela real.

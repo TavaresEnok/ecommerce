@@ -10,10 +10,10 @@
 | Eixo | Situação | Base |
 |---|---|---|
 | **Implementação** | Lotes A, B e C concluídos; rodada de correções da revisão de `7f5572d` concluída (§8). Nenhuma regra de negócio nem resposta de API alterada | §2–§3, §8 |
-| **Funcional** | **Não concluído só pelo G-13 (preexistente).** `verificar-aceite.mjs` 65/65, `verificar-teclado.mjs` 12/12 e percurso de Tab 159/159. Verificação integrada no commit `deecdc1` (execução continuada): 15 de 16 etapas; reprova só o pilot-flow “Interface”, que reprova igual na base por limite de requisições (429) | §4, §8, [verificação](evidencias/verificacao/LEIA-ME.md) |
-| **Visual** | ACEITE: 88 critérios — **86 aprovados**, **1 reprovado preexistente** (G-13) e **1 alterado** (A-R12-07). Zoom real do navegador (200% e 400%) e Tab completo em todas as rotas executados. **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
+| **Funcional** | **Não concluído só pelo T23.** O 429 do G-13 foi resolvido em `6a0d195` (isolamento do limitador entre lotes de suítes, sem mudar o limite): duas execuções completas da fase 7 com código 0, 16/16. `verificar-aceite.mjs` 65/65, `verificar-teclado.mjs` 12/12, Tab 159/159. **T23** (upload de 10 MB + 1 → 500 em ~15% pelo proxy do Next) segue intermitente | §4, §8, §9, [verificação](evidencias/verificacao/LEIA-ME.md) |
+| **Visual** | ACEITE: 88 critérios — **86 aprovados**, **1 parcial** (G-13: falta só o T23) e **1 alterado** (A-R12-07). **Aprovação visual do responsável: pendente** | §5, [ACEITE.md](ACEITE.md) |
 
-A entrega **não** está concluída como um todo enquanto G-13 (falha preexistente das suítes: 429 no pilot-flow e T23 intermitente) seguir reprovado.
+A entrega **não** está concluída como um todo enquanto o T23 (parte do G-13) seguir intermitente.
 
 ## 2. Rotas alteradas
 
@@ -134,4 +134,17 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 
 **Defeito no script da rodada (encontrado depois, corrigido):** a primeira versão de `rodada-completa.sh` saía com 0 mesmo quando teclado e aceite falhavam (as falhas só eram impressas e o último comando era `grep`). Os resultados desta rodada foram lidos nos logs e em `aceite.json`, não no código de saída: a última rodada teve aceite com saída 1 (A-R01-06, registrado acima). Agora cada etapa tem o código de saída verificado e a rodada sai com 1 se alguma falhar; testado numa cópia isolada com `node` simulado (tudo passa → 0; teclado e aceite falham → 1; só aceite → 1; capturas → 1; preparação → 1 e interrompe) e a versão anterior reproduzida com saída 0 no mesmo cenário.
 
-**Pendências abertas:** G-13 (429 do pilot-flow e T23, preexistentes, registrados como tarefas separadas); leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).
+**Pendências abertas:** T23 (upload de 10 MB + 1 pelo proxy do Next, intermitente; tarefa separada); limite por IP em produção agrupa todos os clientes atrás do proxy (tarefa separada); leitor de tela real; aprovação visual do responsável; ordenação de `purchase/orders`; campos do checkout (decisão de produto).
+
+## 9. G-13: limite de requisições e isolamento entre testes (03/10/2026, `6a0d195`)
+
+- **Causa provada:** a API limita por IP do socket (`trustProxy: false`), em janela fixa de 1 min. Todo o tráfego dos testes passa pelo proxy do Next e chega com o IP do contêiner web, então as suítes dividiam uma única cota.
+  - As suítes de API gastam 785 requisições em ~20 s e as de interface começavam dentro da mesma janela.
+  - O navegador recebeu 429 em `purchase/accounts` e `operations/support`, e a tela mostrou “Limite de requisições excedido”.
+  - Sozinha, nenhuma suíte passa de 232 requisições.
+  - A prova anterior (“4 respostas 429 novas”) misturava 429 esperados do limite de IA e foi corrigida.
+- **Correção sem mudar o limite:** `scripts/verify.mjs` espera vencer a janela aberta por outro lote antes de cada lote e registra a espera.
+- **Repetibilidade:** `commercial.test.mjs` com ID de evento único.
+- **Resultado:** duas execuções completas da fase 7 com código 0 (16/16), contra 4 falhas do pilot-flow em 5 sequências antes. O custo é ≈ 3 min de espera por execução.
+- **Fora do escopo, registrado como tarefa:** em produção (Caddy → Next → API) o mesmo `trustProxy: false` faz todos os clientes dividirem a cota de 120/min.
+- **T23:** segue intermitente (passou nas duas execuções, o que não o resolve).

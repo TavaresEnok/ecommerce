@@ -1,0 +1,33 @@
+13:57:42.255 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=1avo8 net::ERR_ABORTED
+13:57:42.258 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=1avo8 net::ERR_ABORTED
+13:57:42.261 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?_rsc=1avo8 net::ERR_ABORTED
+13:57:42.282 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=1ehaf net::ERR_ABORTED
+13:57:42.285 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=1ehaf net::ERR_ABORTED
+13:57:42.285 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?_rsc=1ehaf net::ERR_ABORTED
+13:57:42.293 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/operacao?_rsc=1ehaf net::ERR_ABORTED
+13:57:42.521 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=698sb net::ERR_ABORTED
+13:57:42.521 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=698sb net::ERR_ABORTED
+13:57:42.524 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/atendimento?_rsc=698sb net::ERR_ABORTED
+13:57:42.524 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/operacao?_rsc=698sb net::ERR_ABORTED
+13:57:42.543 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=50t19 net::ERR_ABORTED
+13:57:42.545 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=50t19 net::ERR_ABORTED
+13:57:42.546 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?_rsc=50t19 net::ERR_ABORTED
+13:57:42.546 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/atendimento?_rsc=50t19 net::ERR_ABORTED
+13:57:42.552 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?pedido=01a1020e-4862-701d-9329-c7244d937748&_rsc=50t19 net::ERR_ABORTED
+13:57:42.552 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/operacao?_rsc=50t19 net::ERR_ABORTED
+13:57:42.963 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=lj51u net::ERR_ABORTED
+13:57:42.967 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=lj51u net::ERR_ABORTED
+13:57:42.974 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?_rsc=lj51u net::ERR_ABORTED
+13:57:42.985 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/atendimento?_rsc=lj51u net::ERR_ABORTED
+13:57:43.000 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=1fttb net::ERR_ABORTED
+13:57:43.003 ctx1 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=1fttb net::ERR_ABORTED
+13:57:43.922 ctx2 429 GET http://web:3000/api/tenants/01a1020e-44fb-75e6-b984-bfecc5cd8319/purchase/accounts
+13:57:43.923 ctx2 console Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+13:57:43.957 ctx2 429 GET http://web:3000/api/tenants/01a1020e-44fb-75e6-b984-bfecc5cd8319/operations/support?filter=open
+13:57:43.957 ctx2 console Failed to load resource: the server responded with a status of 429 (Too Many Requests)
+13:57:43.967 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?aba=vitrine&_rsc=1avo8 net::ERR_ABORTED
+13:57:43.971 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/operacao?_rsc=1avo8 net::ERR_ABORTED
+13:57:43.984 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319?_rsc=1ehaf net::ERR_ABORTED
+13:57:43.984 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/pedidos?_rsc=1ehaf net::ERR_ABORTED
+13:57:43.984 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/atendimento?_rsc=1ehaf net::ERR_ABORTED
+13:57:43.988 ctx2 FALHOU http://web:3000/painel/01a1020e-44fb-75e6-b984-bfecc5cd8319/operacao?_rsc=1ehaf net::ERR_ABORTED
