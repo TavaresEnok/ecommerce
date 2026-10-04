@@ -1,6 +1,6 @@
 # Telas e fluxos — inventário e especificação
 
-Base: commit `0179f4d`, arquivos reais de `apps/web/app` e controladores de `apps/api/src`. Fundamentos e componentes em [DESIGN.md](../../DESIGN.md). Critérios verificáveis em [ACEITE.md](ACEITE.md); lote de cada rota em [IMPLEMENTACAO.md](IMPLEMENTACAO.md).
+Base: commit `0179f4d` + evolução de UX/personalização de 03/10/2026 (lotes A–C), arquivos reais de `apps/web/app` e controladores de `apps/api/src`. Fundamentos e componentes em [DESIGN.md](../../DESIGN.md). Critérios verificáveis em [ACEITE.md](ACEITE.md); lote de cada rota em [IMPLEMENTACAO.md](IMPLEMENTACAO.md).
 
 Legenda de estado: **Implementado** (rota existe hoje), **Previsto** (exigido pela especificação, sem rota/tela própria), **Dependente de integração** (tela existe ou é prevista, mas a parte real depende de conta/fornecedor externo ainda não homologado).
 
@@ -11,24 +11,27 @@ O verificador lê esta tabela: código, rota, estado e arquivo precisam existir.
 | Código | Rota | Estado | Arquivo | Conteúdo atual | Componentes envolvidos |
 |---|---|---|---|---|---|
 | R01 | `/` | Implementado | `apps/web/app/page.tsx` | Entrar, criar acesso local, verificar e-mail, recuperar senha; lojas vinculadas; criar loja; configuração (nome, fuso); equipe e convites; aceitar convite; sair/revogar sessões | — |
-| R02 | `/painel/[tenantId]` | Implementado | `apps/web/app/painel/[tenantId]/page.tsx` | Produtos, variações, preço, categorias, locais, ajuste de estoque, mídia, vínculo de imagem; fornecedor/políticas, tema (rascunho/publicação), frete local | `components/storefront.tsx` (`money`) |
-| R03 | `/painel/[tenantId]/pedidos` | Implementado | `apps/web/app/painel/[tenantId]/pedidos/page.tsx` | Conta de pagamento (SIMULADA), filtros, lista, detalhe com expedição, incidentes, pagamentos, notificações, fiscal, correção de endereço, privacidade, protocolos, histórico | — |
+| R02 | `/painel/[tenantId]` | Implementado | `apps/web/app/painel/[tenantId]/page.tsx` | Produtos (lista com busca de escopo declarado e filtros na URL; `?novo=1` cadastro; `?produto=<id>` edição progressiva), Estoque (`?aba=estoque`), Imagens (`?aba=midia`), Categorias e locais (`?aba=organizacao`); `?aba=vitrine` → R15 e `?aba=frete` → R16 | `components/panel/catalog.tsx`, `components/panel/MediaUploader.tsx` |
+| R03 | `/painel/[tenantId]/pedidos` | Implementado | `apps/web/app/painel/[tenantId]/pedidos/page.tsx` | Lista com próximo passo por pedido e visões rápidas (Precisam de atenção, A enviar, Em separação, Enviados), filtros (recolhidos no celular), conta de pagamento no fim (recolhível; aviso no topo se não houver conta), detalhe com expedição, incidentes, pagamentos, notificações, fiscal, correção de endereço, privacidade, protocolos, histórico | — |
 | R04 | `/painel/[tenantId]/atendimento` | Implementado | `apps/web/app/painel/[tenantId]/atendimento/page.tsx` | Protocolos (abertos/atrasados/todos), detalhe, comunicação financeira, assumir, responder, concluir | — |
-| R05 | `/painel/[tenantId]/operacao` | Implementado | `apps/web/app/painel/[tenantId]/operacao/page.tsx` | Alertas, pausar/retomar vendas, exportação, descrição com IA, MFA, plano e faturas, domínio próprio, transportadora | `components/ai-draft.tsx`, `components/commercial.tsx` |
+| R05 | `/painel/[tenantId]/operacao` | Implementado | `apps/web/app/painel/[tenantId]/operacao/page.tsx` | “Hoje”: alertas, contadores que abrem listas filtradas, vendas (pausa recolhida), atalhos; âncoras antigas redirecionam para R16 | `components/panel/Shell.tsx` |
 | R06 | `/plataforma` | Implementado | `apps/web/app/plataforma/page.tsx` | MFA, lojas (consultar/suspender/reativar com motivo), alertas por loja, ciclo de cobrança, planos versionados, auditoria | — |
-| R07 | `/preview/[tenantId]` | Implementado | `apps/web/app/preview/[tenantId]/[[...path]]/page.tsx` | Rascunho do tema renderizado pela vitrine, autorizado e noindex | `components/storefront.tsx` |
-| R08 | `/lojas/[slug]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Início/catálogo, busca `?q=`, categorias, grade de produtos | `components/storefront.tsx`, `components/store-data.ts` |
+| R07 | `/preview/[tenantId]` | Implementado | `apps/web/app/preview/[tenantId]/[[...path]]/page.tsx` | Rascunho do tema renderizado pela vitrine (início, catálogo, categorias, páginas, produtos), autorizado e noindex; com `?editor=1`, recebe o tema não salvo do editor (R15) | `components/storefront.tsx`, `components/preview-live.tsx` |
+| R08 | `/lojas/[slug]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Início montado pelas seções do tema (destaque, produtos, categorias, imagem com texto, texto), busca `?q=` | `components/storefront.tsx`, `components/store-data.ts` |
 | R09 | `/lojas/[slug]/categorias/[categoria]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Catálogo filtrado por categoria | idem |
 | R10 | `/lojas/[slug]/produtos/[produto]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Produto, imagens, descrição, variação, quantidade, adicionar ao carrinho; JSON-LD; redirecionamento de slug antigo | idem |
 | R11 | `/lojas/[slug]/paginas/[pagina]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Página institucional do tema | idem |
 | R12 | `/lojas/[slug]/carrinho` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Carrinho, cotação de frete (tabela, retirada, transportadora), dados do comprador, revisão e confirmação | `components/storefront.tsx` (`Cart`), `components/checkout.tsx` (`Checkout`) |
 | R13 | `/lojas/[slug]/pedidos/[id]` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Comprovante, estados, nova tentativa de pagamento, solicitações (atendimento, arrependimento, cancelamento, dados), protocolos; acesso por segredo no fragmento `#acesso=` | `components/checkout.tsx` (`OrderView`) |
 | R14 | `/lojas/[slug]/atendimento` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Contato geral sem compra e acompanhamento de protocolo por código | `components/checkout.tsx` (`ContactPage`) |
+| R15 | `/painel/[tenantId]/aparencia` | Implementado | `apps/web/app/painel/[tenantId]/aparencia/page.tsx` | Editor de aparência: modelo, identidade, layout e fotos, seções da página inicial, menu, rodapé, páginas, histórico; prévia ao vivo celular/computador; salvar rascunho, publicar, restaurar, republicar versão | `components/panel/appearance.tsx`, `components/theme-model.ts`, `components/brand.ts` |
+| R16 | `/painel/[tenantId]/configuracoes/[secao]` | Implementado | `apps/web/app/painel/[tenantId]/configuracoes/[secao]/page.tsx` | `loja` (nome, fuso, fornecedor e políticas), `entregas` (formas de entrega e transportadora), `dominio`, `seguranca` (verificação em duas etapas), `plano`, `dados` (exportação e descrição com IA); outra seção → 404 | `components/panel/settings.tsx`, `components/ai-draft.tsx` |
+| R17 | `/lojas/[slug]/produtos` | Implementado | `apps/web/app/lojas/[slug]/[[...path]]/page.tsx` | Catálogo completo com faixa de categorias (“Todos os produtos”) | `components/storefront.tsx` |
 
 Observações do inventário:
 - Em subdomínio gerenciado ou domínio próprio ativo, `apps/web/proxy.ts` reescreve `/…` para `/lojas/[slug]/…`: as telas R08–R14 são as mesmas sem o prefixo.
 - `/lojas/[slug]/robots.txt` e `/lojas/[slug]/sitemap.xml` não têm interface e ficam fora do redesign.
-- Não existe `not-found.tsx` nem `error.tsx`: 404 da vitrine usa a página padrão do Next.js e o proxy responde texto puro (“Loja não encontrada”). Tratamento visual de 404/erro entra no lote 3 sem criar rota nova (arquivos convencionais do App Router).
+- 404 da vitrine: `apps/web/app/lojas/[slug]/not-found.tsx` (“Página não encontrada” com volta ao início); o proxy responde texto puro (“Loja não encontrada”) para host desconhecido.
 - Não existe rota própria de checkout nem de confirmação: o checkout fica em R12 e a confirmação/acompanhamento em R13 (decisão D-07: manter).
 
 ## 2. Previsto e dependente de integração (sem inventar URL)
@@ -63,31 +66,31 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 - **Preservar para testes:** formulário “Entrar”, rótulos “E-mail”, “Senha”, “Nome de exibição”; botões “Entrar”, “Sair”, “Salvar configuração” e o nome acessível do botão de loja no formato “Nome — Dono/Funcionário”.
 - **Critérios:** A-R01-*.
 
-### R02 — Catálogo e vitrine (`/painel/[tenantId]`)
+### R02 — Catálogo (`/painel/[tenantId]`)
 
-- **Usuário:** Dono e Funcionário (fornecedor, tema e frete: só Dono).
-- **Tarefa:** listar e encontrar produtos; cadastrar produto simples; editar informações e status; adicionar variações; ajustar preço; ajustar estoque com motivo; enviar/vincular imagens; organizar categorias/locais; (Dono) perfil do fornecedor, tema e publicação, frete local.
-- **Hierarquia:** casca do painel → PageHeader “Produtos” (ações: “Novo produto” principal, “Ajustar estoque”) → SubNav `Produtos · Estoque · Mídia · Categorias e locais` → DataTable de produtos. Edição: visão de produto na mesma rota (`?produto=<id>` proposto, D-09) com coluna principal (Informações, Variações, Imagens, Estoque) e lateral (Publicação, Organização, Descrição com IA). Vitrine e frete: seção própria (`#vitrine`) com Fornecedor e políticas, Tema (rascunho → preview → publicar) e Frete local.
-- **Ação principal:** listagem “Novo produto”; edição “Salvar informações”; vitrine “Publicar vitrine local” (depois de salvar rascunho).
-- **Dados/API:** `GET tenants/:id/catalogue` (produtos+variações, categorias, locais, saldos, movimentos, mídia; até 100), `POST catalogue/products`, `PATCH catalogue/products/:id` (nome, slug, descrição, status, categoria), `POST catalogue/products/:id/variants` (SKU, preço, atributos 1–5, peso/dimensões), `PATCH catalogue/variants/:id` (preço, peso, dimensões), `POST catalogue/categories|locations|adjustments|media|media/maintenance|products/:id/media`; `GET tenants/:id/storefront`, `POST storefront/profile|draft|publish|shipping`.
-- **Estados:** carregando catálogo; nenhum produto (vazio com “Cadastrar primeiro produto”); busca sem resultado; produto sem foto; variação esgotada; mídia processando/falhou; cota de mídia excedida (409); SKU/slug em conflito (409); saldo insuficiente ao reduzir (409); Funcionário sem acesso a fornecedor/tema/frete; publicação falhou (rascunho preservado).
-- **Desktop/celular:** tabela completa ≥ 768 px; lista empilhada < 768 px; edição em duas colunas ≥ 1024 px, coluna única abaixo.
-- **Preservar para testes:** heading “Cadastrar produto simples” (formulário de criação, pode ficar dentro de “Novo produto”), formulários com `aria-label` atuais, botões “Publicar vitrine local”, campo de JSON substituído só se o teste for atualizado junto.
-- **Protótipo:** Composições 1 e 2.
-- **Critérios:** A-R02-*.
+- **Usuário:** Dono e Funcionário.
+- **Tarefa:** encontrar produtos; cadastrar; editar o essencial (nome, preço, disponibilidade, situação, descrição) e, quando preciso, organização/endereço, imagens, variações e estoque por local.
+- **Hierarquia (lista):** PageHeader “Produtos” (contagem, “Novo produto”) → busca cujo rótulo diz o escopo (“Buscar em N produtos”; no limite de 100, “Buscar nos primeiros 100 produtos (A–Z)” + aviso) → filtros Situação/Categoria (sempre visíveis ≥ 768 px; no celular atrás de “Filtros” com contagem) → chips dos filtros aplicados → linhas compactas (celular: foto, nome, categoria, preço, saldo; primeiro item visível em 390×844) ou tabela (desktop). Busca e filtros ficam na URL e são lembrados ao voltar da edição.
+- **Hierarquia (edição, `?produto=<id>`):** “‹ Produtos” → h1 nome + situação + “Ver na loja” → Informações principais (nome; preço editável quando há uma variação, faixa + “Editar nas variações” quando há várias; disponível para venda + “Ajustar estoque”; situação; descrição) → bloco recolhível “Organização e endereço” (categoria e endereço; abre sozinho com erro) → barra de salvar fixa → Imagens (MediaUploader; vínculo automático ao terminar) → recolhíveis “Variações” e “Estoque por local”. Sair com alterações pergunta antes.
+- **Cadastro (`?novo=1`):** página própria (Nome, Preço, SKU, Descrição, Categoria, Endereço na loja preenchido a partir do nome); conflito de endereço/SKU volta ao campo certo com a mensagem da API.
+- **Ação principal:** lista “Novo produto”; edição “Salvar alterações”; cadastro “Cadastrar produto”.
+- **Dados/API:** `GET tenants/:id/catalogue` (até 100 produtos por nome), `POST catalogue/products` (pré-checagem de endereço e SKU → 409 com mensagem), `PATCH catalogue/products/:id`, `POST catalogue/products/:id/variants`, `PATCH catalogue/variants/:id`, `POST catalogue/categories|locations|adjustments|media|media/maintenance|products/:id/media`.
+- **Estados:** carregando; nenhum produto (“Cadastre o primeiro produto”); busca sem resultado (“Nada encontrado para …” + “Limpar busca e filtros”); produto sem foto; variação esgotada; envio de imagem (conferindo, na fila, enviando %, processando no servidor, pronta, falhou + tentar de novo); conflitos 409; saldo insuficiente; salvar parcial (nome salvo, preço não) explicado.
+- **Desktop/celular:** tabela ≥ 768 px; linhas compactas abaixo; edição em coluna única de até 52rem.
+- **Preservar para testes:** heading “Produtos”, formulários “Cadastrar produto” e “Ajustar estoque” com os rótulos atuais, “Limpar busca e filtros”, “Carregando dados autorizados do catálogo…”.
+- **Critérios:** A-R02-*, UX01, UX02, UX04, UX05, UX06, UI01.
 
 ### R03 — Pedidos (`/painel/[tenantId]/pedidos`)
 
 - **Usuário:** Dono e Funcionário (cancelar, anotar incidente, realocar, reprocessar eventos, corrigir endereço, privacidade e conta de pagamento: só Dono).
-- **Tarefa:** encontrar pedidos com pendência; entender estado em quatro dimensões; separar, enviar, marcar retirada, confirmar entrega; tratar incidente financeiro pelo procedimento do piloto; registrar referência fiscal; atender privacidade.
-- **Hierarquia:** lista: PageHeader “Pedidos” → filtros do servidor (pagamento, entrega, pedido, número, “somente com pendências”) → DataTable (Nº, data, comprador, total, pagamento, entrega, pendências). Detalhe: trilha `Pedidos / Nº` → h1 “Pedido nº N” → faixa de estados → FinancialAlert (se houver) → coluna principal (Itens e totais, Pagamentos e recebimentos com total recebido/devolvido/a devolver, Expedição com bloqueios, Incidentes, Histórico) → lateral (Comprador, Entrega, Notificações, Protocolos, Documento fiscal, Ações do Dono). Conta de pagamento sai do topo da lista para um bloco compacto “Conta de pagamento: SIMULADA · Conectada” com link para gerenciar.
-- **Ação principal:** a próxima ação de expedição permitida (Iniciar separação → Registrar envio / Marcar pronto para retirada → Confirmar entrega). Com bloqueio: botão desabilitado + motivos do servidor.
-- **Dados/API:** `GET tenants/:id/operations/orders?…`, `GET purchase/orders/:id`, `GET operations/orders/:id/impediments|notifications`, `POST operations/orders/:id/process|ship|pickup-ready|deliver|return|fiscal|reconcile|access/revoke|erase|incidents/:iid/resolve`, `POST purchase/orders/:id/cancel|address|outbox/retry|reallocate|incidents/:iid/note`, `GET/POST purchase/accounts…`, `POST operations/exports`, `POST purchase/attempts/:id/simulate` (somente SIMULADO).
-- **Estados:** carregando; nenhum pedido; filtro sem resultado; pagamento aguardando; resultado desconhecido (UNKNOWN); excedente/devolução pendente; pago sem estoque; disputa aberta; cancelado; retirada; notificação falhou; eventos com falha; comprador anonimizado.
-- **Desktop/celular:** lista em tabela ≥ 768 px, empilhada abaixo; detalhe em duas colunas ≥ 1024 px.
-- **Preservar para testes:** heading “Pedidos recentes” (pode ser o título da lista), botão de pedido com nome “Nº N”, headings “Expedição”, “Notificações ao comprador”, “Protocolos do consumidor”.
-- **Protótipo:** Composição 3.
-- **Critérios:** A-R03-*.
+- **Tarefa:** saber o que fazer primeiro; separar, enviar, marcar retirada, confirmar entrega; tratar incidente financeiro pelo procedimento do piloto; registrar referência fiscal; atender privacidade.
+- **Hierarquia (lista):** PageHeader “Pedidos” → aviso se não há conta de pagamento (com “Conectar conta SIMULADA”) → “Pedidos recentes” → visões rápidas (Todos, Precisam de atenção, A enviar, Em separação, Enviados) → filtros do servidor (recolhidos no celular) → tabela: Pedido, **Próximo passo** (devolver valor, responder disputa, resolver pendência, responder solicitação, aguardar pagamento, separar, registrar envio, confirmar entrega, concluído), Pagamento, Entrega, Total, Data; linhas com pendência financeira marcadas à esquerda → bloco recolhível “Conta de pagamento” (conta simulada, sem dinheiro real; revogar). Sem nenhum pedido: só o estado vazio.
+- **Hierarquia (detalhe):** inalterada — trilha `Pedidos / Nº` → h1 “Pedido nº N” → estados → FinancialAlert → itens e totais, pagamentos, expedição com bloqueios, incidentes, histórico → lateral com comprador, entrega e ações.
+- **Ação principal:** na lista, abrir o pedido do topo de “Precisam de atenção”; no detalhe, a próxima ação de expedição permitida.
+- **Dados/API:** `GET tenants/:id/operations/orders?payment_status&fulfillment_status&order_status&number&pending`, demais rotas do detalhe inalteradas; nenhuma regra financeira mudou (o próximo passo é só leitura dos estados).
+- **Estados:** carregando; nenhum pedido; nenhum pedido precisa de atenção; filtro sem resultado; resultado desconhecido (UNKNOWN = “Aguardando confirmação do pagamento”, nunca “recusado”); excedente/devolução pendente; disputa; cancelado; retirada.
+- **Preservar para testes:** heading “Pedidos recentes”, formulário “Filtrar pedidos” (`#f-pay`…), links “Nº N”, headings “Expedição”, “Notificações ao comprador”, “Protocolos do consumidor”.
+- **Critérios:** A-R03-*, UX03, UX05.
 
 ### R04 — Atendimento (`/painel/[tenantId]/atendimento`)
 
@@ -100,16 +103,16 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 - **Preservar para testes:** heading “Protocolos”, botão de protocolo com nome iniciando pelo tipo (“Contato geral…”), formulário “Responder consumidor”.
 - **Critérios:** A-R04-*.
 
-### R05 — Operação e conta (`/painel/[tenantId]/operacao`)
+### R05 — Hoje (`/painel/[tenantId]/operacao`)
 
-- **Usuário:** Dono (Funcionário vê alertas e IA conforme permissão atual).
-- **Tarefa:** entender alertas e o que fazer; pausar/retomar vendas; exportar dados; IA de descrição; MFA; plano e faturas; domínio próprio; transportadora.
-- **Hierarquia:** PageHeader “Operação” → Alertas (lista com código, quantidade e instrução — texto de `help` atual) → Vendas → Conta: MFA, Plano e faturas, Domínio próprio, Transportadora → Dados: Exportação → Descrição com IA. SubNav por âncoras.
-- **Ação principal:** depende do alerta; sem alertas, nenhuma ação principal destacada.
-- **Dados/API:** `GET operations/status`, `POST operations/sales/pause|resume|exports|carrier`, `GET/POST tenants/:id/ai/settings`, `POST catalogue/products/:id/ai-description`, `…/ai-generations/:id/save|discard`, `GET auth/session`, `POST auth/mfa/setup|enable|verify`, `GET tenants/:id/billing`, `POST billing/plan|cancel`, `GET/POST tenants/:id/domains`, `POST domains/:id/verify|canonical|disable`.
-- **Estados:** sem alertas (sucesso); alertas críticos; loja suspensa pela plataforma (vendas bloqueadas, explicação); vendas pausadas; MFA não configurado / não confirmado nesta sessão; códigos de recuperação exibidos uma vez; assinatura em atraso; nenhum plano publicado (D07); domínio em cada estado; IA desligada.
-- **Preservar para testes:** heading “Alertas”, regiões “Verificação em duas etapas” e “Plano e faturas”, formulários “Confirmar MFA”, “Cadastrar domínio”, “Configurar transportadora”, botões “Configurar MFA”, “Ativar”, “Confirmar”, “Cadastrar”, “Salvar”, textos “confirmado nesta sessão”, “Códigos de recuperação”, “Transportadora configurada.”.
-- **Critérios:** A-R05-*.
+- **Usuário:** Dono e Funcionário (pausar/retomar: só Dono).
+- **Tarefa:** ver o que pede atenção agora e ir direto para a lista certa.
+- **Hierarquia:** PageHeader “Hoje” → Alertas (“Tudo em dia” ou contadores — pedidos com pendência, aguardando pagamento, protocolos — que abrem as listas filtradas, mais os alertas operacionais com instrução) → Vendas (estado; pausa num bloco recolhível com motivo obrigatório) → Atalhos (cadastrar produto, ver pedidos, editar aparência, ver loja publicada).
+- **Dados/API:** `GET operations/status`, `POST operations/sales/pause|resume`.
+- **Estados:** sem alertas; alertas críticos; loja suspensa; vendas pausadas.
+- **Endereços antigos:** `#seguranca`, `#plano`, `#dominio`, `#transportadora`, `#dados`, `#ia` redirecionam para R16.
+- **Preservar para testes:** heading “Alertas”, formulário “Pausar vendas” (dentro do bloco “Pausar novas vendas”), “Novas vendas pausadas.”, “Retomar vendas”.
+- **Critérios:** A-R05-01, A-R05-02, UX03.
 
 ### R06 — Administração da plataforma (`/plataforma`)
 
@@ -122,14 +125,14 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 - **Preservar para testes:** headings “Lojas”, “Planos (versões imutáveis)”; textos “PILOT v1”, “Piloto”.
 - **Critérios:** A-R06-*.
 
-### R07 — Preview privado (`/preview/[tenantId]`)
+### R07 — Prévia privada (`/preview/[tenantId]`)
 
 - **Usuário:** integrante autorizado da loja.
-- **Tarefa:** conferir o rascunho do tema antes de publicar.
-- **Hierarquia:** faixa fixa de aviso “Preview privado do rascunho — não publicado” (tom pendente, ícone olho) com link “Voltar ao painel” → vitrine renderizada com tokens da loja. Carrinho/atendimento/pedidos mostram “Não disponível no preview”.
+- **Tarefa:** conferir o rascunho antes de publicar (aberta sozinha ou dentro do editor R15).
+- **Hierarquia:** faixa “Prévia privada do rascunho, não publicada” com “Voltar ao editor” (fora do editor) → loja renderizada pelo **mesmo** componente da loja pública. Início, catálogo, categorias, páginas e produtos têm versão privada; busca e carrinho não aparecem; carrinho, atendimento e pedidos digitados na barra mostram “Indisponível na prévia” com “Voltar ao início da prévia”; compra desativada no produto.
 - **Estados:** negado/rascunho inexistente (mensagem + “Entrar no painel”).
-- **Preservar para testes:** heading do título do rascunho.
-- **Critérios:** A-R07-*.
+- **Segurança:** `noindex`; só esta rota pode ser exibida em quadro, e só pela mesma origem.
+- **Critérios:** A-R07-*, PV-01, TH02, FN02.
 
 ### R08/R09 — Catálogo, busca e categoria (`/lojas/[slug]`, `/lojas/[slug]/categorias/[categoria]`)
 
@@ -139,8 +142,32 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 - **Ação principal:** abrir produto.
 - **Dados/API:** `GET public/stores/:slug?q=&category=` (até 100 produtos ativos), mídia `public/stores/:slug/media/:id/small|large`.
 - **Estados:** nenhum produto publicado; busca sem resultado (“Nenhum produto encontrado para ‘termo’” + limpar busca); produto sem foto; esgotado; loja sintética; loja suspensa (404 da vitrine, pedidos continuam em R13).
-- **Preservar para testes:** heading do título da loja, searchbox “Buscar produto ou SKU”, botão “Pesquisar”, links com nome do produto, heading “Fornecedor e atendimento”.
+- **Preservar para testes:** heading (h1) com o título da loja — único; o rodapé não repete o título como outro heading —, searchbox “Buscar produtos”, botão “Buscar”, links de produto cujo nome acessível é só o nome do produto, heading “Fornecedor e atendimento”.
 - **Critérios:** A-R08-*, A-R09-*.
+
+### R15 — Aparência (`/painel/[tenantId]/aparencia`)
+
+- **Usuário:** Dono (Funcionário vê “Somente o Dono altera a aparência”).
+- **Tarefa:** escolher um modelo, ajustar identidade e layout, montar a página inicial, editar menu/rodapé/páginas, conferir na prévia e publicar; voltar atrás com segurança.
+- **Hierarquia:** PageHeader “Aparência” (estado: alterações não salvas / rascunho salvo / ainda não publicada; “Ver loja publicada”; ações “Salvar rascunho” e “Publicar”) → aviso de conflito quando outra sessão salvou → controles (desktop à esquerda; celular em “Editar”): Modelo (prévia tentativa + o que muda/o que fica + opção de usar as seções sugeridas), Identidade (nome, descrição, logo, cor com explicação do ajuste de contraste, fonte dos títulos, botões), Layout e fotos, Página inicial (lista de seções com ↑/↓, editar, ocultar, duplicar, remover, adicionar), Menu, Rodapé, Páginas da loja, Histórico (trazer a publicada para o rascunho; republicar versão) → prévia (desktop à direita, fixa; celular em “Prévia”) com Celular (390 px) e Computador (1280 px reduzido para caber).
+- **Dados/API:** `GET tenants/:id/storefront` (rascunho v2 normalizado, estado, histórico, categorias), `GET catalogue` (produtos e imagens), `POST storefront/draft` (com `base_revision_id`), `POST storefront/publish` (revisão exata), `POST storefront/draft/restore`, `POST storefront/rollback` (`expected_published_id`), `POST catalogue/media`.
+- **Estados:** carregando; erro ao abrir; sem rascunho; alterações não salvas (sair pergunta antes); rascunho salvo; publicado; conflito 409 (nada gravado, recarregar); validação 400 com o motivo; dados da loja incompletos ao publicar (link para R16 loja); imagem de outra loja recusada.
+- **Preservar para testes:** heading “Aparência”, campo “Nome da loja”, botões “Salvar rascunho” e “Publicar”, iframe “Prévia da loja com as alterações”, abas “Editar”/“Prévia”, alerta “O rascunho mudou em outra sessão”, mensagens “Rascunho salvo. A loja publicada só muda quando você publicar.” e “Aparência publicada na loja.”.
+- **Critérios:** TH01–TH04, UI01, UI02, A-R02-12.
+
+### R16 — Configurações (`/painel/[tenantId]/configuracoes/[secao]`)
+
+- **Usuário:** Dono (Funcionário vê “Somente o Dono…” onde couber; Segurança e Dados e IA valem para qualquer integrante).
+- **Tarefa:** uma tarefa por página: dados da loja e do fornecedor, entregas, domínio, segurança da conta, plano e faturas, dados e IA.
+- **Hierarquia:** PageHeader com o nome da seção → aviso de verificação em duas etapas quando a ação exige → formulário/listas da seção.
+- **Dados/API:** os mesmos de antes (settings, storefront/profile, storefront/shipping, operations/carrier, domains, auth/mfa, billing, operations/exports, ai).
+- **Estados:** carregando; vazio (sem formas de entrega, sem domínio); verificação pendente; códigos de recuperação exibidos uma vez; domínio em cada estado; nenhum plano pago publicado; IA desligada pela plataforma.
+- **Preservar para testes:** regiões “Verificação em duas etapas”, “Plano e faturas”, “Domínio próprio”, “Descrição com IA”; formulários “Confirmar código de verificação”, “Cadastrar domínio” (campo “Endereço do domínio”), “Configurar transportadora”; botões “Ativar verificação em duas etapas”, “Ativar”, “Confirmar”, “Cadastrar”, “Salvar”; textos “confirmado nesta sessão”, “Códigos de recuperação”, “Transportadora configurada.”.
+- **Critérios:** A-R05-03 a A-R05-06, UX03.
+
+### R17 — Catálogo da loja (`/lojas/[slug]/produtos`)
+
+- **Usuário:** comprador. **Tarefa:** ver todos os produtos e trocar de categoria. **Hierarquia:** “Todos os produtos” + contagem → faixa de categorias (`aria-current`) → grade do modelo. **Estados:** loja sem produtos; produto sem foto/esgotado. **Critérios:** UX01 (primeiro produto visível em 390×844), UI03.
 
 ### R10 — Produto (`/lojas/[slug]/produtos/[produto]`)
 
@@ -168,7 +195,8 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 - **Estados:** carrinho vazio (“Seu carrinho está vazio” + voltar ao catálogo); item indisponível/acima do saldo; CEP sem atendimento; cotação vencida/mudou (novo total exige confirmação); pagamento indisponível (“Nenhum pedido será criado”); erro ao confirmar com repetição segura; ambiente SIMULADO.
 - **Preservar para testes:** heading “Seu carrinho”; formulário “Calcular frete” com rótulos “CEP”, “Rua”, “Número”, “Cidade”, “UF”; botão “Calcular frete”; formulário “Dados do comprador” com “Nome completo” e “E-mail para comprovante”; botões “Revisar pedido”, “Corrigir dados”, “Confirmar compra de R$ X”; texto “Revise antes de confirmar”.
 - **Protótipo:** Composição 5.
-- **Critérios:** A-R12-*.
+- **Celular (< 1024 px):** resumo recolhível no topo com o total (subtotal antes do frete) na própria linha; na revisão, itens, entrega e total junto de “Confirmar compra de R$ X” (D-25).
+- **Critérios:** A-R12-*, CK-RESUMO, FN01.
 
 ### R13 — Comprovante e acompanhamento (`/lojas/[slug]/pedidos/[id]`)
 
@@ -192,7 +220,7 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 ## 4. Fluxos principais
 
-1. **Lojista publica a primeira vitrine:** R01 entrar → criar loja → R02 cadastrar produto → variação/preço → estoque → imagem → Vitrine e frete: fornecedor → tema → preview (R07) → publicar → frete → R03 conectar conta (SIMULADA) → abrir vitrine (R08).
+1. **Lojista publica a primeira loja:** R01 entrar → criar loja → R02 cadastrar produto → preço → estoque → imagem → R16 dados da loja (fornecedor e políticas) → R15 escolher modelo, ajustar e conferir na prévia → publicar → R16 entregas → R03 conectar conta (SIMULADA) → abrir a loja (R08).
 2. **Compra:** R08/R09 → R10 variação → adicionar → R12 carrinho → entrega → dados → revisão → confirmar → R13 aguardando confirmação → pago.
 3. **Pedido com pendência financeira:** R05 alerta → R03 lista “somente com pendências” → detalhe → FinancialAlert → gateway externo → anotar referência → nova consulta → incidente resolvido pelo gateway → expedição liberada.
 4. **Arrependimento:** R13 abrir solicitação → R04 protocolo → comunicação financeira (Dono) → resposta → conclusão.

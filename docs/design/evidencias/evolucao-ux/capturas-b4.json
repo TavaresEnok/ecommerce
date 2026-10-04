@@ -1,0 +1,750 @@
+[
+  {
+    "name": "loja-atelie-inicio",
+    "url": "/lojas/barro-e-trama-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 835,
+      "bottom": 1104,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-inicio",
+    "url": "/lojas/barro-e-trama-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 783,
+      "bottom": 1102,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-catalogo",
+    "url": "/lojas/barro-e-trama-27c24c/produtos",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 262,
+      "bottom": 506,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-catalogo",
+    "url": "/lojas/barro-e-trama-27c24c/produtos",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 268,
+      "bottom": 587,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-produto",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-floral",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-produto",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-floral",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-sem-foto",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/pano-de-prato-de-linho",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-sem-foto",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/pano-de-prato-de-linho",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-esgotado",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-floral",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-atelie-esgotado",
+    "url": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-floral",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-inicio",
+    "url": "/lojas/essencial-casa-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 478,
+      "bottom": 731,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-inicio",
+    "url": "/lojas/essencial-casa-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 391,
+      "bottom": 688,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-catalogo",
+    "url": "/lojas/essencial-casa-27c24c/produtos",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 318,
+      "bottom": 571,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-catalogo",
+    "url": "/lojas/essencial-casa-27c24c/produtos",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 324,
+      "bottom": 621,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-produto",
+    "url": "/lojas/essencial-casa-27c24c/produtos/caixa-de-som-portatil-a-prova-de-respingos",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-produto",
+    "url": "/lojas/essencial-casa-27c24c/produtos/caixa-de-som-portatil-a-prova-de-respingos",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-sem-foto",
+    "url": "/lojas/essencial-casa-27c24c/produtos/suporte-de-notebook-dobravel",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-sem-foto",
+    "url": "/lojas/essencial-casa-27c24c/produtos/suporte-de-notebook-dobravel",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-esgotado",
+    "url": "/lojas/essencial-casa-27c24c/produtos/fone-retro-vermelho",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-essencial-esgotado",
+    "url": "/lojas/essencial-casa-27c24c/produtos/fone-retro-vermelho",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-inicio",
+    "url": "/lojas/atelier-norte-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 760,
+      "bottom": 1026,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-inicio",
+    "url": "/lojas/atelier-norte-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 908,
+      "bottom": 1368,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-catalogo",
+    "url": "/lojas/atelier-norte-27c24c/produtos",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 262,
+      "bottom": 528,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-catalogo",
+    "url": "/lojas/atelier-norte-27c24c/produtos",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 268,
+      "bottom": 728,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-produto",
+    "url": "/lojas/atelier-norte-27c24c/produtos/bolsa-de-couro-preta",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-produto",
+    "url": "/lojas/atelier-norte-27c24c/produtos/bolsa-de-couro-preta",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-sem-foto",
+    "url": "/lojas/atelier-norte-27c24c/produtos/lenco-de-seda-estampado-com-acabamento-em-bainha-feita-a-mao-e-embalagem-para-pr",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-editorial-sem-foto",
+    "url": "/lojas/atelier-norte-27c24c/produtos/lenco-de-seda-estampado-com-acabamento-em-bainha-feita-a-mao-e-embalagem-para-pr",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-caso-vazia",
+    "url": "/lojas/loja-vazia-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-caso-vazia",
+    "url": "/lojas/loja-vazia-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "loja-caso-um",
+    "url": "/lojas/um-produto-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 698,
+      "bottom": 1173,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-caso-um",
+    "url": "/lojas/um-produto-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 783,
+      "bottom": 1295,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-caso-contraste",
+    "url": "/lojas/loja-amarela-27c24c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 399,
+      "bottom": 685,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "loja-caso-contraste",
+    "url": "/lojas/loja-amarela-27c24c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 418,
+      "bottom": 940,
+      "visible": false
+    },
+    "errors": []
+  },
+  {
+    "name": "painel-hoje",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/operacao",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-hoje",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/operacao",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-produtos",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": {
+      "top": 301,
+      "bottom": 393,
+      "visible": true
+    },
+    "errors": []
+  },
+  {
+    "name": "painel-produtos",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-produtos-filtro",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?status=DRAFT",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-produtos-filtro",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?status=DRAFT",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-busca-vazia",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?q=zzzz",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-busca-vazia",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?q=zzzz",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-novo-produto",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?novo=1",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-novo-produto",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?novo=1",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-pedidos",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-pedidos",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-atendimento",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/atendimento",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-atendimento",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/atendimento",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-aparencia",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-aparencia",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-loja",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/loja",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-loja",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/loja",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-entregas",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/entregas",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-entregas",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/entregas",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-dominio",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dominio",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-dominio",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dominio",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-seguranca",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/seguranca",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-seguranca",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/seguranca",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-plano",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/plano",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-plano",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/plano",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-dados",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dados",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-dados",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dados",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-imagens",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=midia",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-imagens",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=midia",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-estoque",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=estoque",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-estoque",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=estoque",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-produto-editar",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?produto=01a1045c-d671-71bf-ab34-2657470dab7e",
+    "width": 390,
+    "height": 844,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  },
+  {
+    "name": "painel-produto-editar",
+    "url": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?produto=01a1045c-d671-71bf-ab34-2657470dab7e",
+    "width": 1440,
+    "height": 900,
+    "result": "ok",
+    "overflowPx": 0,
+    "firstItem": null,
+    "errors": []
+  }
+]

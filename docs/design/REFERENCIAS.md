@@ -33,3 +33,29 @@ Todas as seis referências foram tentadas por `curl` e pela ferramenta de busca 
 | Ilustrações de produto no protótipo | SVG simples desenhados para o protótipo, marcados como **ilustração demonstrativa**. Não são fotos comerciais nem podem ser usados como imagem de produto real. |
 | IBM Plex Sans | Fonte de terceiros sob OFL 1.1, redistribuída com a licença. |
 | Capturas em `docs/design/preview/capturas/` | Renderizações do nosso protótipo (Chromium headless), não de sites externos. |
+
+## Consulta de 03/10/2026 — evolução de UX e personalização
+
+Sessão do Claude Code no computador do responsável, com acesso à web. Páginas abertas por busca de página (texto) e pelo navegador embutido. Nenhuma imagem, texto, código, nome de tema ou identidade foi copiado; o que segue são princípios e a aplicação própria neste projeto. Concorrentes foram consultados só como referência de categoria, nunca como modelo a reproduzir.
+
+| Fonte (URL) | Status do acesso | Princípio observado | Aplicação concreta |
+|---|---|---|---|
+| Shopify Themes e preset do tema Dawn — https://themes.shopify.com/ , https://themes.shopify.com/themes/dawn/presets/dawn | Acessado (texto) | Um tema oferece *presets* que mudam composição e tipografia, não só cor; a página inicial é montada por seções | Três modelos com composição própria (DESIGN §11, D-29); página inicial por seções tipadas |
+| Loja de demonstração do Dawn — https://theme-dawn-demo.myshopify.com/ , `/collections/all` | Acessado (navegador) | Catálogo completo como rota própria, com o primeiro produto logo no início no celular | Rota `/produtos` (R17) e medida UX01 |
+| Nuvemshop — https://www.nuvemshop.com.br/layouts | **404** | — | — |
+| Nuvemshop — https://www.nuvemshop.com.br/loja-layouts-nuvem e `/rio` | Acessado (texto); **loja de demonstração não aberta** | Temas apresentados por segmento de negócio, com opções de identidade sobre uma base pronta | Descrição de cada modelo pelo segmento (“Para moda e acessórios…”) e troca de modelo preservando o conteúdo |
+| WooCommerce — https://woocommerce.com/products/themes/ | **404** | — | — |
+| WooCommerce — https://woocommerce.com/product-category/themes/ e `/products/hypermarket/` | Acessado (texto) | Temas como ponto de partida por tipo de loja; catálogos grandes pedem grade densa e busca em destaque | Modelo Essencial: busca sempre visível, categorias primeiro, grade densa |
+| Baymard — https://baymard.com/research e `/research/apparel-and-accessories` | Acesso parcial: títulos públicos, conteúdo pago | Não aplicado além de princípios gerais já registrados em 02/10 | — |
+| IBM Carbon — Data table (uso) — https://carbondesignsystem.com/components/data-table/usage/ | Acessado (texto) | Barra com busca e filtros, filtros aplicados visíveis, ações em lote só quando existem | Lista de produtos com busca de escopo declarado, filtros na URL e chips removíveis; sem ações em lote (a API não tem) |
+| Shopify Polaris — https://shopify.dev/docs/api/polaris , `/app-home/polaris-web-components` , tabela em `/app-home/latest/web-components/layout-and-structure/table` | Acessado (texto) | Tabelas administrativas viram linhas compactas em telas pequenas | Lista de produtos em linhas compactas no celular (foto, nome, preço, saldo) |
+| W3C — WCAG 2.2 Quick Reference — https://www.w3.org/WAI/WCAG22/quickref/ | Acessado (texto) | 1.4.10 reflow em 320 px; 2.4.11 foco não encoberto; 2.5.7 movimentos de arrastar têm alternativa; 2.5.8 tamanho do alvo | Verificação em 320/640 px (AX01); reordenar seções e links com botões ↑/↓ (sem arrastar); alvos de 44 px |
+
+Limitações: a loja de demonstração da Nuvemshop e as páginas de demonstração de temas da WooCommerce não foram abertas; a Baymard não foi lida (conteúdo pago). Nenhum teste com usuários foi feito; não há afirmação de superioridade sobre concorrentes nem de efeito em conversão.
+
+### Recursos de terceiros incorporados nesta rodada
+
+| Recurso | Origem | Licença | Onde |
+|---|---|---|---|
+| Bodoni Moda 500/600, Archivo 500/600/700, Fraunces 400/600 (subconjunto latino, WOFF2) | pacotes npm `@fontsource/bodoni-moda`, `@fontsource/archivo`, `@fontsource/fraunces` 5.3.0 (registro npm) | SIL OFL 1.1 | `apps/web/app/fonts/` com `OFL-*.txt` |
+| 42 imagens de demonstração (41 fotos + 1 ilustração PNG) | Openverse (API pública), filtro `cc0,pdm`, maioria do diretório de fotos do WordPress; uma ilustração com o quadriculado de fundo convertido em transparência real | CC0 / domínio público; origem, autor e URL de cada arquivo em `scripts/fixtures/fotos.json` | `scripts/fixtures/fotos/` (só para dados de demonstração; uma foto com marca visível foi descartada) |

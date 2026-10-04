@@ -43,13 +43,13 @@ const browser = await launch();
   check('funcionario-sem-acoes-dono', owner === 0, `botão “Cancelar pedido…” visível para funcionário: ${owner}`);
   await context.close();
 }
-// 3. Vitrine: variação por setas atualiza SKU; adicionar anuncia em role=status; etapa do checkout move o foco para o título.
+// 3. Vitrine: variação por setas atualiza a opção escolhida; adicionar anuncia em role=status; etapa do checkout move o foco para o título.
 {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true });
   const page = await context.newPage(); await page.goto(`${base}/lojas/${A.slug}/produtos/camiseta`);
   await page.getByRole('radio', { name: 'Azul / M' }).focus(); await page.keyboard.press('ArrowRight');
-  const checked = await page.getByRole('radio', { name: 'Verde / M' }).isChecked(), sku = await page.getByText(/SKU .*Verde/).count();
-  check('variacao-setas', checked && sku > 0, `seta → seleciona Verde / M: ${checked}; SKU atualizado: ${sku > 0}`);
+  const checked = await page.getByRole('radio', { name: 'Verde / M' }).isChecked(), chosen = (await page.locator('.legend-value').textContent()).trim();
+  check('variacao-setas', checked && /Verde/.test(chosen), `seta → seleciona Verde / M: ${checked}; opção escolhida anunciada na legenda: “${chosen}”`);
   const box = await page.getByRole('button', { name: 'Adicionar ao carrinho' }).boundingBox();
   check('alvo-toque-adicionar', box.height >= 44 && box.width >= 44, `“Adicionar ao carrinho” ${Math.round(box.width)}×${Math.round(box.height)} px`);
   await page.getByRole('button', { name: 'Adicionar ao carrinho' }).press('Enter');

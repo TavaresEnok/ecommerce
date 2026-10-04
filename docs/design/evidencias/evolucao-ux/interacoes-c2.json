@@ -1,0 +1,36 @@
+{
+  "base": "http://localhost:3000",
+  "date": "2026-10-04T02:52:37.609Z",
+  "results": [
+    {
+      "id": "UX02",
+      "ok": true,
+      "detail": "links de navegação visíveis antes de abrir: 0; “Menu” com aria-expanded=false; Enter abre o diálogo com foco dentro (true); grupos: Dia a dia · Catálogo · Loja · Conta; Esc fecha (true) e devolve o foco ao botão (true); navegar fecha o menu (true)"
+    },
+    {
+      "id": "UX04",
+      "ok": true,
+      "detail": "“Organização e endereço” começa recolhido (true); endereço repetido → erro no campo (aria-invalid=true; “Ao mudar, o endereço antigo leva para o novo. Este endereço já é usado (ou foi usado) por ”), nada salvo (nome no servidor continua “Bule de porcelana floral”); nome digitado mantido (“Bule de porcelana floral (edição TESTE)”) e “Alterações não salvas” visível (1); voltar para a lista pergunta “Descartar alterações?” (1)"
+    },
+    {
+      "id": "UX06",
+      "ok": true,
+      "detail": "loja com 101 produtos: rótulo “Buscar nos primeiros 100 produtos (A–Z)”; aviso “O painel carrega os primeiros 100 produtos em ordem alfabética. Produtos depois deles não aparecem nesta lista…”; buscar o 101º (“Zíper…”) mostra “Nada encontrado”, coerente com o escopo declarado"
+    },
+    {
+      "id": "UI01",
+      "ok": true,
+      "detail": "botão “Adicionar imagens”; estados vistos no envio válido: Conferindo → Processando no servidor → Pronta; arquivo PDF recusado antes do envio com “(1 KB) Formato não aceito. Envie JPEG, PNG ou WebP. Tirar da lista” e “Tirar da lista” disponível"
+    },
+    {
+      "id": "UI02",
+      "ok": true,
+      "detail": "link criado com destino “Categoria: Cestaria” (sem digitar endereço); ↑ move de 4ª para 3ª posição com anúncio “Cestos TESTE movido para a posição 3 de 4.”; salvo e reaberto: menu “Cerâmica, Mesa e cozinha, Cestos TESTE, Sobre”; servidor guarda { kind: category, ref: cestaria }"
+    },
+    {
+      "id": "AX01",
+      "ok": true,
+      "detail": "9 telas × 320/640 px: rolagem horizontal/erros nenhum; 1º Tab em “Ir para o conteúdo” em todas. Zoom real do navegador e leitor de tela não foram exercitados aqui."
+    }
+  ]
+}

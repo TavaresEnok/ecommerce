@@ -1,0 +1,11 @@
+{
+  "base": "http://localhost:3000",
+  "date": "2026-10-04T02:56:43.056Z",
+  "results": [
+    {
+      "id": "CK-RESUMO",
+      "ok": true,
+      "detail": "resumo do topo antes do frete: “Resumo do pedido · 1 unidade Subtotal R$ 189,00”; depois do frete: “Resumo do pedido · 1 unidade Total R$ 204,00”; revisão com 1 item(ns), “Entrega: Entrega Grande SP, prazo 3 dias · Rua das Acácias, 120 — São Paulo/SP.” e botão “Confirmar compra de R$ 204,00” (não clicado; nenhum pedido criado)"
+    }
+  ]
+}

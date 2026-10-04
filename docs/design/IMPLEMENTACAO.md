@@ -91,17 +91,38 @@ Também conclui G-01, G-02, G-05, G-07, G-09, G-10, G-11 para a casca e os compo
 
 Também conclui G-03, G-04, G-06, G-08, G-12, G-13, G-14, G-15 para todo o escopo.
 
+### Lotes A–C — Evolução de UX e personalização (03/10/2026)
+
+Critérios em [ACEITE.md §3](ACEITE.md) (UX01–QA01). Contratos financeiros, de estoque e de permissão inalterados; API de tema ampliada de forma aditiva (v1 continua aceito).
+
+| Lote | Rota | Entrega | Arquivos principais |
+|---|---|---|---|
+| A | R02 `/painel/[tenantId]` | Navegação por tarefas e menu móvel; lista de produtos com busca de escopo declarado, filtros na URL e linhas compactas; cadastro em página própria; edição progressiva com proteção de saída; envio de imagens com estados reais | `components/panel/Shell.tsx`, `catalog.tsx`, `MediaUploader.tsx`, `ui/kit.tsx`, `apps/api/src/catalogue.ts` (pré-checagem de endereço/SKU) |
+| A | R05 `/painel/[tenantId]/operacao` | “Hoje”: alertas, contadores para listas filtradas, pausa recolhida, atalhos; âncoras antigas redirecionam | `app/painel/[tenantId]/operacao/page.tsx` |
+| A | R16 `/painel/[tenantId]/configuracoes/[secao]` | Configurações por assunto (loja, entregas, domínio, segurança, plano, dados e IA) | `components/panel/settings.tsx`, `app/painel/[tenantId]/configuracoes/[secao]/page.tsx` |
+| B | R15 `/painel/[tenantId]/aparencia` | Editor de aparência com modelos, seções, menu/rodapé por destinos, páginas, histórico, prévia ao vivo e proteção contra sobrescrita | `components/panel/appearance.tsx`, `theme-model.ts`, `brand.ts`, `preview-live.tsx`, `apps/api/src/theme.ts`, `storefront.ts`, migração `0011_theme_v2.sql` |
+| B | R07 `/preview/[tenantId]` | Prévia com catálogo e categorias; tema não salvo do editor por `postMessage`; enquadramento só pela mesma origem | `app/preview/[tenantId]/[[...path]]/page.tsx`, `next.config.mjs`, `infra/sites.caddy` |
+| B | R08 `/lojas/[slug]`, R17 `/lojas/[slug]/produtos`, R09, R10, R11 | Loja montada pelas seções do tema nos três modelos; catálogo completo; produto com galeria, opções, quantidade e informações recolhíveis; casos de poucos produtos e sem foto | `components/storefront.tsx`, `app/style.css`, `app/fonts/`, `docs/design/tokens.json` |
+| C | R03 `/painel/[tenantId]/pedidos` | Fila com próximo passo, visões rápidas, filtros recolhidos no celular, conta de pagamento no fim | `app/painel/[tenantId]/pedidos/page.tsx` |
+| C | R12 `/lojas/[slug]/carrinho` | Resumo recolhível no topo com total; itens e entrega junto da confirmação | `components/checkout.tsx` |
+| C | todas | Sessão expirada, 320 px/zoom, teclado, movimento reduzido | `ui/kit.tsx`, `app/style.css` |
+
+Testes novos: `tests/theme-schema.test.mjs` (esquema, v1→v2, leitura tolerante) e `tests/theme.test.mjs` (duas sessões, publicação exata, histórico, isolamento entre lojas, contraste de cor clara, editor com prévia em 390/1440) — ambos no verificador oficial a partir da fase 2. Verificações de interação reproduzíveis no projeto de desenvolvimento: `scripts/ux-checks.mjs`; capturas: `scripts/design-review.mjs`; dados: `scripts/fixtures/seed-presets.mjs`.
+
 ## 5. Contrato de seletores usados pelos testes (preservar)
 
-**Alterações feitas na implementação (mesmo commit da tela, comportamento testado preservado):** número do pedido e protocolo passaram de botão para **link** (`getByRole('link', { name: /^Nº \d+$/ })` em `purchase-worker` e `pilot-flow`; `getByRole('link', { name: /^Contato geral/ })` em `pilot-flow`); o status da configuração passou a “Configuração salva.” (`foundation`); o heading do catálogo passou a “Produtos” (`storefront`). Nenhuma asserção funcional foi removida.
+**Alterações da evolução de 03/10/2026 (mesmo commit, asserções preservadas):** `commercial-ui` navega para `/configuracoes/seguranca|plano|dominio|entregas` (antes tudo em `/operacao`), botão “Ativar verificação em duas etapas” (antes “Configurar MFA”), form “Confirmar código de verificação” (antes “Confirmar MFA”), campo “Endereço do domínio” (antes “Hostname”); `storefront` usa searchbox “Buscar produtos” e botão “Buscar” (antes “Buscar produto ou SKU”/“Pesquisar”).
+
+**Alterações feitas na implementação do redesign (mesmo commit da tela, comportamento testado preservado):** número do pedido e protocolo passaram de botão para **link** (`getByRole('link', { name: /^Nº \d+$/ })` em `purchase-worker` e `pilot-flow`; `getByRole('link', { name: /^Contato geral/ })` em `pilot-flow`); o status da configuração passou a “Configuração salva.” (`foundation`); o heading do catálogo passou a “Produtos” (`storefront`). Nenhuma asserção funcional foi removida.
 
 | Teste | Seletores |
 |---|---|
 | `tests/foundation.test.mjs` | form “Entrar”; rótulos “E-mail”, “Senha”, “Nome de exibição”; botões “Entrar”, “Sair”, “Salvar configuração”, “Loja A — Dono”, “Loja B — Dono” (formato “Nome — Papel”); `role=status` |
-| `tests/storefront.test.mjs` | headings “Cadastrar produto simples”, título da loja (ex.: “AURORA TESTE”), título do rascunho, nome do produto, “Seu carrinho”, “Fornecedor e atendimento”; searchbox “Buscar produto ou SKU”; botões “Pesquisar”, “Adicionar ao carrinho”, “Calcular frete”; form “Calcular frete”; rótulos “CEP”, “Rua”, “Número”, “Cidade”, “UF”; link “Ver carrinho”, link com nome do produto; texto “Centro TESTE:”; `role=status`/`alert` |
+| `tests/storefront.test.mjs` | heading “Produtos” no painel, título da loja (ex.: “AURORA TESTE”, h1 único — o rodapé não o repete como heading), título do rascunho, nome do produto, “Seu carrinho”, “Fornecedor e atendimento”; searchbox “Buscar produtos”; botões “Buscar”, “Adicionar ao carrinho”, “Calcular frete”; form “Calcular frete”; rótulos “CEP”, “Rua”, “Número”, “Cidade”, “UF”; link “Ver carrinho”, link cujo nome acessível é só o nome do produto (preço fora do link); texto “Centro TESTE:”; `role=status`/`alert` |
 | `tests/purchase-worker.test.mjs` | forms “Calcular frete”, “Dados do comprador”, “Abrir solicitação”; rótulos “Nome completo”, “E-mail para comprovante”, “Tipo”, “Mensagem”; botões “Revisar pedido”, “Corrigir dados”, “Confirmar compra de R$ …”, “Enviar solicitação”; link “Nº N”; headings “Pedidos recentes”, “Protocolos do consumidor”, “Pedido nº N”, “Seu carrinho”; textos “COMPROVANTE · PAGAMENTO SIMULADO”, “Pago”, “Pedido não autorizado.”, “Revise antes de confirmar”, “Protocolo … registrado em” |
 | `tests/pilot-flow.test.mjs` | form “Contato geral”, “Responder consumidor”; rótulos “Nome”, “E-mail”, “Mensagem”; botão “Enviar”; links “Contato geral…”, “Nº N”; headings “Alertas”, “Expedição”, “Notificações ao comprador”, “Protocolos”; texto “Código de acompanhamento:” |
-| `tests/commercial-ui.test.mjs` | regiões “Verificação em duas etapas”, “Plano e faturas”; forms “Confirmar MFA”, “Cadastrar domínio”, “Configurar transportadora”; rótulos “Código”, “Hostname”, “CEP de origem”; botões “Configurar MFA”, “Ativar”, “Confirmar”, “Cadastrar”, “Salvar”; headings “Lojas”, “Planos (versões imutáveis)”; textos “confirmado nesta sessão”, “Códigos de recuperação”, “Transportadora configurada.”, “PILOT v1”, “Piloto”, `_ecommerce-challenge.` |
+| `tests/commercial-ui.test.mjs` | rotas `/configuracoes/seguranca|plano|dominio|entregas`; regiões “Verificação em duas etapas”, “Plano e faturas”; forms “Confirmar código de verificação”, “Cadastrar domínio”, “Configurar transportadora”; rótulos “Código”, “Endereço do domínio”, “CEP de origem”; botões “Ativar verificação em duas etapas”, “Ativar”, “Confirmar”, “Cadastrar”, “Salvar”; headings “Lojas”, “Planos (versões imutáveis)”; textos “confirmado nesta sessão”, “Códigos de recuperação”, “Transportadora configurada.”, “PILOT v1”, “Piloto”, `_ecommerce-challenge.` |
+| `tests/theme.test.mjs` | heading “Aparência”; campo “Nome da loja”; botões “Salvar rascunho”, “Publicar”; abas “Editar”/“Prévia”; iframe “Prévia da loja com as alterações”; alerta “O rascunho mudou em outra sessão”; texto “Rascunho salvo. A loja publicada só muda quando você publicar.”; link “Ver produtos” da loja |
 
 ## 6. Como verificar cada lote
 
@@ -110,6 +131,9 @@ node docs/design/verificar.mjs                 # tokens, contraste, protótipo, 
 npm run typecheck -w @ecommerce/web            # tipos
 npm run build -w @ecommerce/web                # build Next
 node scripts/verify.mjs --phase=7              # suítes completas em Docker (requer Docker e .local/test.env)
+node docs/design/tokens-css.mjs --check        # :root do CSS em dia com tokens.json
 ```
+
+Evolução de UX (projeto de desenvolvimento, dados de teste): `node scripts/fixtures/seed-presets.mjs` cria as seis lojas de exemplo (três modelos + vazia, um produto, cor clara/imagens irregulares) e grava os acessos em `.local/demo-presets.json`; `scripts/design-review.mjs` e `scripts/ux-checks.mjs` rodam no contêiner `tests` (comandos no cabeçalho de cada arquivo).
 
 Capturas das rotas reais: usar o seed (`node scripts/seed.mjs --local`) e Playwright em 390/768/1440, gravando em `artifacts/` (ignorado) e registrando o resultado no ACEITE. Se Docker não estiver disponível no ambiente, registrar “não executado” com o motivo — não marcar como aprovado.

@@ -76,14 +76,14 @@ await step('A-R01-04', async () => {
   const store = await api('tenants', { method: 'POST', actor: user, body: { name, slug: `longa-${randomBytes(3).toString('hex')}` } });
   let [ctx, page] = await open(390, user); await page.goto(`${base}/`); await page.getByText(name.slice(0, 40)).first().waitFor();
   check('A-R01-07', (await overflow(page)) <= 0, `nome com ${name.length} caracteres; rolagem horizontal ${await overflow(page)} px`); await shot(page, 'A-R01-07-390'); await ctx.close();
-  [ctx, page] = await open(1440, user); await page.goto(`${base}/painel/${store.body.id}`); await page.getByText('Nenhum produto cadastrado').waitFor();
-  check('A-R02-04', (await page.getByRole('link', { name: 'Cadastrar primeiro produto' }).count()) === 1, 'vazio “Nenhum produto cadastrado” com “Cadastrar primeiro produto”'); await shot(page, 'A-R02-04-1440'); await ctx.close();
+  [ctx, page] = await open(1440, user); await page.goto(`${base}/painel/${store.body.id}`); await page.getByText('Cadastre o primeiro produto').waitFor();
+  check('A-R02-04', (await page.locator('.empty').getByRole('link', { name: 'Cadastrar produto' }).count()) === 1, 'vazio “Cadastre o primeiro produto” com a ação “Cadastrar produto”'); await shot(page, 'A-R02-04-1440'); await ctx.close();
 });
 // A-R02-05 busca local sem resultado
 await step('A-R02-05', async () => {
-  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}`); await page.getByRole('searchbox', { name: /Buscar por nome/ }).fill('zzzz-inexistente');
-  await page.getByText('Nenhum produto corresponde aos filtros').waitFor(); const scope = await page.getByText(/Procura apenas entre os \d+ produtos carregados/).count();
-  check('A-R02-05', scope === 1 && (await page.getByRole('button', { name: 'Limpar busca e filtros' }).count()) === 1, 'vazio da busca com “Limpar busca e filtros”; escopo da busca declarado no campo'); await shot(page, 'A-R02-05-1440'); await ctx.close();
+  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}`); const search = page.getByRole('searchbox', { name: /^Buscar (em \d+ produtos?|nos primeiros \d+ produtos)/ });
+  await search.fill('zzzz-inexistente'); await page.getByText(/Nada encontrado para “zzzz-inexistente”/).waitFor(); const scope = await page.locator('label[for="q-prod"]').textContent();
+  check('A-R02-05', (await page.getByRole('button', { name: 'Limpar busca e filtros' }).count()) === 1, `vazio “Nada encontrado…” com “Limpar busca e filtros”; o rótulo do campo declara o escopo: “${scope}”`); await shot(page, 'A-R02-05-1440'); await ctx.close();
 });
 // A-R03-06 expedição de um pedido pago sem pendências (criado aqui) e A-R13-02 acompanhamento com rastreio
 await step('A-R03-06', async () => {
@@ -118,7 +118,7 @@ await step('A-R04-01', async () => {
 });
 // A-R05-02 pausar e retomar vendas
 await step('A-R05-02', async () => {
-  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/operacao`); const f = page.getByRole('form', { name: 'Pausar vendas' }); await f.waitFor();
+  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/operacao`); await page.locator('summary', { hasText: 'Pausar novas vendas' }).click(); const f = page.getByRole('form', { name: 'Pausar vendas' }); await f.waitFor();
   await f.getByRole('button', { name: 'Pausar novas vendas' }).click(); const invalid = await f.getByLabel('Motivo da pausa').evaluate((e) => !e.validity.valid);
   await f.getByLabel('Motivo da pausa').fill('Inventário TESTE'); await f.getByRole('button', { name: 'Pausar novas vendas' }).click(); await page.getByText('Novas vendas pausadas.').waitFor();
   const top = await page.getByText('Novas vendas pausadas').count(); await shot(page, 'A-R05-02-1440');
@@ -292,30 +292,31 @@ await step('CK-05', async () => {
 
 // PV-01 preview privado: produto, categoria, menu, voltar, busca e carrinho; nada leva a 404 nem à loja pública; anônimo não vê.
 await step('PV-01', async () => {
-  const pub = (await api(`public/stores/${A.slug}`)).body.theme;
-  const draftBody = (title, menu) => ({ schema_version: 1, title, description: pub.description, hero: pub.hero, color: pub.color, font: pub.font, pages: pub.pages, menu, assets: pub.assets || [] });
-  const r = await api(`tenants/${A.id}/storefront/draft`, { method: 'POST', actor: owner, body: draftBody('AURORA RASCUNHO PRIVADO TESTE', [{ label: 'Catálogo', path: '/' }, { label: 'Sobre', path: '/paginas/sobre' }, { label: 'Meu carrinho', path: '/carrinho' }]) });
+  const settings = (await api(`tenants/${A.id}/storefront`, { actor: owner })).body, original = settings.draft_theme;
+  const draft = (title, menu) => ({ ...original, title, menu, base_revision_id: undefined });
+  const r = await api(`tenants/${A.id}/storefront/draft`, { method: 'POST', actor: owner, body: draft('AURORA RASCUNHO PRIVADO TESTE', [{ label: 'Catálogo', to: { kind: 'catalog' } }, { label: 'Sobre', to: { kind: 'page', ref: 'sobre' } }, { label: 'Meu carrinho', to: { kind: 'cart' } }]) });
   if (r.status >= 300) throw new Error(`rascunho ${r.status} ${JSON.stringify(r.body)}`);
   try {
     const [ctx, page] = await open(1440, owner); const hrefs = new Set(), record = async () => { for (const h of await page.evaluate(() => [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href')))) hrefs.add(h); };
     await page.goto(`${base}/preview/${A.id}`); await page.getByRole('heading', { level: 1, name: 'AURORA RASCUNHO PRIVADO TESTE' }).waitFor(); await record();
     const robots = await page.locator('meta[name=robots]').getAttribute('content'), search = await page.getByRole('search').count(), cart = await page.getByRole('link', { name: /carrinho/i }).count();
-    const nav = page.getByRole('navigation', { name: 'Navegação da loja' }), unavailable = [await nav.getByText('Meu carrinho (indisponível no preview)').count(), await nav.getByText('Atendimento (indisponível no preview)').count()], categoriesNav = await page.getByRole('navigation', { name: 'Categorias' }).count();
+    const nav = page.getByRole('navigation', { name: 'Navegação da loja', exact: true }), unavailable = [await nav.getByText('Meu carrinho (indisponível na prévia)').count(), await nav.getByText('Atendimento (indisponível na prévia)').count()];
     await shot(page, 'PV-01-inicio-1440');
-    await page.getByRole('link', { name: 'Camiseta aurora' }).click(); await page.getByRole('heading', { level: 1, name: 'Camiseta aurora' }).waitFor(); const productUrl = page.url(), noBuy = await page.getByText('Compra desabilitada no preview').count(); await record(); await shot(page, 'PV-01-produto-1440');
+    await page.getByRole('link', { name: /Camiseta aurora/ }).first().click(); await page.getByRole('heading', { level: 1, name: 'Camiseta aurora' }).waitFor(); const productUrl = page.url(), noBuy = await page.getByText('A compra fica desativada na prévia.').count(); await record(); await shot(page, 'PV-01-produto-1440');
     await page.getByRole('navigation', { name: 'Trilha' }).getByRole('link', { name: 'Início' }).click(); await page.waitForURL(`${base}/preview/${A.id}`);
     await nav.getByRole('link', { name: 'Sobre' }).click(); await page.getByRole('heading', { level: 1, name: 'Sobre a loja TESTE' }).waitFor(); const pageUrl = page.url(); await record();
     await page.goBack(); await page.waitForURL(`${base}/preview/${A.id}`); const back = await page.getByRole('heading', { level: 1, name: 'AURORA RASCUNHO PRIVADO TESTE' }).count();
-    // categoria (o menu do tema não aceita categoria) e carrinho digitados na barra de endereço: aviso claro, sem 404
-    const typed = []; for (const d of ['categorias/colecao', 'carrinho']) { const res = await page.goto(`${base}/preview/${A.id}/${d}`); await page.getByText('Não disponível no preview').waitFor(); typed.push(`${d} → ${res.status()}`); if (d === 'categorias/colecao') await shot(page, 'PV-01-categoria-1440'); await page.getByRole('link', { name: 'Voltar ao início do preview' }).click(); await page.waitForURL(`${base}/preview/${A.id}`); }
+    // Catálogo e categoria têm versão privada; carrinho digitado na barra de endereço mostra “Indisponível na prévia”, sem 404.
+    const typed = [];
+    for (const [d, expectText] of [['produtos', 'Todos os produtos'], ['categorias/colecao', 'Coleção de demonstração'], ['carrinho', 'Indisponível na prévia']]) { const res = await page.goto(`${base}/preview/${A.id}/${d}`); await page.getByRole('heading', { name: expectText }).first().waitFor(); typed.push(`${d} → ${res.status()}`); await record(); if (d === 'carrinho') { await shot(page, 'PV-01-carrinho-1440'); await page.getByRole('link', { name: 'Voltar ao início da prévia' }).click(); await page.waitForURL(`${base}/preview/${A.id}`); } }
     const statuses = []; for (const h of hrefs) { if (h.startsWith('#') || h.startsWith('mailto:')) continue; const res = await page.request.get(new URL(h, base).href); statuses.push([h, res.status()]); }
     const broken = statuses.filter(([, s]) => s >= 400), toPublic = [...hrefs].filter((h) => h.startsWith('/lojas/'));
     const [actx, anon] = await open(1440); await anon.goto(`${base}/preview/${A.id}/produtos/camiseta`); const denied = await anon.getByText(/Acesso negado ou rascunho inexistente/).count(), leak = await anon.getByText('AURORA RASCUNHO PRIVADO TESTE').count();
-    await anon.goto(`${base}/lojas/${A.slug}`); const publicLeak = await anon.getByText('AURORA RASCUNHO PRIVADO TESTE').count(), publicTitle = await anon.getByRole('heading', { level: 1, name: 'AURORA TESTE' }).count(); await actx.close();
-    check('PV-01', /noindex/.test(robots) && search === 0 && cart === 0 && unavailable.every((n) => n === 1) && categoriesNav === 0 && typed.every((t) => t.endsWith('200')) && noBuy === 1 && productUrl.endsWith(`/preview/${A.id}/produtos/camiseta`) && pageUrl.endsWith(`/preview/${A.id}/paginas/sobre`) && back === 1 && broken.length === 0 && toPublic.length === 0 && denied === 1 && leak === 0 && publicLeak === 0 && publicTitle === 1,
-      `noindex: ${/noindex/.test(robots)}; busca ${search}, link de carrinho ${cart}; categoria/carrinho e atendimento do menu como texto indisponível: ${unavailable.join('/')}; sem navegação de categorias (${categoriesNav}); endereços digitados ${typed.join(', ')} com “Não disponível no preview” e “Voltar ao início do preview”; produto ${productUrl.split(base)[1]} sem compra (${noBuy}); página ${pageUrl.split(base)[1]}; Voltar do navegador ao início: ${back}; ${statuses.length} links conferidos, quebrados ${broken.length}, para a loja pública ${toPublic.length}; anônimo negado (${denied}) sem ver o rascunho; vitrine pública segue com o título publicado (${publicTitle}) e não mostra o rascunho (${publicLeak})`);
+    await anon.goto(`${base}/lojas/${A.slug}`); const publicLeak = await anon.getByText('AURORA RASCUNHO PRIVADO TESTE').count(); await actx.close();
+    check('PV-01', /noindex/.test(robots) && search === 0 && cart === 0 && unavailable.every((n) => n === 1) && typed.every((t) => t.endsWith('200')) && noBuy === 1 && productUrl.endsWith(`/preview/${A.id}/produtos/camiseta`) && pageUrl.endsWith(`/preview/${A.id}/paginas/sobre`) && back === 1 && broken.length === 0 && toPublic.length === 0 && denied === 1 && leak === 0 && publicLeak === 0,
+      `noindex: ${/noindex/.test(robots)}; busca ${search}, link de carrinho ${cart}; carrinho e atendimento do menu como texto indisponível: ${unavailable.join('/')}; endereços digitados ${typed.join(', ')}; produto ${productUrl.split(base)[1]} sem compra (${noBuy}); página ${pageUrl.split(base)[1]}; Voltar do navegador ao início: ${back}; ${statuses.length} links conferidos, quebrados ${broken.length}, para a loja pública ${toPublic.length}; anônimo negado (${denied}) e sem vazamento (${leak}/${publicLeak})`);
     await ctx.close();
-  } finally { await api(`tenants/${A.id}/storefront/draft`, { method: 'POST', actor: owner, body: draftBody(pub.title, pub.menu) }); }
+  } finally { const now = (await api(`tenants/${A.id}/storefront`, { actor: owner })).body; await api(`tenants/${A.id}/storefront/draft`, { method: 'POST', actor: owner, body: { ...original, base_revision_id: now.state.draft_revision_id } }); }
 });
 
 // A-R01-01 foco no título após entrar pelo formulário
@@ -337,9 +338,11 @@ await step('A-R01-03', async () => {
 // A-R01-05 Funcionário vê a configuração somente leitura e sem equipe
 await step('A-R01-05', async () => {
   const [ctx, page] = await open(1440, await session(demo.employee.email, demo.employee.password)); await page.goto(`${base}/`);
-  await page.getByRole('button', { name: /— Funcionário$/ }).first().click(); await page.getByText('Somente o Dono altera a configuração').waitFor();
-  const editable = await page.locator('main input:not([type=hidden]):not([readonly]):not([disabled]), main select:not([disabled])').count(), team = await page.getByRole('heading', { name: 'Equipe' }).count();
-  check('A-R01-05', team === 0 && (await page.getByRole('button', { name: 'Salvar configuração' }).count()) === 0, `Funcionário: aviso “Somente o Dono altera a configuração”, sem botão de salvar e sem equipe (${team}); campos editáveis restantes na página: ${editable}`); await shot(page, 'A-R01-05-1440'); await ctx.close();
+  await page.getByRole('button', { name: /— Funcionário$/ }).first().click(); await page.getByRole('heading', { level: 1, name: 'Produtos' }).waitFor();
+  const nav = page.getByRole('navigation', { name: 'Painel da loja' }), ownerLinks = await nav.getByRole('link', { name: /^(Aparência|Dados da loja|Entregas|Domínio|Plano e faturas)$/ }).count();
+  await page.goto(`${base}/painel/${A.id}/aparencia`); await page.getByText('Somente o Dono altera a aparência').waitFor();
+  const team = await page.getByRole('heading', { name: 'Equipe' }).count(), save = await page.getByRole('button', { name: /Salvar rascunho|Publicar/ }).count();
+  check('A-R01-05', ownerLinks === 0 && team === 0 && save === 0, `Funcionário: navegação sem as áreas do Dono (${ownerLinks}); Aparência mostra “Somente o Dono altera a aparência”, sem salvar/publicar (${save}) e sem equipe (${team})`); await shot(page, 'A-R01-05-1440'); await ctx.close();
 });
 // A-R01-06 encerrar todas as sessões por teclado (usuário descartável)
 await step('A-R01-06', async () => {
@@ -365,21 +368,21 @@ await step('A-R02-07', async () => {
   for (const w of [390, 1440]) { const [ctx, page] = await open(w, owner); await page.goto(`${base}/painel/${A.id}?novo=1`); const f = page.getByRole('form', { name: 'Cadastrar produto' });
     await f.getByLabel('Nome', { exact: true }).fill('Produto com SKU repetido TESTE'); await f.getByLabel('SKU').fill(`${A.slug.split('-')[0]}-CAFE-001`); await f.getByLabel('Preço').fill('19,9'); await f.getByRole('button', { name: 'Cadastrar produto' }).click();
     await page.getByRole('alert').filter({ hasText: 'O produto não foi cadastrado' }).waitFor(); const sku = f.getByLabel('SKU'), invalid = await sku.getAttribute('aria-invalid'), described = await sku.evaluate((e) => (e.getAttribute('aria-describedby') || '').split(' ').map((id) => document.getElementById(id)?.textContent).join(' '));
-    const kept = await f.getByLabel('Nome', { exact: true }).inputValue(), slugInvalid = await f.getByLabel('Endereço na vitrine').getAttribute('aria-invalid');
+    const kept = await f.getByLabel('Nome', { exact: true }).inputValue(), slugInvalid = await f.getByLabel('Endereço na loja').getAttribute('aria-invalid');
     check(`A-R02-07 ${w}`, invalid === 'true' && /SKU/.test(described) && slugInvalid === null && kept === 'Produto com SKU repetido TESTE', `erro no campo SKU (aria-invalid ${invalid}; “${described.trim().slice(-60)}”); endereço sem erro; nome mantido`); await shot(page, `A-R02-07-${w}`); await ctx.close(); }
 });
 // A-R02-09 mídia em processamento → pronta
 await step('A-R02-09', async () => {
-  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}?aba=midia`); const f = page.getByRole('form', { name: 'Enviar imagem' });
+  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}?aba=midia`); await page.getByRole('heading', { level: 1, name: 'Imagens' }).waitFor();
   // PNG válido gerado no próprio navegador (canvas 400×500, gradiente), sem arquivo de apoio.
   const png = Buffer.from((await page.evaluate(() => { const c = document.createElement('canvas'); c.width = 400; c.height = 500; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 400, 500); gr.addColorStop(0, '#245742'); gr.addColorStop(1, '#e6b8a2'); g.fillStyle = gr; g.fillRect(0, 0, 400, 500); return c.toDataURL('image/png'); })).split(',')[1], 'base64');
-  // Worker do projeto isolado parado durante o envio: o estado “Processando” fica estável para a captura.
+  // Worker do projeto isolado parado durante o envio: o estado “Processando no servidor…” fica estável para a captura.
   compose(['stop', 'worker']);
-  try { await f.getByLabel('Arquivo de imagem').setInputFiles({ name: 'aceite.png', mimeType: 'image/png', buffer: png }); await f.getByRole('button', { name: 'Enviar imagem' }).click();
-    await page.getByText('Processando', { exact: true }).first().waitFor({ timeout: 15000 }); await shot(page, 'A-R02-09-processando-1440'); }
+  try { await page.locator('.uploader input[type=file]').setInputFiles({ name: 'aceite.png', mimeType: 'image/png', buffer: png });
+    await page.getByText('Processando no servidor…').first().waitFor({ timeout: 15000 }); await shot(page, 'A-R02-09-processando-1440'); }
   finally { compose(['up', '-d', '--wait', '--no-deps', 'worker']); }
-  const ready = await waitFor(async () => { await page.reload(); await page.getByRole('heading', { level: 1 }).waitFor(); return (await page.getByText('Processando', { exact: true }).count()) === 0; }, 'mídia pronta');
-  await shot(page, 'A-R02-09-pronta-1440'); check('A-R02-09', ready, 'selo “Processando” na imagem recém-enviada (worker do projeto parado) e, com o worker de volta, a imagem passa a “Pronta” sem processamento pendente'); await ctx.close();
+  const ready = await page.getByText('Pronta. Vincule-a na edição do produto.').waitFor({ timeout: 90000 }).then(() => true, () => false);
+  await shot(page, 'A-R02-09-pronta-1440'); check('A-R02-09', ready, '“Processando no servidor…” na imagem recém-enviada (worker do projeto parado) e, com o worker de volta, o próprio envio passa a “Pronta. Vincule-a na edição do produto.”'); await ctx.close();
 });
 // A-R02-10 ajuste que deixaria saldo abaixo do reservado
 await step('A-R02-10', async () => {
@@ -395,26 +398,27 @@ await step('A-R02-10', async () => {
 });
 // A-R02-12 publicar o tema pela interface (loja C): falha preserva a publicação anterior; sucesso publica.
 await step('A-R02-12', async () => {
-  const ownerC = await session(C.email, C.password), [ctx, page] = await open(1440, ownerC), hero = `Mensagem publicada pela interface ${randomBytes(2).toString('hex')}`;
-  const pubBefore = (await api(`public/stores/${C.slug}`)).body.theme.hero;
-  await page.goto(`${base}/painel/${C.id}?aba=vitrine`); const theme = page.getByRole('form', { name: 'Salvar tema' }); await theme.getByLabel('Mensagem principal').fill(hero);
-  await theme.getByRole('button', { name: 'Salvar rascunho' }).focus(); await page.keyboard.press('Enter'); await page.getByText(/Rascunho do tema salvo/).waitFor();
-  const [pctx, preview] = await open(1440, ownerC); await preview.goto(`${base}/preview/${C.id}`); const inPreview = await preview.getByText(hero).count(); await pctx.close();
+  const ownerC = await session(C.email, C.password), [ctx, page] = await open(1440, ownerC), title = `Loja C pela interface ${randomBytes(2).toString('hex')}`;
+  const pubBefore = (await api(`public/stores/${C.slug}`)).body.theme.title;
+  await page.goto(`${base}/painel/${C.id}/aparencia`); await page.getByRole('heading', { level: 1, name: 'Aparência' }).waitFor();
+  const name = page.getByLabel('Nome da loja', { exact: true }); if (!(await name.isVisible())) await page.getByText('Identidade', { exact: true }).first().click(); await name.fill(title);
+  await page.getByRole('button', { name: 'Salvar rascunho' }).focus(); await page.keyboard.press('Enter'); await page.getByText(/Rascunho salvo\. A loja publicada só muda/).waitFor();
+  const [pctx, preview] = await open(1440, ownerC); await preview.goto(`${base}/preview/${C.id}`); const inPreview = await preview.getByRole('heading', { level: 1, name: title }).count(); await pctx.close();
   await page.route('**/storefront/publish', (route) => route.abort('connectionrefused'), { times: 1 });
-  await page.getByRole('button', { name: 'Publicar vitrine local' }).click(); await page.getByRole('alert').first().waitFor(); const failText = (await page.getByRole('alert').first().textContent()).trim(); await shot(page, 'A-R02-12-falha-1440');
-  const pubAfterFail = (await api(`public/stores/${C.slug}`)).body.theme.hero;
-  await page.getByRole('button', { name: 'Publicar vitrine local' }).click(); await page.getByText('Vitrine publicada.').waitFor(); await shot(page, 'A-R02-12-publicada-1440');
-  const pubAfter = (await api(`public/stores/${C.slug}`)).body.theme.hero;
-  check('A-R02-12', inPreview === 1 && pubAfterFail === pubBefore && pubAfter === hero, `salvar rascunho por teclado → preview mostra a nova mensagem (${inPreview}); falha de rede na publicação: “${failText.slice(0, 70)}” e a vitrine pública continua com a mensagem anterior (${pubAfterFail === pubBefore}); publicar de novo: “Vitrine publicada.” e a vitrine pública muda (${pubAfter === hero})`);
+  await page.getByRole('button', { name: 'Publicar' }).click(); await page.getByRole('alert').first().waitFor(); const failText = (await page.getByRole('alert').first().textContent()).trim(); await shot(page, 'A-R02-12-falha-1440');
+  const pubAfterFail = (await api(`public/stores/${C.slug}`)).body.theme.title;
+  await page.getByRole('button', { name: 'Publicar' }).click(); await page.getByText('Aparência publicada na loja.').waitFor(); await shot(page, 'A-R02-12-publicada-1440');
+  const pubAfter = (await api(`public/stores/${C.slug}`)).body.theme.title;
+  check('A-R02-12', inPreview === 1 && pubAfterFail === pubBefore && pubAfter === title, `salvar rascunho por teclado → a prévia mostra o novo nome (${inPreview}); falha de rede na publicação: “${failText.slice(0, 70)}” e a loja pública continua igual (${pubAfterFail === pubBefore}); publicar de novo: “Aparência publicada na loja.” e a loja muda (${pubAfter === title})`);
   await ctx.close();
 });
 // A-R02-14 100 produtos (limite do plano piloto) e nome longo
 await step('A-R02-14', async () => {
   const u = await fresh(), P = `tenants/${u.store.id}`; let created = 0;
   for (let i = 1; i <= 100; i++) { const r = await api(`${P}/catalogue/products`, { method: 'POST', actor: u.actor, body: { name: i === 1 ? 'Conjunto de pratos rasos e fundos em porcelana com borda dourada pintada à mão — linha comemorativa TESTE' : `Produto sintético ${String(i).padStart(3, '0')} TESTE`, slug: `produto-${i}`, sku: `VAZ-${i}`, price_cents: String(1000 + i) } }); if (r.status === 201) created++; else throw new Error(`produto ${i}: ${r.status} ${JSON.stringify(r.body)}`); }
-  for (const w of [390, 1440]) { const [ctx, page] = await open(w, u.actor); await page.goto(`${base}/painel/${u.store.id}`); await page.getByText(/Mostrando \d+ de \d+ produtos carregados/).waitFor();
-    const foot = await page.getByText(/Mostrando \d+ de \d+ produtos carregados/).textContent(), limit = await page.getByText('A listagem do painel traz até 100 produtos, sem paginação.').count(), over = await overflow(page);
-    check(`A-R02-14 ${w}`, /Mostrando 100 de 100/.test(foot) && limit === 1 && over <= 0, `${created} produtos: “${foot}” + aviso do limite sem paginação; rolagem horizontal ${over} px`); await shot(page, `A-R02-14-${w}`); await ctx.close(); }
+  for (const w of [390, 1440]) { const [ctx, page] = await open(w, u.actor); await page.goto(`${base}/painel/${u.store.id}`); await page.getByText('Buscar nos primeiros 100 produtos (A–Z)').waitFor();
+    const foot = (await page.locator('.list-foot').textContent()).trim(), limit = await page.getByText(/O painel carrega os primeiros 100 produtos em ordem alfabética/).count(), over = await overflow(page);
+    check(`A-R02-14 ${w}`, foot === '100 produtos' && limit === 1 && over <= 0, `${created} produtos: rótulo “Buscar nos primeiros 100 produtos (A–Z)”, rodapé “${foot}” e aviso do limite; rolagem horizontal ${over} px`); await shot(page, `A-R02-14-${w}`); await ctx.close(); }
 });
 // A-R03-01 filtros mantidos ao abrir um pedido e voltar
 await step('A-R03-01', async () => {
@@ -502,8 +506,8 @@ await step('A-R05-04', async () => {
   // Domínio exige MFA confirmado na sessão (regra da API): usa o Dono da loja C com MFA ativado nesta sessão.
   const ownerC = await session(C.email, C.password), setup = await api('auth/mfa/setup', { method: 'POST', actor: ownerC });
   if (setup.status < 300) { const en = await api('auth/mfa/enable', { method: 'POST', actor: ownerC, body: { code: totp(setup.body.secret, Math.floor(Date.now() / 30000)) } }); if (en.status >= 300) throw new Error(`mfa ${en.status} ${JSON.stringify(en.body)}`); }
-  const [ctx, page] = await open(1440, ownerC); await page.goto(`${base}/painel/${C.id}/operacao`); const region = page.getByRole('region', { name: 'Domínio próprio' }), host = `loja-${randomBytes(2).toString('hex')}.example.test`;
-  await region.getByRole('form', { name: 'Cadastrar domínio' }).getByLabel('Hostname').fill(host); await region.getByRole('button', { name: 'Cadastrar' }).click(); await region.getByText(host).first().waitFor();
+  const [ctx, page] = await open(1440, ownerC); await page.goto(`${base}/painel/${C.id}/configuracoes/dominio`); const region = page.getByRole('region', { name: 'Domínio próprio' }), host = `loja-${randomBytes(2).toString('hex')}.example.test`;
+  await region.getByRole('form', { name: 'Cadastrar domínio' }).getByLabel('Endereço do domínio').fill(host); await region.getByRole('button', { name: 'Cadastrar' }).click(); await region.getByText(host).first().waitFor();
   const txt = await region.getByText(/_ecommerce-challenge\./).count(); await region.getByRole('button', { name: 'Verificar' }).first().click(); await sleep(2500); const afterVerify = (await region.textContent()).replace(/\s+/g, ' '); await shot(page, 'A-R05-04-verificar-1440');
   await region.getByRole('button', { name: 'Remover…' }).first().click(); const dlg = page.getByRole('dialog'); await dlg.waitFor(); await dlg.getByRole('button', { name: /Remover/ }).click(); await dlg.waitFor({ state: 'hidden' }); await sleep(1000);
   const gone = (await region.getByText(host).count()) === 0;
@@ -511,19 +515,19 @@ await step('A-R05-04', async () => {
 });
 // A-R05-05 plano e faturas sem plano pago publicado
 await step('A-R05-05', async () => {
-  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/operacao`); const region = page.getByRole('region', { name: 'Plano e faturas' }); await region.waitFor(); const text = (await region.textContent()).replace(/\s+/g, ' ');
+  const [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/configuracoes/plano`); const region = page.getByRole('region', { name: 'Plano e faturas' }); await region.waitFor(); const text = (await region.textContent()).replace(/\s+/g, ' ');
   check('A-R05-05', /Nenhum plano pago/i.test(text), `região “Plano e faturas”: “${(text.match(/Nenhum plano pago[^.]*\./i) || [''])[0]}”`); await ctx.close();
 });
 // A-R05-06 IA desligada pela plataforma; geração com resultado incerto (provedor SIMULADO, marcador [timeout])
 await step('A-R05-06', async () => {
   const admin = await adminSession(), policy = (enabled) => api('platform/ai/policy', { method: 'POST', actor: admin, body: { enabled, provider: 'SIMULATED', tenant_monthly_limit_micros: '2000000', global_monthly_limit_micros: '20000000', reason: enabled ? 'Revisão visual: IA simulada' : 'Revisão visual: desligar IA' } });
   let r = await policy(false); if (r.status >= 300) throw new Error(`política ${r.status} ${JSON.stringify(r.body)}`);
-  let [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/operacao`); await page.getByText(/Recurso desligado pela plataforma/).waitFor(); const off = await page.getByText(/Recurso desligado pela plataforma/).count(); await shot(page, 'A-R05-06-desligada-1440'); await ctx.close();
+  let [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/configuracoes/dados`); await page.getByText(/Recurso desligado pela plataforma/).waitFor(); const off = await page.getByText(/Recurso desligado pela plataforma/).count(); await shot(page, 'A-R05-06-desligada-1440'); await ctx.close();
   r = await policy(true); if (r.status >= 300) throw new Error(`política ${r.status} ${JSON.stringify(r.body)}`);
   try {
     const p = (await api(`tenants/${A.id}/catalogue/products`, { method: 'POST', actor: owner, body: { name: 'Produto IA incerta TESTE', slug: `ia-incerta-${randomBytes(2).toString('hex')}`, sku: `IA-${randomBytes(2).toString('hex')}`, price_cents: '1000', description: 'Gerar descrição [timeout]' } })).body;
     const on = await api(`tenants/${A.id}/ai/settings`, { method: 'POST', actor: owner, body: { enabled: true } }); if (on.status >= 300) throw new Error(`ia na loja ${on.status}`);
-    [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/operacao`); const ia = page.getByRole('region', { name: 'Descrição com IA' }); await ia.waitFor();
+    [ctx, page] = await open(1440, owner); await page.goto(`${base}/painel/${A.id}/configuracoes/dados`); const ia = page.getByRole('region', { name: 'Descrição com IA' }); await ia.waitFor();
     await ia.getByRole('button', { name: 'Desligar nesta loja' }).waitFor();
     await ia.getByLabel('Produto').selectOption(p.id); await ia.getByRole('button', { name: 'Gerar rascunho' }).click(); await ia.getByText('Resultado incerto').waitFor({ timeout: 20000 });
     const save = await ia.getByRole('button', { name: 'Salvar no produto' }).count(), generated = await ia.getByText('Rascunho gerado').count(); await shot(page, 'A-R05-06-incerta-1440'); await ctx.close();
@@ -536,8 +540,8 @@ await step('A-R08-04', async () => {
   await api(`${P}/storefront/profile`, { method: 'POST', actor: u.actor, body: { synthetic: true, name: 'Fornecedor VAZIO TESTE', document: '', address: 'Endereço fictício TESTE', email: 'contato-vazio@example.test', phone: 'Contato fictício TESTE', policies: 'Políticas sintéticas TESTE.', delivery: 'Sem entregas reais. TESTE', risks: 'Sem riscos: sem produtos. TESTE' } });
   const d = (await api(`${P}/storefront/draft`, { method: 'POST', actor: u.actor, body: { schema_version: 1, title: 'LOJA VAZIA TESTE', description: 'Vitrine publicada sem produtos', hero: 'Em breve', color: '#7A3B26', font: 'system', pages: [], menu: [{ label: 'Catálogo', path: '/' }], assets: [] } })).body;
   const pub = await api(`${P}/storefront/publish`, { method: 'POST', actor: u.actor, body: { revision_id: d.id } }); if (pub.status >= 300) throw new Error(`publicar ${pub.status} ${JSON.stringify(pub.body)}`);
-  const [ctx, page] = await open(1440); const res = await page.goto(`${base}/lojas/${u.store.slug}`); await page.getByText('Nenhum produto publicado ainda').waitFor(); await shot(page, 'A-R08-04-1440');
-  check('A-R08-04', res.status() === 200, `vitrine publicada sem produtos (HTTP ${res.status()}): “Nenhum produto publicado ainda”`); await ctx.close();
+  const [ctx, page] = await open(1440); const res = await page.goto(`${base}/lojas/${u.store.slug}`); await page.getByText('Ainda não há produtos à venda').waitFor(); await shot(page, 'A-R08-04-1440');
+  check('A-R08-04', res.status() === 200, `vitrine publicada sem produtos (HTTP ${res.status()}): “Ainda não há produtos à venda”`); await ctx.close();
 });
 // A-R10-02 variação esgotada ao lado de disponível
 await step('A-R10-02', async () => {
@@ -549,7 +553,7 @@ await step('A-R10-02', async () => {
 // A-R10-04 erro do servidor junto à quantidade: a página foi aberta antes de o saldo cair (ajuste feito pelo Dono)
 await step('A-R10-04', async () => {
   const cat = (await api(`tenants/${A.id}/catalogue`, { actor: owner })).body, apron = cat.products.find((p) => p.slug === 'avental'), m = apron.variants.find((v) => v.attributes.tamanho === 'M');
-  const [ctx, page] = await open(1440); await page.goto(`${base}/lojas/${A.slug}/produtos/avental`); const n = Number((await page.getByText(/\d+ disponíve/).first().textContent()).match(/\d+/)[0]);
+  const [ctx, page] = await open(1440); await page.goto(`${base}/lojas/${A.slug}/produtos/avental`); await page.getByRole('button', { name: 'Adicionar ao carrinho' }).waitFor(); const n = (await api(`public/stores/${A.slug}/products/avental`)).body.variants.find((v) => v.id === m.id).available;
   const adj = (delta, reason) => api(`tenants/${A.id}/catalogue/adjustments`, { method: 'POST', actor: owner, body: { variant_id: m.id, location_id: A.location, delta, reason } });
   await adj(-1, 'Venda no balcão TESTE (saldo cai com a página aberta)');
   try {
@@ -565,7 +569,7 @@ await step('A-R11-01', async () => {
   const ownerB = await session(demo.storeB.email, demo.storeB.password), pub = (await api(`public/stores/${demo.storeB.slug}`)).body.theme;
   const body = Array.from({ length: 14 }, (_, i) => `${i + 1}. Política de trocas e devoluções sintética: parágrafo ${i + 1} com texto suficiente para várias linhas de leitura e conferir a largura confortável da coluna. TESTE`).join('\n\n');
   const pages = [...pub.pages.filter((p) => p.slug !== 'politicas'), { slug: 'politicas', title: 'Políticas da loja TESTE', body }];
-  const d = (await api(`tenants/${demo.storeB.id}/storefront/draft`, { method: 'POST', actor: ownerB, body: { schema_version: 1, title: pub.title, description: pub.description, hero: pub.hero, color: pub.color, font: pub.font, pages, menu: pub.menu, assets: pub.assets || [] } })).body;
+  const { supplier: _supplier, ...theme } = pub, d = (await api(`tenants/${demo.storeB.id}/storefront/draft`, { method: 'POST', actor: ownerB, body: { ...theme, pages } })).body;
   await api(`tenants/${demo.storeB.id}/storefront/publish`, { method: 'POST', actor: ownerB, body: { revision_id: d.id } });
   const widths = [];
   for (const w of [390, 1440]) { const [ctx, page] = await open(w); await page.goto(`${base}/lojas/${demo.storeB.slug}/paginas/politicas`); await page.getByRole('heading', { level: 1, name: 'Políticas da loja TESTE' }).waitFor();
