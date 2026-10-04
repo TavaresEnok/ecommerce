@@ -7,7 +7,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { chromium } from '@playwright/test';
 import { client } from './seed.mjs';
-const base=process.env.BASE_URL||'http://web:3000',api=client(base,process.env.APP_ORIGIN||'http://localhost:3000'),out='/app/artifacts/capturas',widths=[1440,390];
+const base=process.env.BASE_URL||'http://web:3000',api=client(base,process.env.APP_ORIGIN||'http://localhost:3000'),label=process.env.CAPTURE_LABEL||'atual',out=`/app/artifacts/capturas/${label}`,sizes=(process.env.CAPTURE_SIZES||'1440x900,390x844').split(',').map(s=>s.split('x').map(Number));
 const [store]=JSON.parse(readFileSync('/app/demo.json','utf8')),slug=new URL(store.url).pathname.split('/')[2];
 mkdirSync(out,{recursive:true});
 const ok=(r,s=201)=>{if(r.status!==s)throw new Error(`${r.status} ${JSON.stringify(r.body)}`);return r;};
@@ -49,15 +49,17 @@ const pages=[
  ['vitrine-nao-encontrada',`${shop}/produtos/nao-existe`,'none'],
 ];
 const browser=await chromium.launch(),index=[];
-for(const [i,[name,path,session,action]] of pages.entries())for(const width of widths){
- const context=await browser.newContext({viewport:{width,height:900}});
+const only=(process.env.CAPTURE_ONLY||'').split(',').filter(Boolean);
+for(const [i,[name,path,session,action]] of pages.entries())for(const [width,height] of sizes){
+ if(only.length&&!only.some(o=>name.includes(o)))continue;
+ const context=await browser.newContext({viewport:{width,height}});
  if(session==='owner')await context.addCookies([cookieOf(actor.cookie)]);if(session==='cart')await context.addCookies([cookieOf(cart)]);if(session==='order'&&orderCart)await context.addCookies([cookieOf(orderCart)]);
- const page=await context.newPage(),file=`${String(i+1).padStart(2,'0')}-${name}-${width}.png`,entry={file,path,width,result:'ok'};
+ const page=await context.newPage(),file=`${String(i+1).padStart(2,'0')}-${name}-${width}x${height}.png`,entry={file,path,width,height,result:'ok'};
  try{await page.goto(base+path,{waitUntil:'networkidle',timeout:30000});if(action)await action(page);await page.waitForTimeout(800);
-  entry.title=await page.title();entry.overflowPx=await page.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-window.innerWidth));
+  entry.title=await page.title();entry.firstItem=await page.evaluate(()=>{const row=document.querySelector('[data-first-item],table tbody tr, .product-list li, .grid-products > *');if(!row)return null;const r=row.getBoundingClientRect();return {top:Math.round(r.top+scrollY),bottom:Math.round(r.bottom+scrollY),fitsViewport:r.bottom<=innerHeight};});entry.overflowPx=await page.evaluate(()=>Math.max(0,document.documentElement.scrollWidth-window.innerWidth));
  }catch(e){entry.result=`falha: ${String(e.message).split('\n')[0]}`;}
- await page.screenshot({path:`${out}/${file}`,fullPage:true}).catch(()=>{entry.result+=' (sem imagem)';});
+ await page.screenshot({path:`${out}/${file.replace('.png','-tela.png')}`,fullPage:false}).catch(()=>{});await page.screenshot({path:`${out}/${file}`,fullPage:true}).catch(()=>{entry.result+=' (sem imagem)';});
  index.push(entry);console.log(entry.result==='ok'?'✔':'✖',file,entry.result==='ok'?'':entry.result);await context.close();
 }
 await browser.close();writeFileSync(`${out}/indice.json`,JSON.stringify({base,store:slug,capturedAt:new Date().toISOString(),pages:index},null,2));
-console.log(`${index.filter(e=>e.result==='ok').length}/${index.length} capturas em artifacts/capturas`);
+console.log(`${index.filter(e=>e.result==='ok').length}/${index.length} capturas em artifacts/capturas/${label}`);
