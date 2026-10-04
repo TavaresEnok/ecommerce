@@ -1,5 +1,7 @@
 # Relatório final — implementação do redesign (prompt 2)
 
+> **Atualização de 04/10/2026:** evolução de UX, interface e personalização (lotes A–C de 03/10) em [§10](#10-evolução-de-ux-interface-e-personalização-0304102026).
+
 **Data:** 02/10/2026 · **Branch:** `claude/gallant-fermat-6x20fs` · **Base:** `831d9a2` (materiais de design sobre o commit de produto `0179f4d`)
 **Commits desta entrega:** `f4e5e5e` (lote A), `d445f81` (lote B), `6160a61` (lote C), `1500fbb` e `2a6531e` (correções encontradas na verificação) e o commit de documentação que acompanha este relatório.
 
@@ -148,3 +150,67 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 - **Resultado:** duas execuções completas da fase 7 com código 0 (16/16), contra 4 falhas do pilot-flow em 5 sequências antes. O custo é ≈ 3 min de espera por execução.
 - **Fora do escopo, registrado como tarefa:** em produção (Caddy → Next → API) o mesmo `trustProxy: false` faz todos os clientes dividirem a cota de 120/min.
 - **T23:** segue intermitente (passou nas duas execuções, o que não o resolve).
+
+## 10. Evolução de UX, interface e personalização (03–04/10/2026)
+
+**Commits (locais, em `main`, sem push):** `2bab597` (código e testes), `b1ddf97` (lojas de exemplo e scripts de revisão), `50ef541` (documentação e evidências), `17383a9` (nome do formulário do desafio de MFA) e o commit deste relatório. Critérios em [ACEITE.md §3](ACEITE.md); decisões D-23 a D-30 em [DESIGN.md §15](../../DESIGN.md).
+
+### 10.1 As cinco falhas apontadas — antes e depois
+
+Antes: [`evidencias/capturas-locais/`](evidencias/capturas-locais/) (loja de demonstração antiga). Depois: [`evidencias/evolucao-ux/`](evidencias/evolucao-ux/) (lojas de exemplo; conteúdo diferente, mesmas larguras).
+
+| Falha | O que mudou | Antes → depois |
+|---|---|---|
+| 4.1 Navegação móvel e catálogo | Faixa com todos os itens trocada por botão “Menu” + `<dialog>` agrupado por tarefa; lista de produtos em linhas compactas com filtros atrás de “Filtros”. Primeiro produto: y = 1068 px → 301 px em 390×844 | [catálogo 390](evidencias/capturas-locais/05-painel-catalogo-390.png) → [produtos 390](evidencias/evolucao-ux/painel-produtos-390.jpg), [menu aberto](evidencias/evolucao-ux/painel-menu-aberto-390.jpg) |
+| 4.2 Configurações, edição de produto e pedidos | Uma página por tarefa (`/configuracoes/*`, `/aparencia`), “Hoje” no lugar de “Operação”; edição de produto progressiva com proteção de saída; pedidos com próximo passo e visões rápidas | [operação 390](evidencias/capturas-locais/11-painel-operacao-390.png) → [hoje](evidencias/evolucao-ux/painel-hoje-390.jpg), [entregas](evidencias/evolucao-ux/painel-entregas-390.jpg); [produto](evidencias/capturas-locais/06-painel-produto-editar-390.png) → [produto](evidencias/evolucao-ux/painel-produto-editar-390.jpg); [pedidos](evidencias/capturas-locais/08-painel-pedidos-390.png) → [pedidos](evidencias/evolucao-ux/painel-pedidos-390.jpg) |
+| 4.3 Linguagem e escopo da busca | Sem “SIMULATED”, “MFA”, “Hostname” nem legenda repetida; busca diz o que cobre (“Buscar em 12 produtos”; no limite, “primeiros 100 (A–Z)” + aviso) | [busca no limite](evidencias/evolucao-ux/painel-busca-limite-390.jpg), [segurança](evidencias/evolucao-ux/painel-seguranca-390.jpg) |
+| 4.4 Identidade da loja e casos-limite | Três modelos com composição própria; fotos CC0 com origem registrada; loja vazia, de um produto (destaque), de dois produtos, sem foto, título longo, PNG transparente e foto de 240 px | [vitrine antiga 1440](evidencias/capturas-locais/14-vitrine-inicio-1440.png) → [Editorial](evidencias/evolucao-ux/loja-editorial-1440.jpg), [Essencial](evidencias/evolucao-ux/loja-essencial-1440.jpg), [Ateliê](evidencias/evolucao-ux/loja-atelie-1440.jpg); [vazia](evidencias/evolucao-ux/loja-caso-vazia-390.jpg), [um produto](evidencias/evolucao-ux/loja-caso-um-1440.jpg), [cor clara](evidencias/evolucao-ux/loja-caso-contraste-390.jpg) |
+| 4.5 Envio de imagens, menu e estados | Envio em português com estados reais (conferindo, fila, enviando %, processando, pronta, erro com recuperação); menu e rodapé por destinos escolhidos em listas, reordenáveis sem arrastar; estados de foco, desabilitado, salvo, não salvo e conflito | [envios](evidencias/evolucao-ux/painel-imagens-envios-1440.jpg), [menu](evidencias/evolucao-ux/painel-aparencia-menu-1440.jpg), [editor](evidencias/evolucao-ux/painel-aparencia-1440.jpg) |
+
+### 10.2 Personalização: como usar e o que é persistido
+
+1. Painel → **Loja → Aparência**. Escolher um **modelo** (a prévia muda antes de aplicar; textos, imagens, menu, páginas e cor são preservados; usar as seções sugeridas é opcional).
+2. **Identidade:** nome, descrição, logo, cor (com explicação quando a loja usa uma versão ajustada para contraste), fonte dos títulos, formato dos botões. **Layout e fotos:** largura, densidade, proporção e enquadramento.
+3. **Página inicial:** adicionar, editar, ocultar, duplicar, remover e reordenar seções (destaque, produtos, categorias, imagem com texto, texto). **Menu / Rodapé:** links por destino (início, catálogo, categoria, produto, página, carrinho, atendimento, site externo `https://`). **Páginas da loja.**
+4. **Prévia** ao vivo em Celular (390 px) e Computador (1280 px reduzido), com o mesmo componente da loja pública.
+5. **Salvar rascunho** grava no servidor (sobrevive a recarregar e a outra sessão; se outra sessão salvou antes, nada é sobrescrito). **Publicar** publica exatamente o rascunho da tela. **Histórico:** trazer a versão publicada de volta para o rascunho ou republicar uma das últimas 10 publicações.
+
+Persistido no servidor: tudo acima (tema v2, `theme_revisions` imutáveis + `theme_media`). Publicado: só o que passou por “Publicar”. Restaurável: a publicada (para o rascunho) e as 10 últimas publicações (republicar). Não persistido: a escolha Celular/Computador e o modo Editar/Prévia.
+
+### 10.3 Telas e interações realmente inspecionadas
+
+- Capturas examinadas por mim (rodadas b1–b4, 68 capturas cada, 390 e 1440): as três lojas (início, catálogo, produto, sem foto, esgotado), os três casos-limite e 17 telas do painel. Problemas vistos e corrigidos: imagem do bloco “imagem com texto” alta demais no Ateliê; blocos recolhíveis da página do produto sem seta e com vão; produto sem foto com quadro enorme; galeria mais estreita que a coluna; loja com um produto com grade quase vazia; filtros do catálogo desalinhados no desktop; **prévia do editor escondida no desktop** (regra do modo celular vencia por especificidade) e **bloqueada pelo `X-Frame-Options: DENY`**; prévia “Computador” mostrando o layout de celular; mensagem de conflito duplicada; pedidos com “SIMULATED” e conta de pagamento antes da lista; loja sem pedidos mostrando filtros inúteis; PNG “transparente” que tinha o quadriculado desenhado na imagem.
+- Interações automatizadas e conferidas (`scripts/ux-checks.mjs`, rodada c2): menu por teclado, edição com erro e proteção de saída, busca no limite (101 produtos), envio válido e inválido, menu criado/reordenado/salvo/reaberto, 9 telas em 320 e 640 px, resumo do checkout até a revisão (sem confirmar).
+- Testes de ponta a ponta do tema (`tests/theme.test.mjs`): duas sessões, publicação exata, histórico, isolamento, cor clara, editor em 390/1440.
+
+### 10.4 Testes e verificador
+
+Verificador oficial `node scripts/verify.mjs --phase=7` no commit `17383a9` (04/10/2026, início 03:09 UTC, ~11 min): **código 2** — as **18 etapas locais aprovadas** (contrato de evidências, preparação isolada, build Node LTS, migrações/S3/saúde, tipos, núcleo transacional com worker parado, worker real com interface e T27, fase 2 com T22/T23/T37 e Playwright, **tema v2** — `theme-schema` + `theme` com 7/7 —, regressões da fundação, logs sanitizados, persistência S3, CLI do operador, backup, fatos após o backup, restore, conferências após restore, PITR). O código 2 vem só das pendências **externas** que a regra do projeto exige (Mercado Pago, domínio HTTPS, e-mail, backup externo, operação, piloto real, decisões comerciais, IA real). Evidência: [`docs/execucao/evidencias/fase-7/verification.json`](../execucao/evidencias/fase-7/verification.json). `worktreeClean: false` porque pastas de ferramentas de terceiros não versionadas (`.claude/`, `.agents/`, `agency-agents/`, `.mcp.json`, `skills-lock.json`) estavam no diretório.
+
+**Primeira execução do dia (commit `50ef541`): código 1.** Parou em `commercial-ui.test.mjs` (390 px): o formulário do desafio de verificação em duas etapas da sessão (`MfaChallenge`) ainda se chamava “Confirmar MFA”, enquanto o teste já usava o nome novo. Corrigido em `17383a9` (mesmo nome nos dois formulários) e reexecutado do zero.
+
+Outras verificações: `npm run typecheck` sem erros; build do web e da API dentro da imagem (etapa “Build em Node LTS”); `node docs/design/verificar.mjs` coerente (51 contrastes, 17 rotas); `node docs/design/tokens-css.mjs --check` em dia; `caddy validate` do `Caddyfile.staging` válido; `node --test tests/theme-schema.test.mjs` no host (4/4); `scripts/ux-checks.mjs` rodada c2 (6/6) + CK-RESUMO; `scripts/design-review.mjs` rodada b4 (68 capturas, rolagem horizontal 0, nenhum erro de console).
+
+### 10.5 Limitações e pendências
+
+- Linhas antigas do ACEITE cujas telas mudaram estão como **“reexecutar”**: `verificar-aceite.mjs` e `verificar-teclado.mjs` foram atualizados, mas não rodaram no ambiente `ecommerce-design-demo` nesta rodada.
+- AX01 **parcial**: zoom real do navegador em 200%/400%, percurso completo de Tab nas telas novas e leitor de tela não foram exercitados.
+- O estado “Enviando N%” do envio de imagens não foi observado nos testes locais (envio rápido demais); “Tentar de novo” após falha de rede não foi exercitado.
+- Na rodada c1, a verificação UX04 falhou uma vez por ler o campo antes da nova renderização; o script passou a esperar o estado do campo e as rodadas seguintes passaram. Registrado para não esconder intermitência.
+- As capturas “antes” usam a loja de demonstração antiga; as “depois” usam as lojas de exemplo (conteúdo diferente).
+- Sem teste com usuários, sem medição de conversão e sem comparação objetiva com concorrentes.
+
+### 10.6 O que depende de você ou de integração externa
+
+- **Avaliação visual final** dos três modelos, das fotos escolhidas e da hierarquia do painel.
+- Nome do produto, logotipo e domínio continuam indefinidos (“Plataforma”).
+- Pagamento real (Mercado Pago), e-mail transacional real e domínio público seguem dependentes de homologação externa; tudo aqui usa pagamento **simulado** e dados de teste.
+
+### 10.7 Como iniciar e abrir os três modelos
+
+```bash
+docker compose up -d --wait              # projeto de desenvolvimento em http://localhost:3000
+node scripts/fixtures/seed-presets.mjs   # seis lojas de exemplo (só se ainda não existirem); acessos em .local/demo-presets.json
+```
+
+Abra os endereços `store` de `.local/demo-presets.json` (chaves `editorial`, `essencial`, `atelie`, `vazia`, `um`, `contraste`) — por exemplo `/lojas/atelier-norte-<sufixo>`, `/lojas/essencial-casa-<sufixo>`, `/lojas/barro-e-trama-<sufixo>` — e o editor em `/painel/<tenantId>/aparencia` com a conta correspondente.

@@ -1,7 +1,15 @@
 # Status dos materiais de design
 
-**Data:** 03/10/2026 · **Base:** `0179f4d` (produto, fases 0 a 7) + `831d9a2` (materiais) · **Branch:** `claude/gallant-fermat-6x20fs`
-**Estado:** redesign **implementado nas rotas reais R01–R14** (lotes A, B e C) + rodada de correções de 03/10. ACEITE: 86 aprovados, 1 parcial (G-13: 429 resolvido em `6a0d195`; falta o T23 intermitente), 1 alterado. **Entrega não concluída como um todo** enquanto o T23 seguir intermitente — detalhes, resultados e pendências em [RELATORIO-FINAL.md](RELATORIO-FINAL.md); critérios em [ACEITE.md](ACEITE.md). **Não houve aprovação visual do responsável.** O redesign **não** torna o sistema pronto para produção.
+**Data:** 04/10/2026 · **Branch:** `main` (commits locais, sem push) · **Último código:** `17383a9`
+**Estado:** redesign das rotas R01–R14 + **evolução de UX e personalização** (03/10): navegação do painel por tarefas com menu móvel, configurações por assunto (R16), catálogo e edição progressiva, envio de imagens com estados reais, pedidos com próximo passo, checkout móvel com total no topo, **editor de aparência** (R15) com três modelos, tema v2 versionado, prévia ao vivo, histórico e proteção contra sobrescrita, catálogo da loja (R17).
+**Verificação:** `scripts/verify.mjs --phase=7` em `17383a9` → **código 2 com as 18 etapas locais aprovadas** (o 2 vem só das homologações externas exigidas pelo projeto). ACEITE §3: UX01–UX06, UI01–UI03, TH01–TH04, FN01, FN02, QA01 aprovados; **AX01 parcial** (sem zoom real 200/400%, sem percurso completo de Tab nas telas novas, sem leitor de tela). Linhas antigas do ACEITE cujas telas mudaram estão como **“reexecutar”** (scripts atualizados, não reexecutados no ambiente `ecommerce-design-demo`).
+**Não houve aprovação visual do responsável.** Pagamentos seguem simulados; nada foi publicado em lojas reais. Detalhes: [RELATORIO-FINAL.md §10](RELATORIO-FINAL.md); critérios: [ACEITE.md](ACEITE.md).
+
+## Como abrir os três modelos (projeto de desenvolvimento)
+
+`docker compose up -d --wait` (http://localhost:3000) → `node scripts/fixtures/seed-presets.mjs` (só se as lojas de exemplo ainda não existirem; acessos em `.local/demo-presets.json`, fora do Git) → abrir os endereços `store` das chaves `editorial`, `essencial` e `atelie` e o editor em `/painel/<tenantId>/aparencia` com a conta correspondente.
+
+## Histórico anterior (02–03/10/2026)
 
 ## 0. Implementação (prompt 2) — registro de progresso
 
