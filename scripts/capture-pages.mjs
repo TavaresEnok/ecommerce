@@ -2,19 +2,23 @@
 // Runs inside the tests image against the web service:
 //   docker compose run --rm --no-deps -v ./scripts/capture-pages.mjs:/app/scripts/capture-pages.mjs:ro \
 //     -v ./.local/demo.json:/app/demo.json:ro tests node scripts/capture-pages.mjs
-// Output: artifacts/capturas/<nn>-<nome>-<largura>.png and artifacts/capturas/indice.json
+// With the example stores of scripts/fixtures/seed-presets.mjs, mount .local/demo-presets.json as /app/demo.json instead:
+// the first store (CAPTURE_STORE=atelie by default) gets every page; the other stores get home, catalog and product.
+// Output: artifacts/capturas/<label>/<nn>-<nome>-<largura>.png and indice.json
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { chromium } from '@playwright/test';
 import { client } from './seed.mjs';
 const base=process.env.BASE_URL||'http://web:3000',api=client(base,process.env.APP_ORIGIN||'http://localhost:3000'),label=process.env.CAPTURE_LABEL||'atual',out=`/app/artifacts/capturas/${label}`,sizes=(process.env.CAPTURE_SIZES||'1440x900,390x844').split(',').map(s=>s.split('x').map(Number));
-const [store]=JSON.parse(readFileSync('/app/demo.json','utf8')),slug=new URL(store.url).pathname.split('/')[2];
+// demo.json (scripts/seed.mjs) lists {email,password,tenantId,url}; demo-presets.json lists {key,…,store}.
+const demo=JSON.parse(readFileSync('/app/demo.json','utf8')).map(d=>({...d,url:d.url??d.store}));
+const store=demo.find(d=>d.key===(process.env.CAPTURE_STORE||'atelie'))??demo[0],slug=new URL(store.url).pathname.split('/')[2],others=demo.filter(d=>d!==store&&d.key);
 mkdirSync(out,{recursive:true});
 const ok=(r,s=201)=>{if(r.status!==s)throw new Error(`${r.status} ${JSON.stringify(r.body)}`);return r;};
 // Owner session and one paid order, created through the same public/admin endpoints the interface uses.
 const login=ok(await api('auth/login',{method:'POST',body:{email:store.email,password:store.password}}));
 const actor={csrf:login.body.csrf,cookie:login.headers.get('set-cookie').split(';')[0]};
-const catalogue=ok(await api(`tenants/${store.tenantId}/catalogue`,{actor}),200).body,product=catalogue.products.find(p=>p.status==='ACTIVE'),variant=product.variants[0].id;
+const catalogue=ok(await api(`tenants/${store.tenantId}/catalogue`,{actor}),200).body,product=catalogue.products.find(p=>p.status==='ACTIVE'&&p.variants.some(v=>v.active&&v.available>0))??catalogue.products.find(p=>p.status==='ACTIVE'),variant=(product.variants.find(v=>v.active&&v.available>0)??product.variants[0]).id;
 const address={cep:'01001000',street:'Rua Demonstração',number:'1',city:'São Paulo',state:'SP',complement:''};
 const add=()=>api(`public/stores/${slug}/cart/items`,{method:'POST',body:{variant_id:variant,quantity:1}});
 let order=null,orderCart=null;
@@ -33,21 +37,31 @@ const pages=[
  ['suas-lojas','/','owner'],
  ['painel-catalogo',panel,'owner'],
  ['painel-produto-editar',panel,'owner',async p=>{await p.getByRole('link',{name:new RegExp(product.name)}).first().click();}],
- ['painel-vitrine-e-frete',`${panel}?aba=vitrine`,'owner'],
+ ['painel-novo-produto',`${panel}?novo=1`,'owner'],
+ ['painel-estoque',`${panel}?aba=estoque`,'owner'],
+ ['painel-imagens',`${panel}?aba=midia`,'owner'],
+ ['painel-categorias-locais',`${panel}?aba=organizacao`,'owner'],
+ ['painel-aparencia',`${panel}/aparencia`,'owner',async p=>{await p.waitForTimeout(2500);}],
+ ['painel-aparencia-celular',`${panel}/aparencia`,'owner',async p=>{await p.getByRole('button',{name:'Celular'}).click().catch(()=>{});await p.waitForTimeout(2500);}],
  ['painel-pedidos',`${panel}/pedidos`,'owner'],
  ['painel-pedido-detalhe',`${panel}/pedidos`,'owner',async p=>{await p.getByRole('link',{name:/^Nº \d+$/}).first().click();await p.getByRole('heading',{name:'Expedição'}).waitFor({timeout:10000});}],
  ['painel-atendimento',`${panel}/atendimento`,'owner'],
- ['painel-operacao',`${panel}/operacao`,'owner'],
+ ['painel-hoje',`${panel}/operacao`,'owner'],
+ ...['loja','entregas','dominio','seguranca','plano','dados'].map(s=>[`painel-config-${s}`,`${panel}/configuracoes/${s}`,'owner']),
  ['plataforma',`/plataforma`,'owner'],
  ['preview-rascunho',`/preview/${store.tenantId}`,'owner'],
  ['vitrine-inicio',shop,'none'],
- ['vitrine-busca',`${shop}?q=caneca`,'none'],
+ ['vitrine-catalogo',`${shop}/produtos`,'none'],
+ ['vitrine-busca',`${shop}?q=${encodeURIComponent(product.name.split(' ')[0])}`,'none'],
  ['vitrine-produto',`${shop}/produtos/${product.slug}`,'none'],
  ['vitrine-carrinho',`${shop}/carrinho`,'cart'],
  ['vitrine-atendimento',`${shop}/atendimento`,'none'],
  ...(order?[['vitrine-pedido-comprovante',`${shop}/pedidos/${order.id}`,'order']]:[]),
  ['vitrine-nao-encontrada',`${shop}/produtos/nao-existe`,'none'],
 ];
+// Other example stores (other models and edge cases): home, catalog and the first product of each.
+for(const o of others){const oslug=new URL(o.url).pathname.split('/')[2],data=await (await fetch(`${base}/api/public/stores/${oslug}`)).json().catch(()=>({products:[]}));
+ pages.push([`loja-${o.key}-inicio`,`/lojas/${oslug}`,'none'],...(data.products?.length?[[`loja-${o.key}-catalogo`,`/lojas/${oslug}/produtos`,'none'],[`loja-${o.key}-produto`,`/lojas/${oslug}/produtos/${data.products[0].slug}`,'none']]:[]));}
 const browser=await chromium.launch(),index=[];
 const only=(process.env.CAPTURE_ONLY||'').split(',').filter(Boolean);
 for(const [i,[name,path,session,action]] of pages.entries())for(const [width,height] of sizes){

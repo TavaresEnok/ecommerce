@@ -1,326 +1,962 @@
 {
   "base": "http://web:3000",
-  "store": "aurora-565ba85e3c",
-  "capturedAt": "2026-10-03T21:46:29.578Z",
+  "store": "barro-e-trama-27c24c",
+  "capturedAt": "2026-10-04T21:07:31.517Z",
   "pages": [
     {
-      "file": "01-acesso-entrar-1440.png",
+      "file": "01-acesso-entrar-1440.jpg",
       "path": "/",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "01-acesso-entrar-390.png",
+      "file": "01-acesso-entrar-390.jpg",
       "path": "/",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "02-acesso-criar-1440.png",
+      "file": "02-acesso-criar-1440.jpg",
       "path": "/",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "02-acesso-criar-390.png",
+      "file": "02-acesso-criar-390.jpg",
       "path": "/",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "03-acesso-recuperar-1440.png",
+      "file": "03-acesso-recuperar-1440.jpg",
       "path": "/",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "03-acesso-recuperar-390.png",
+      "file": "03-acesso-recuperar-390.jpg",
       "path": "/",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "04-suas-lojas-1440.png",
+      "file": "04-suas-lojas-1440.jpg",
       "path": "/",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Suas lojas · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "04-suas-lojas-390.png",
+      "file": "04-suas-lojas-390.jpg",
       "path": "/",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Suas lojas · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "05-painel-catalogo-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "05-painel-catalogo-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Produtos · Plataforma",
+      "firstItem": {
+        "top": 0,
+        "bottom": 0,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "05-painel-catalogo-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "05-painel-catalogo-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Produtos · Plataforma",
+      "firstItem": {
+        "top": 301,
+        "bottom": 393,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "06-painel-produto-editar-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "06-painel-produto-editar-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "Camiseta aurora · Plataforma",
+      "title": "Bule de porcelana verde · Plataforma",
+      "firstItem": {
+        "top": 1655,
+        "bottom": 1712,
+        "fitsViewport": false
+      },
       "overflowPx": 0
     },
     {
-      "file": "06-painel-produto-editar-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "06-painel-produto-editar-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "Camiseta aurora · Plataforma",
+      "title": "Bule de porcelana verde · Plataforma",
+      "firstItem": {
+        "top": 1943,
+        "bottom": 2164,
+        "fitsViewport": false
+      },
       "overflowPx": 0
     },
     {
-      "file": "07-painel-vitrine-e-frete-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92?aba=vitrine",
+      "file": "07-painel-novo-produto-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?novo=1",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "Fornecedor e tema · Plataforma",
+      "title": "Novo produto · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "07-painel-vitrine-e-frete-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92?aba=vitrine",
+      "file": "07-painel-novo-produto-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?novo=1",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "Fornecedor e tema · Plataforma",
+      "title": "Novo produto · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "08-painel-pedidos-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/pedidos",
+      "file": "08-painel-estoque-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=estoque",
       "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Estoque · Plataforma",
+      "firstItem": {
+        "top": 215,
+        "bottom": 260,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "08-painel-estoque-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=estoque",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Estoque · Plataforma",
+      "firstItem": {
+        "top": 197,
+        "bottom": 338,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "09-painel-imagens-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=midia",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Imagens · Plataforma",
+      "firstItem": {
+        "top": 429,
+        "bottom": 502,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "09-painel-imagens-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=midia",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Imagens · Plataforma",
+      "firstItem": {
+        "top": 587,
+        "bottom": 761,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "10-painel-categorias-locais-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=organizacao",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Categorias e locais · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "10-painel-categorias-locais-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c?aba=organizacao",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Categorias e locais · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "11-painel-aparencia-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Aparência · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "11-painel-aparencia-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Aparência · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "12-painel-aparencia-celular-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Aparência · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "12-painel-aparencia-celular-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/aparencia",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Aparência · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "13-painel-pedidos-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
+      "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Pedidos · Plataforma",
+      "firstItem": {
+        "top": 414,
+        "bottom": 475,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "08-painel-pedidos-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/pedidos",
+      "file": "13-painel-pedidos-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Pedidos · Plataforma",
+      "firstItem": {
+        "top": 426,
+        "bottom": 632,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "09-painel-pedido-detalhe-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/pedidos",
+      "file": "14-painel-pedido-detalhe-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Pedido nº 1 · Plataforma",
+      "firstItem": {
+        "top": 434,
+        "bottom": 495,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "09-painel-pedido-detalhe-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/pedidos",
+      "file": "14-painel-pedido-detalhe-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/pedidos",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Pedido nº 1 · Plataforma",
+      "firstItem": {
+        "top": 531,
+        "bottom": 671,
+        "fitsViewport": true
+      },
       "overflowPx": 0
     },
     {
-      "file": "10-painel-atendimento-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/atendimento",
+      "file": "15-painel-atendimento-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/atendimento",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Atendimento · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "10-painel-atendimento-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/atendimento",
+      "file": "15-painel-atendimento-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/atendimento",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Atendimento · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "11-painel-operacao-1440.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/operacao",
+      "file": "16-painel-hoje-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/operacao",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "Operação · Plataforma",
+      "title": "Hoje · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "11-painel-operacao-390.png",
-      "path": "/painel/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92/operacao",
+      "file": "16-painel-hoje-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/operacao",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "Operação · Plataforma",
+      "title": "Hoje · Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "12-plataforma-1440.png",
+      "file": "17-painel-config-loja-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/loja",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Dados da loja · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "17-painel-config-loja-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/loja",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Dados da loja · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "18-painel-config-entregas-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/entregas",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Entregas · Plataforma",
+      "firstItem": {
+        "top": 277,
+        "bottom": 322,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "18-painel-config-entregas-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/entregas",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Entregas · Plataforma",
+      "firstItem": {
+        "top": 259,
+        "bottom": 428,
+        "fitsViewport": true
+      },
+      "overflowPx": 0
+    },
+    {
+      "file": "19-painel-config-dominio-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dominio",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Domínio · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "19-painel-config-dominio-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dominio",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Domínio · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "20-painel-config-seguranca-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/seguranca",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Segurança · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "20-painel-config-seguranca-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/seguranca",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Segurança · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "21-painel-config-plano-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/plano",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Plano e faturas · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "21-painel-config-plano-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/plano",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Plano e faturas · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "22-painel-config-dados-1440.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dados",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Dados e IA · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "22-painel-config-dados-390.jpg",
+      "path": "/painel/01a1045c-c0b6-776e-81ea-94e1af6cac1c/configuracoes/dados",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Dados e IA · Plataforma",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "23-plataforma-1440.jpg",
       "path": "/plataforma",
       "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "12-plataforma-390.png",
+      "file": "23-plataforma-390.jpg",
       "path": "/plataforma",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Plataforma",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "13-preview-rascunho-1440.png",
-      "path": "/preview/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "24-preview-rascunho-1440.jpg",
+      "path": "/preview/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "Preview privado",
+      "title": "Prévia privada",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "13-preview-rascunho-390.png",
-      "path": "/preview/01a102a1-24d1-738d-bb4f-b2fd5d1f2f92",
+      "file": "24-preview-rascunho-390.jpg",
+      "path": "/preview/01a1045c-c0b6-776e-81ea-94e1af6cac1c",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "Preview privado",
+      "title": "Prévia privada",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "14-vitrine-inicio-1440.png",
-      "path": "/lojas/aurora-565ba85e3c",
+      "file": "25-vitrine-inicio-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "14-vitrine-inicio-390.png",
-      "path": "/lojas/aurora-565ba85e3c",
+      "file": "25-vitrine-inicio-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "15-vitrine-busca-1440.png",
-      "path": "/lojas/aurora-565ba85e3c?q=caneca",
+      "file": "26-vitrine-catalogo-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "15-vitrine-busca-390.png",
-      "path": "/lojas/aurora-565ba85e3c?q=caneca",
+      "file": "26-vitrine-catalogo-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "16-vitrine-produto-1440.png",
-      "path": "/lojas/aurora-565ba85e3c/produtos/camiseta",
+      "file": "27-vitrine-busca-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c?q=Bule",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "Camiseta aurora — AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "16-vitrine-produto-390.png",
-      "path": "/lojas/aurora-565ba85e3c/produtos/camiseta",
+      "file": "27-vitrine-busca-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c?q=Bule",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "Camiseta aurora — AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "17-vitrine-carrinho-1440.png",
-      "path": "/lojas/aurora-565ba85e3c/carrinho",
+      "file": "28-vitrine-produto-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-verde",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Bule de porcelana verde — Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "17-vitrine-carrinho-390.png",
-      "path": "/lojas/aurora-565ba85e3c/carrinho",
+      "file": "28-vitrine-produto-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos/bule-de-porcelana-verde",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Bule de porcelana verde — Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "18-vitrine-atendimento-1440.png",
-      "path": "/lojas/aurora-565ba85e3c/atendimento",
+      "file": "29-vitrine-carrinho-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/carrinho",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "18-vitrine-atendimento-390.png",
-      "path": "/lojas/aurora-565ba85e3c/atendimento",
+      "file": "29-vitrine-carrinho-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/carrinho",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "19-vitrine-pedido-comprovante-1440.png",
-      "path": "/lojas/aurora-565ba85e3c/pedidos/01a103ba-7d58-7549-8403-554d8989fecd",
+      "file": "30-vitrine-atendimento-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/atendimento",
       "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Barro & Trama",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "30-vitrine-atendimento-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/atendimento",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Barro & Trama",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "31-vitrine-pedido-comprovante-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/pedidos/01a108bb-0ea0-75af-b6c6-45a760e0d440",
+      "width": 1440,
+      "height": 900,
       "result": "ok",
       "title": "Pedido",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "19-vitrine-pedido-comprovante-390.png",
-      "path": "/lojas/aurora-565ba85e3c/pedidos/01a103ba-7d58-7549-8403-554d8989fecd",
+      "file": "31-vitrine-pedido-comprovante-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/pedidos/01a108bb-0ea0-75af-b6c6-45a760e0d440",
       "width": 390,
+      "height": 844,
       "result": "ok",
       "title": "Pedido",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "20-vitrine-nao-encontrada-1440.png",
-      "path": "/lojas/aurora-565ba85e3c/produtos/nao-existe",
+      "file": "32-vitrine-nao-encontrada-1440.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos/nao-existe",
       "width": 1440,
+      "height": 900,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
       "overflowPx": 0
     },
     {
-      "file": "20-vitrine-nao-encontrada-390.png",
-      "path": "/lojas/aurora-565ba85e3c/produtos/nao-existe",
+      "file": "32-vitrine-nao-encontrada-390.jpg",
+      "path": "/lojas/barro-e-trama-27c24c/produtos/nao-existe",
       "width": 390,
+      "height": 844,
       "result": "ok",
-      "title": "AURORA TESTE",
+      "title": "Barro & Trama",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "33-loja-essencial-inicio-1440.jpg",
+      "path": "/lojas/essencial-casa-27c24c",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "33-loja-essencial-inicio-390.jpg",
+      "path": "/lojas/essencial-casa-27c24c",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "34-loja-essencial-catalogo-1440.jpg",
+      "path": "/lojas/essencial-casa-27c24c/produtos",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "34-loja-essencial-catalogo-390.jpg",
+      "path": "/lojas/essencial-casa-27c24c/produtos",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "35-loja-essencial-produto-1440.jpg",
+      "path": "/lojas/essencial-casa-27c24c/produtos/caderno-espiral-a5-pontilhado",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Caderno espiral A5 pontilhado — Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "35-loja-essencial-produto-390.jpg",
+      "path": "/lojas/essencial-casa-27c24c/produtos/caderno-espiral-a5-pontilhado",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Caderno espiral A5 pontilhado — Essencial Casa Digital",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "36-loja-editorial-inicio-1440.jpg",
+      "path": "/lojas/atelier-norte-27c24c",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "36-loja-editorial-inicio-390.jpg",
+      "path": "/lojas/atelier-norte-27c24c",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "37-loja-editorial-catalogo-1440.jpg",
+      "path": "/lojas/atelier-norte-27c24c/produtos",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "37-loja-editorial-catalogo-390.jpg",
+      "path": "/lojas/atelier-norte-27c24c/produtos",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "38-loja-editorial-produto-1440.jpg",
+      "path": "/lojas/atelier-norte-27c24c/produtos/bolsa-de-couro-preta",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Bolsa de couro preta — Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "38-loja-editorial-produto-390.jpg",
+      "path": "/lojas/atelier-norte-27c24c/produtos/bolsa-de-couro-preta",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Bolsa de couro preta — Atelier Norte",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "39-loja-vazia-inicio-1440.jpg",
+      "path": "/lojas/loja-vazia-27c24c",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Loja Vazia",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "39-loja-vazia-inicio-390.jpg",
+      "path": "/lojas/loja-vazia-27c24c",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Loja Vazia",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "40-loja-um-inicio-1440.jpg",
+      "path": "/lojas/um-produto-27c24c",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "40-loja-um-inicio-390.jpg",
+      "path": "/lojas/um-produto-27c24c",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "41-loja-um-catalogo-1440.jpg",
+      "path": "/lojas/um-produto-27c24c/produtos",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "41-loja-um-catalogo-390.jpg",
+      "path": "/lojas/um-produto-27c24c/produtos",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "42-loja-um-produto-1440.jpg",
+      "path": "/lojas/um-produto-27c24c/produtos/bule-de-porcelana-verde",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Bule de porcelana verde — Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "42-loja-um-produto-390.jpg",
+      "path": "/lojas/um-produto-27c24c/produtos/bule-de-porcelana-verde",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Bule de porcelana verde — Loja de Um Produto",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "43-loja-contraste-inicio-1440.jpg",
+      "path": "/lojas/loja-amarela-27c24c",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Loja Amarela",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "43-loja-contraste-inicio-390.jpg",
+      "path": "/lojas/loja-amarela-27c24c",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Loja Amarela",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "44-loja-contraste-catalogo-1440.jpg",
+      "path": "/lojas/loja-amarela-27c24c/produtos",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Loja Amarela",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "44-loja-contraste-catalogo-390.jpg",
+      "path": "/lojas/loja-amarela-27c24c/produtos",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Loja Amarela",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "45-loja-contraste-produto-1440.jpg",
+      "path": "/lojas/loja-amarela-27c24c/produtos/caderno-imagem-pequena-240-px",
+      "width": 1440,
+      "height": 900,
+      "result": "ok",
+      "title": "Caderno (imagem pequena, 240 px) — Loja Amarela",
+      "firstItem": null,
+      "overflowPx": 0
+    },
+    {
+      "file": "45-loja-contraste-produto-390.jpg",
+      "path": "/lojas/loja-amarela-27c24c/produtos/caderno-imagem-pequena-240-px",
+      "width": 390,
+      "height": 844,
+      "result": "ok",
+      "title": "Caderno (imagem pequena, 240 px) — Loja Amarela",
+      "firstItem": null,
       "overflowPx": 0
     }
   ]

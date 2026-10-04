@@ -106,7 +106,7 @@ Larguras padrão: **390**, **768** e **1440** px (altura 900). “Teclado” = n
 
 ## 3. Evolução de UX e personalização (03/10/2026)
 
-Critérios do pedido de evolução (lotes A–C). Evidências no projeto de desenvolvimento com as lojas de exemplo (`scripts/fixtures/seed-presets.mjs`), salvo indicação. Capturas selecionadas e medidas em [`evidencias/evolucao-ux/`](evidencias/evolucao-ux/) (rodadas completas em `artifacts/revisao/<rodada>/`, fora do Git, recriáveis pelos scripts citados). “Antes” = [`evidencias/capturas-locais/`](evidencias/capturas-locais/), feitas antes do lote A na loja de demonstração antiga (conteúdo diferente das lojas de exemplo).
+Critérios do pedido de evolução (lotes A–C). Evidências no projeto de desenvolvimento com as lojas de exemplo (`scripts/fixtures/seed-presets.mjs`), salvo indicação. Capturas selecionadas e medidas em [`evidencias/evolucao-ux/`](evidencias/evolucao-ux/) (rodadas completas em `artifacts/revisao/<rodada>/`, fora do Git, recriáveis pelos scripts citados). “Antes” = capturas feitas antes do lote A na loja de demonstração antiga, preservadas no histórico do Git (commit `240694e`, `docs/design/evidencias/capturas-locais/`); desde 04/10 essa pasta tem o conjunto atual de 45 telas × 390/1440.
 
 | ID | Critério | Como verificar | Resultado | Evidência |
 |---|---|---|---|---|
