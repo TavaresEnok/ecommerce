@@ -19,7 +19,9 @@ export function Alert({ tone = 'info', title, children, role, icon, id, focusabl
 }
 // Mensagens de resultado de uma ação: erro com role=alert, sucesso com role=status. Ficam visíveis até a próxima ação.
 export function Feedback({ error, notice }: { error?: string; notice?: string }) {
-  return <>{error && <Alert tone="danger" role="alert" title="Não foi possível concluir">{<p>{error}</p>}</Alert>}{notice && <p role="status" className="alert alert-success" style={{ display: 'block' }}>{notice}</p>}</>;
+  // Sessão vencida no meio do trabalho: título próprio e caminho para entrar de novo. Nada foi salvo pela ação recusada.
+  const expired = !!error && /sess[aã]o expirou/i.test(error);
+  return <>{error && <Alert tone={expired ? 'warning' : 'danger'} role="alert" title={expired ? 'Sessão expirada' : 'Não foi possível concluir'}><p>{error}</p>{expired && <p>A última ação não foi salva. Se digitou um texto longo, copie-o antes. <a href="/">Entrar novamente</a></p>}</Alert>}{notice && <p role="status" className="alert alert-success" style={{ display: 'block' }}>{notice}</p>}</>;
 }
 export function EmptyState({ icon = 'info', title, children, action }: { icon?: IconName; title: string; children?: ReactNode; action?: ReactNode }) {
   return <div className="empty"><Icon name={icon} /><p className="empty-title">{title}</p>{children && <div className="small muted">{children}</div>}{action}</div>;
@@ -27,10 +29,13 @@ export function EmptyState({ icon = 'info', title, children, action }: { icon?: 
 export function Loading({ label = 'Carregando…' }: { label?: string }) {
   return <div className="loading" aria-busy="true"><p role="status" className="small">{label}</p><div className="skeleton" style={{ width: '70%' }} aria-hidden /><div className="skeleton" style={{ width: '90%' }} aria-hidden /><div className="skeleton" style={{ width: '55%' }} aria-hidden /></div>;
 }
-export function PageHeader({ eyebrow, title, meta, crumbs, actions }: { eyebrow?: ReactNode; title: ReactNode; meta?: ReactNode; crumbs?: { label: string; href?: string }[]; actions?: ReactNode }) {
-  return <div className="stack-sm">
+// Cabeçalho de página: título + meta curta + ações. Sem legenda acima do título (o destino atual já aparece na navegação).
+// `eyebrow` é aceito só por compatibilidade e não é exibido.
+export function PageHeader({ title, meta, crumbs, actions, back }: { eyebrow?: ReactNode; title: ReactNode; meta?: ReactNode; crumbs?: { label: string; href?: string }[]; actions?: ReactNode; back?: { href: string; label: string } }) {
+  return <div className="stack-sm page-header">
+    {back && <a className="back-link" href={back.href}><Icon name="back" size={16} />{back.label}</a>}
     {crumbs && crumbs.length > 0 && <nav aria-label="Você está em"><ol className="crumbs">{crumbs.map((c, i) => <li key={i} aria-current={i === crumbs.length - 1 ? 'page' : undefined}>{c.href && i < crumbs.length - 1 ? <a href={c.href}>{c.label}</a> : c.label}</li>)}</ol></nav>}
-    <div className="page-head"><div>{eyebrow && <p className="caption">{eyebrow}</p>}<h1>{title}</h1>{meta && <div className="meta">{meta}</div>}</div>{actions && <div className="cluster">{actions}</div>}</div>
+    <div className="page-head"><div><h1>{title}</h1>{meta && <div className="meta">{meta}</div>}</div>{actions && <div className="cluster">{actions}</div>}</div>
   </div>;
 }
 type A11y = { id: string; 'aria-describedby'?: string; 'aria-invalid'?: true };
@@ -72,5 +77,25 @@ export function useDirty() {
   const [dirty, setDirty] = useState(false);
   useEffect(() => { if (!dirty) return; const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn); }, [dirty]);
   return { dirty, markDirty: () => setDirty(true), clean: () => setDirty(false) };
+}
+// Protege alterações não salvas também na navegação interna: com `dirty`, um clique em link do próprio site abre um diálogo
+// (“Descartar alterações?”) em vez de sair. O aviso nativo de `beforeunload` cobre fechar a aba/recarregar.
+export function useLeaveGuard(dirty: boolean, onDiscard?: () => void) {
+  const [target, setTarget] = useState<string | null>(null);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); };
+    const click = (e: MouseEvent) => {
+      const a = (e.target as HTMLElement | null)?.closest('a[href]') as HTMLAnchorElement | null;
+      if (!a || a.target === '_blank' || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+      e.preventDefault(); e.stopPropagation(); setTarget(url.pathname + url.search + url.hash);
+    };
+    window.addEventListener('beforeunload', warn); document.addEventListener('click', click, true);
+    return () => { window.removeEventListener('beforeunload', warn); document.removeEventListener('click', click, true); };
+  }, [dirty]);
+  const dialog = <ConfirmDialog open={target !== null} title="Descartar alterações?" description={<p>As alterações desta tela ainda não foram salvas. Se sair agora, elas serão perdidas.</p>} confirmLabel="Descartar e sair" onClose={() => setTarget(null)} onConfirm={() => { const go = target; setTarget(null); onDiscard?.(); if (go) location.assign(go); }} />;
+  return dialog;
 }
 export function useTitle(title: string) { useEffect(() => { document.title = title ? `${title} · Plataforma` : 'Plataforma'; }, [title]); }

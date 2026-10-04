@@ -83,13 +83,44 @@
   --store-color-accent-border: #245742;
   --store-color-accent-text: #245742;
   --store-color-accent-tint: #E9EEEC;
+  --store-color-overlay-scrim: rgba(0, 0, 0, 0.56);
+  --store-color-on-overlay: #FFFFFF;
+  --store-color-overlay-ink: #141414;
+  --store-color-control-on-media: rgba(255, 255, 255, 0.94);
   --store-font-family-body: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --store-font-family-display: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --store-font-family-display-serif: Georgia, "Times New Roman", serif;
+  --store-font-family-display-bodoni: "Bodoni Moda", Georgia, "Times New Roman", serif;
+  --store-font-family-display-archivo: Archivo, "IBM Plex Sans", system-ui, sans-serif;
+  --store-font-family-display-fraunces: Fraunces, Georgia, "Times New Roman", serif;
   --store-radius-control: 6px;
   --store-radius-media: 4px;
+  --store-radius-button-square: 0px;
+  --store-radius-button-pill: 999px;
   --store-layout-content-max: 1200px;
   --store-layout-media-ratio: 4 / 5;
+  --store-layout-content-max-narrow: 960px;
+  --store-layout-content-max-wide: 1440px;
+  --store-layout-ratio-square: 1 / 1;
+  --store-layout-ratio-landscape: 4 / 3;
+  --store-preset-editorial-bg: #FFFFFF;
+  --store-preset-editorial-surface: #F3F2F0;
+  --store-preset-editorial-text: #171717;
+  --store-preset-editorial-text-muted: #575757;
+  --store-preset-editorial-border: #E4E2DF;
+  --store-preset-editorial-control-border: #767676;
+  --store-preset-essencial-bg: #FFFFFF;
+  --store-preset-essencial-surface: #F2F4F7;
+  --store-preset-essencial-text: #101828;
+  --store-preset-essencial-text-muted: #475467;
+  --store-preset-essencial-border: #E4E7EC;
+  --store-preset-essencial-control-border: #667085;
+  --store-preset-atelie-bg: #FBF9F5;
+  --store-preset-atelie-surface: #F0ECE4;
+  --store-preset-atelie-text: #2B2620;
+  --store-preset-atelie-text-muted: #5E554A;
+  --store-preset-atelie-border: #E3DDD2;
+  --store-preset-atelie-control-border: #7A7064;
 }
 /* tokens:fim */
 

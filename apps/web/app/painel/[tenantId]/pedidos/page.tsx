@@ -26,46 +26,83 @@ function Orders() {
   return selected ? <OrderDetail id={selected} back={`${base}${query ? `?${query}` : ''}`} /> : <OrderList query={query} onFilter={(q) => router.push(`${base}${q ? `?${q}` : ''}`)} />;
 }
 
+// Próximo passo de cada pedido, só para orientar a fila (as ações e regras continuam no detalhe e na API).
+function nextStep(r: Row): { text: string; tone: 'danger' | 'warning' | 'action' | 'wait' | 'done' } {
+  if (r.refund_due_cents !== '0') return { text: `Devolver ${money(r.refund_due_cents)} no Mercado Pago`, tone: 'danger' };
+  if (r.dispute_status === 'OPEN') return { text: 'Responder a disputa', tone: 'danger' };
+  if (r.open_incidents > 0) return { text: r.open_incidents === 1 ? 'Resolver 1 pendência' : `Resolver ${r.open_incidents} pendências`, tone: 'danger' };
+  if (r.open_requests > 0) return { text: r.open_requests === 1 ? 'Responder 1 solicitação' : `Responder ${r.open_requests} solicitações`, tone: 'warning' };
+  if (r.order_status === 'CANCELLED') return { text: 'Cancelado, nada a fazer', tone: 'done' };
+  if (r.payment_status === 'PENDING') return { text: 'Aguardando confirmação do pagamento', tone: 'wait' };
+  if (r.payment_status === 'UNPAID') return { text: 'Aguardando pagamento', tone: 'wait' };
+  if (r.payment_status === 'PAID' && r.fulfillment_status === 'UNFULFILLED') return { text: r.delivery_kind === 'PICKUP' ? 'Separar para retirada' : 'Separar e enviar', tone: 'action' };
+  if (r.fulfillment_status === 'PROCESSING') return { text: r.delivery_kind === 'PICKUP' ? 'Avisar que está pronto' : 'Registrar envio', tone: 'action' };
+  if (r.fulfillment_status === 'SHIPPED') return { text: 'Confirmar entrega', tone: 'action' };
+  return { text: 'Concluído', tone: 'done' };
+}
+// Visões rápidas = combinações dos filtros do servidor (a URL continua a fonte da verdade).
+const VIEWS: { label: string; q: string }[] = [
+  { label: 'Todos', q: '' },
+  { label: 'Precisam de atenção', q: 'pending=true' },
+  { label: 'A enviar', q: 'payment_status=PAID&fulfillment_status=UNFULFILLED' },
+  { label: 'Em separação', q: 'fulfillment_status=PROCESSING' },
+  { label: 'Enviados', q: 'fulfillment_status=SHIPPED' },
+];
+const ENVIRONMENT: Record<string, string> = { SANDBOX: 'ambiente de teste', PRODUCTION: 'produção' };
+const sameQuery = (a: string, b: string) => { const x = new URLSearchParams(a), y = new URLSearchParams(b); x.sort(); y.sort(); return x.toString() === y.toString(); };
+
 function OrderList({ query, onFilter }: { query: string; onFilter: (q: string) => void }) {
-  const p = usePanel(), { busy, error, notice, run } = useAction(), [orders, setOrders] = useState<Row[] | null>(null), [accounts, setAccounts] = useState<Account[] | null>(null), [revoke, setRevoke] = useState<Account | null>(null), [loadError, setLoadError] = useState('');
+  const p = usePanel(), { busy, error, notice, run } = useAction(), [orders, setOrders] = useState<Row[] | null>(null), [accounts, setAccounts] = useState<Account[] | null>(null), [revoke, setRevoke] = useState<Account | null>(null), [loadError, setLoadError] = useState(''), [filtersOpen, setFiltersOpen] = useState(false);
   const current = new URLSearchParams(query), api = (path: string, method = 'GET', body?: unknown) => call(`tenants/${p.tenantId}/${path}`, { method, body, csrf: p.csrf });
   const load = useCallback(async () => { setOrders(await api(`operations/orders${query ? `?${query}` : ''}`)); if (p.owner) setAccounts(await api('purchase/accounts')); }, [query, p.tenantId]);
   useEffect(() => { setOrders(null); setLoadError(''); load().catch((e) => setLoadError(e.message)); }, [load]);
   function filter(e: FormEvent<HTMLFormElement>) { e.preventDefault(); const b = fields(e.currentTarget), q = new URLSearchParams(); for (const k of FILTERS) if (b[k]) q.set(k, b[k] === 'on' ? 'true' : b[k]); onFilter(q.toString()); }
   const connected = accounts?.filter((a) => a.status === 'CONNECTED') ?? [];
+  // Loja sem nenhum pedido: só o estado vazio (visões e filtros não teriam o que mostrar).
+  const noneYet = !query && orders?.length === 0;
+  const view = VIEWS.find((v) => sameQuery(v.q, query)), custom = !!query && !view, activeFilters = FILTERS.filter((k) => current.get(k)).length, attention = view?.q === 'pending=true';
+  const connect = () => void run(async () => { await api('purchase/accounts/simulated', 'POST'); await load(); await p.refresh(); }, 'Conta simulada conectada.');
   return <>
-    <PageHeader eyebrow="Vendas" title="Pedidos" meta="Pedidos da loja com pagamento, entrega e pendências. Pagamentos reais dependem da homologação do Mercado Pago." />
+    <PageHeader title="Pedidos" meta="Mais recentes primeiro. Cada linha mostra o próximo passo; abra o pedido para agir." />
     <Feedback error={error} notice={notice} />
-    {p.owner && accounts && <section className="surface section stack-sm" aria-labelledby="t-account">
-      <div className="section-head" style={{ marginBottom: 0 }}><h2 id="t-account">Conta de pagamento</h2>{connected.length === 0 && <button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void run(async () => { await api('purchase/accounts/simulated', 'POST'); await load(); await p.refresh(); }, 'Conta simulada conectada.')}>Conectar conta SIMULADA</button>}</div>
-      <p className="small muted">Mercado Pago real fica desabilitado até a homologação externa. A conta SIMULADA não movimenta dinheiro.</p>
-      {accounts.length > 0 && <ul className="stack-sm" style={{ listStyle: 'none' }}>{accounts.map((a) => <li key={a.id} className="cluster"><span>{a.provider === 'SIMULATED' ? 'Conta simulada' : a.provider} · {a.environment}</span><StatusBadge map={ACCOUNT_STATUS} value={a.status} />{a.status === 'CONNECTED' && <button className="btn btn-quiet btn-sm" disabled={busy} onClick={() => setRevoke(a)}>Revogar…</button>}</li>)}</ul>}
-    </section>}
+    {p.owner && accounts && connected.length === 0 && <Alert tone="warning" title="Nenhuma conta de pagamento conectada">
+      <p>Sem conta conectada, o comprador não consegue concluir a compra. O Mercado Pago real depende da homologação; a conta simulada não movimenta dinheiro.</p>
+      <p><button className="btn btn-secondary btn-sm" disabled={busy} onClick={connect}>Conectar conta SIMULADA</button></p></Alert>}
     <section className="stack-sm" aria-labelledby="t-recent">
       <h2 id="t-recent">Pedidos recentes</h2>
+      {!noneYet && <nav aria-label="Visões de pedidos" className="view-tabs"><ul>{VIEWS.map((v) => <li key={v.label}><Link href={v.q ? `?${v.q}` : '?'} aria-current={view === v ? 'page' : undefined} onClick={(e) => { e.preventDefault(); onFilter(v.q); }}>{v.label}</Link></li>)}{custom && <li><span className="view-custom" aria-current="page">Filtro personalizado</span></li>}</ul></nav>}
       <div className="table-wrap">
-        <form className="toolbar" aria-label="Filtrar pedidos" onSubmit={filter} key={query}>
+        {!noneYet && <><div className="orders-filter-bar"><button type="button" className="btn btn-secondary btn-sm filter-toggle" aria-expanded={filtersOpen} aria-controls="filtros-pedidos" onClick={() => setFiltersOpen(!filtersOpen)}><Icon name="filter" />Filtros{activeFilters > 0 && <span className="count-pill" aria-label={`${activeFilters} ativos`}>{activeFilters}</span>}</button>{query && <button type="button" className="btn btn-quiet btn-sm" onClick={() => onFilter('')}>Limpar filtros</button>}</div>
+        <form className={`toolbar orders-filters${filtersOpen ? '' : ' is-collapsed'}`} id="filtros-pedidos" aria-label="Filtrar pedidos" onSubmit={filter} key={query}>
           <div className="field narrow"><label htmlFor="f-pay">Pagamento</label><select className="select" id="f-pay" name="payment_status" defaultValue={current.get('payment_status') ?? ''}><option value="">Todos</option>{opt(PAYMENT_STATUS)}</select></div>
           <div className="field narrow"><label htmlFor="f-ful">Entrega</label><select className="select" id="f-ful" name="fulfillment_status" defaultValue={current.get('fulfillment_status') ?? ''}><option value="">Todas</option>{opt(FULFILLMENT_STATUS)}</select></div>
           <div className="field narrow"><label htmlFor="f-ord">Pedido</label><select className="select" id="f-ord" name="order_status" defaultValue={current.get('order_status') ?? ''}><option value="">Todos</option>{opt(ORDER_STATUS)}</select></div>
           <div className="field narrow"><label htmlFor="f-num">Número</label><input className="input" id="f-num" name="number" inputMode="numeric" pattern="[0-9]*" defaultValue={current.get('number') ?? ''} /></div>
           <label className="check" style={{ alignSelf: 'center' }}><input type="checkbox" name="pending" defaultChecked={current.get('pending') === 'true'} /> Somente com pendências</label>
           <div className="cluster-tight"><button className="btn btn-secondary">Filtrar</button>{query && <button type="button" className="btn btn-quiet" onClick={() => onFilter('')}>Limpar filtros</button>}</div>
-        </form>
+        </form></>}
         {loadError ? <div style={{ padding: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="Não foi possível carregar os pedidos">{loadError}</Alert></div> : !orders ? <div style={{ padding: 'var(--space-16)' }}><Loading label="Carregando pedidos autorizados…" /></div> :
-          orders.length === 0 ? <div style={{ padding: 'var(--space-16)' }}>{query ? <EmptyState icon="search" title="Nenhum pedido com esses filtros" action={<button className="btn btn-secondary btn-sm" onClick={() => onFilter('')}>Limpar filtros</button>} /> : <EmptyState icon="receipt" title="Nenhum pedido ainda">Os pedidos aparecem aqui quando um comprador conclui a compra na vitrine publicada.</EmptyState>}</div> :
-          <table className="data stack stack-wide"><caption>Mais recentes primeiro; até 100 pedidos por consulta. Datas no {zoneNote(p.timezone)}.</caption>
-            <thead><tr><th scope="col">Pedido</th><th scope="col">Data</th><th scope="col">Pagamento</th><th scope="col">Entrega</th><th scope="col" className="num">Total</th><th scope="col">Pendências</th></tr></thead>
-            <tbody>{orders.map((r) => <tr key={r.id}>
+          orders.length === 0 ? <div style={{ padding: 'var(--space-16)' }}>{query ? <EmptyState icon="search" title={attention ? 'Nenhum pedido precisa de atenção' : 'Nenhum pedido com esses filtros'} action={<button className="btn btn-secondary btn-sm" onClick={() => onFilter('')}>Limpar filtros</button>}>{attention ? 'Sem devoluções, disputas, pendências ou solicitações em aberto.' : null}</EmptyState> : <EmptyState icon="receipt" title="Nenhum pedido ainda">Os pedidos aparecem aqui quando um comprador conclui a compra na vitrine publicada.</EmptyState>}</div> :
+          <table className="data stack stack-wide orders-table"><caption>Mais recentes primeiro; até 100 pedidos por consulta. Datas no {zoneNote(p.timezone)}.</caption>
+            <thead><tr><th scope="col">Pedido</th><th scope="col">Próximo passo</th><th scope="col">Pagamento</th><th scope="col">Entrega</th><th scope="col" className="num">Total</th><th scope="col">Data</th></tr></thead>
+            <tbody>{orders.map((r) => { const step = nextStep(r); return <tr key={r.id} className={step.tone === 'danger' ? 'needs-attention' : undefined}>
               <td className="primary"><Link href={`?pedido=${r.id}${query ? `&${query}` : ''}`} style={{ fontWeight: 600 }}>Nº {r.number}</Link><span className="cell-sub">{label(ORDER_STATUS, r.order_status)} · {r.delivery_kind === 'PICKUP' ? 'retirada' : 'entrega'}</span></td>
-              <td data-label="Data">{formatDateTime(r.created_at, p.timezone)}</td>
+              <td data-label="Próximo passo"><span className={`next-step tone-${step.tone}`}>{step.tone === 'danger' && <Icon name="alert" size={16} />}{step.text}</span>{r.dispute_status !== 'NONE' && r.dispute_status !== 'OPEN' && <span className="cell-sub"><StatusBadge map={DISPUTE_STATUS} value={r.dispute_status} /></span>}</td>
               <td data-label="Pagamento"><StatusBadge map={PAYMENT_STATUS} value={r.payment_status} /></td>
               <td data-label="Entrega"><StatusBadge map={FULFILLMENT_STATUS} value={r.fulfillment_status} /></td>
               <td className="num" data-label="Total"><span className="money">{money(r.total_cents)}</span></td>
-              <td data-label="Pendências"><span className="cluster-tight">{r.refund_due_cents !== '0' ? <Badge tone="danger">Devolver {money(r.refund_due_cents)}</Badge> : r.open_incidents > 0 ? <Badge tone="danger">{r.open_incidents} {r.open_incidents === 1 ? 'pendência' : 'pendências'}</Badge> : null}{r.dispute_status !== 'NONE' && <StatusBadge map={DISPUTE_STATUS} value={r.dispute_status} />}{r.open_requests > 0 && <Badge tone="warning">{r.open_requests} {r.open_requests === 1 ? 'solicitação' : 'solicitações'}</Badge>}{r.open_incidents === 0 && r.open_requests === 0 && r.dispute_status === 'NONE' && <span className="muted">—</span>}</span></td>
-            </tr>)}</tbody></table>}
+              <td data-label="Data">{formatDateTime(r.created_at, p.timezone)}</td>
+            </tr>; })}</tbody></table>}
       </div>
     </section>
+    {p.owner && accounts && accounts.length > 0 && <details className="surface fold fold-section">
+      <summary><span className="fold-title">Conta de pagamento</span><span className="fold-summary">{connected.length ? `${connected.length === 1 ? 'Uma conta conectada' : `${connected.length} contas conectadas`}${connected.some((a) => a.provider === 'SIMULATED') ? ' (simulada, sem dinheiro real)' : ''}` : 'Nenhuma conta conectada'}</span></summary>
+      <div className="fold-body stack-sm">
+        <p className="small muted">Mercado Pago real fica desabilitado até a homologação externa. A conta simulada não movimenta dinheiro.</p>
+        <ul className="stack-sm" style={{ listStyle: 'none' }}>{accounts.map((a) => <li key={a.id} className="cluster"><span>{a.provider === 'SIMULATED' ? 'Conta simulada (sem dinheiro real)' : 'Mercado Pago'}{a.provider !== 'SIMULATED' && ENVIRONMENT[a.environment] ? ` · ${ENVIRONMENT[a.environment]}` : ''}</span><StatusBadge map={ACCOUNT_STATUS} value={a.status} />{a.status === 'CONNECTED' && <button className="btn btn-quiet btn-sm" disabled={busy} onClick={() => setRevoke(a)}>Revogar…</button>}</li>)}</ul>
+        {connected.length === 0 && <div><button className="btn btn-secondary btn-sm" disabled={busy} onClick={connect}>Conectar conta SIMULADA</button></div>}
+      </div>
+    </details>}
     <ConfirmDialog open={!!revoke} title="Revogar a conta de pagamento?" description={<p>Novas cobranças ficam bloqueadas imediatamente. Pagamentos já recebidos e devoluções pendentes continuam registrados.</p>} confirmLabel="Revogar conta" busy={busy}
       onClose={() => setRevoke(null)} onConfirm={() => void run(async () => { await api(`purchase/accounts/${revoke!.id}/revoke`, 'POST'); setRevoke(null); await load(); await p.refresh(); }, 'Conta revogada; novas cobranças bloqueadas.')} />
   </>;

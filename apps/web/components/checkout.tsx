@@ -101,6 +101,10 @@ export function CartFlow({ slug }: { slug: string }) {
   if (!cart) return <p role="status">Carregando carrinho…</p>;
   const invalid = cart.items.filter((i) => !i.active || i.status !== 'ACTIVE' || i.quantity > i.available);
   const steps: [string, boolean, boolean][] = [['Carrinho', true, false], ['Entrega', !!quote, step === 'delivery'], ['Seus dados', step === 'review', step === 'buyer'], ['Revisão', false, step === 'review']];
+  const units = cart.items.reduce((n, i) => n + i.quantity, 0);
+  // Mesmo conteúdo no resumo lateral (≥ 64em) e no resumo recolhível do topo (celular): itens, frete e total.
+  const lines = <ul className="line-items">{cart.items.map((i) => <li key={i.variant_id} style={{ gridTemplateColumns: 'minmax(0, 1fr) auto' }}><span>{i.name}<br /><span className="muted">{i.quantity} × {money(i.price_cents)}</span></span><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></li>)}</ul>;
+  const totals = <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete{quote ? ` · ${quote.method}` : ''}</dt><dd>{quote ? money(quote.price_cents) : 'calcule na entrega'}</dd></div>{quote && <div className="grand"><dt>Total</dt><dd>{money(quote.total_cents)}</dd></div>}</dl>;
   return <>
     <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>
     <h1 ref={heading} tabIndex={-1} style={{ padding: 'var(--space-16) 0 0' }}>Seu carrinho</h1>
@@ -108,6 +112,10 @@ export function CartFlow({ slug }: { slug: string }) {
     {recovered && <div style={{ paddingTop: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="A confirmação anterior foi recusada pela loja">{recovered} Nenhum pedido foi criado por ela. Revise e confirme de novo.</Alert></div>}
     {cart.items.length === 0 ? <div style={{ padding: 'var(--space-24) 0 var(--space-48)' }}><EmptyState icon="cart" title="Seu carrinho está vazio" action={<a className="btn btn-primary" href={`/lojas/${slug}`}>Ver produtos</a>}>Adicionar itens não reserva estoque; a reserva acontece só ao confirmar a compra.</EmptyState></div> :
     <div className={`checkout${step === 'review' ? ' is-review' : ''}`}>
+      <details className="mobile-summary">
+        <summary><span className="ms-label">Resumo do pedido<span className="small muted"> · {units} {units === 1 ? 'unidade' : 'unidades'}</span></span><span className="ms-total"><span className="small muted">{quote ? 'Total' : 'Subtotal'}</span> <span className="money">{money(quote ? quote.total_cents : cart.subtotal_cents)}</span></span></summary>
+        <div className="ms-body">{lines}{totals}</div>
+      </details>
       <div className="checkout-main">
         <section className="step-block" aria-labelledby="t-items">
           <header><h2 id="t-items">Itens</h2>{step === 'delivery' || editItems ? <span className="small muted">Preços recalculados pela loja; adicionar itens não reserva estoque.</span> : <button type="button" className="btn btn-secondary btn-sm" aria-expanded={false} disabled={!!unknown} onClick={() => setEditItems(true)}>Alterar itens</button>}</header>
@@ -163,7 +171,9 @@ export function CartFlow({ slug }: { slug: string }) {
         {quote && step === 'review' && methods?.simulation && <section className="confirm" aria-labelledby="t-review">
           <h2 id="t-review">Revise antes de confirmar</h2>
           <Alert tone="warning" title="Ambiente SIMULADO">Nenhum valor real é cobrado. Meios de pagamento reais aguardam homologação.</Alert>
+          <div className="review-items"><h3 className="small">Itens</h3>{lines}</div>
           <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete ({quote.method})</dt><dd>{money(quote.price_cents)}</dd></div><div className="grand"><dt>Total a pagar</dt><dd>{money(quote.total_cents)}</dd></div></dl>
+          <p className="small">Entrega: {quote.method}, prazo {quote.days} {quote.days === 1 ? 'dia' : 'dias'}{address ? ` · ${address.street}, ${address.number} — ${address.city}/${address.state}` : ''}.</p>
           <p className="small">Ao confirmar, você aceita as políticas do fornecedor exibidas no rodapé. Os itens ficam reservados por até 40 minutos aguardando o pagamento. Se preço, disponibilidade ou frete mudarem, a loja pede nova confirmação.</p>
           {errors.confirm && <Alert tone="danger" role="alert" title="A loja recusou a confirmação">{errors.confirm} Nenhum pedido foi criado por esta confirmação; corrija o que for preciso e confirme de novo.</Alert>}
           {unknown ? !unknown.restored && pendingPanel : <button type="button" className="btn btn-primary" disabled={busy} onClick={confirm}>{busy ? 'Confirmando…' : `Confirmar compra de ${money(quote.total_cents)}`}</button>}
@@ -171,8 +181,8 @@ export function CartFlow({ slug }: { slug: string }) {
       </div>
       <section className="order-summary" aria-labelledby="t-summary">
         <h2 id="t-summary">Resumo</h2>
-        <ul className="line-items">{cart.items.map((i) => <li key={i.variant_id} style={{ gridTemplateColumns: 'minmax(0, 1fr) auto' }}><span>{i.name}<br /><span className="muted">{i.quantity} × {money(i.price_cents)}</span></span><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></li>)}</ul>
-        <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete{quote ? ` · ${quote.method}` : ''}</dt><dd>{quote ? money(quote.price_cents) : 'calcule na entrega'}</dd></div>{quote && <div className="grand"><dt>Total</dt><dd>{money(quote.total_cents)}</dd></div>}</dl>
+        {lines}
+        {totals}
         <p className="small muted">Valores calculados pela loja.{quote ? ` Cotação de entrega válida até ${formatTime(quote.expires_at)}; depois disso o total é recalculado.` : ''} Não há cupons ou descontos nesta loja.</p>
       </section>
     </div>}

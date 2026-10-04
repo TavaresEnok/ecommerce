@@ -1,11 +1,12 @@
 'use client';
-// R05 — Operação e conta da loja. Mostra somente números vindos de /operations/status; nada de métricas decorativas.
+// R05 — Hoje: o que pede atenção agora (alertas e pendências reais de /operations/status) e o estado das vendas.
+// Configurações ocasionais ficam em /configuracoes/*; âncoras antigas (#plano, #dominio…) redirecionam para lá.
 import Link from 'next/link';
 import { type FormEvent, useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Icon } from '../../../../components/ui/icons';
 import { call, fields, useAction } from '../../../../components/panel/api';
 import { usePanel } from '../../../../components/panel/Shell';
-import { CommercialSections } from '../../../../components/commercial';
-import { AiDraftSection } from '../../../../components/ai-draft';
 import { Alert, Badge, Feedback, Field, Loading, PageHeader, useTitle } from '../../../../components/ui/kit';
 
 type Status = { outbox_oldest_seconds: number; inbox_oldest_seconds: number; notifications_pending: number; notifications_failed: number; financial_incidents: number; payment_uncertain: number; support_overdue: number; financial_communication_pending: number; suspended: boolean; sales_paused: boolean; alerts: { code: string; severity: string; value: number }[] };
@@ -21,39 +22,51 @@ const HELP: Record<string, { title: string; text: string; link?: (base: string) 
   INBOX_BACKLOG: { title: 'Notificações do meio de pagamento não processadas', text: 'Verifique o processamento em segundo plano.' },
 };
 
+const OLD_ANCHORS: Record<string, string> = { '#seguranca': 'configuracoes/seguranca', '#plano': 'configuracoes/plano', '#dominio': 'configuracoes/dominio', '#transportadora': 'configuracoes/entregas', '#dados': 'configuracoes/dados', '#ia': 'configuracoes/dados' };
 export default function Operation() {
-  const p = usePanel(), base = `/painel/${p.tenantId}`, { busy, error, notice, run } = useAction(), [status, setStatus] = useState<Status | null>(null), [loadError, setLoadError] = useState('');
-  useTitle('Operação');
-  const api = (path: string, method = 'GET', body?: unknown, headers?: Record<string, string>) => call(`tenants/${p.tenantId}/operations/${path}`, { method, body, csrf: p.csrf, headers });
-  const load = useCallback(async () => setStatus(await api('status')), [p.tenantId]);
+  const p = usePanel(), router = useRouter(), base = `/painel/${p.tenantId}`, { busy, error, notice, run } = useAction(), [status, setStatus] = useState<Status | null>(null), [loadError, setLoadError] = useState('');
+  useTitle('Hoje');
+  useEffect(() => { const to = OLD_ANCHORS[location.hash]; if (to) router.replace(`${base}/${to}`); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const api = (path: string, method = 'GET', body?: unknown) => call(`tenants/${p.tenantId}/operations/${path}`, { method, body, csrf: p.csrf });
+  const load = useCallback(async () => setStatus(await api('status')), [p.tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { load().catch((e) => setLoadError(e.message)); }, [load]);
-  async function exportStore() { const e = await api('exports', 'POST', { kind: 'STORE' }); const data = await api(`exports/${e.id}`, 'GET', undefined, { 'X-Export-Token': e.token }); const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = `exportacao-loja-${e.id}.json`; a.click(); URL.revokeObjectURL(url); }
-  const sections = [['alertas', 'Alertas'], ['vendas', 'Vendas'], ...(p.owner ? [['seguranca', 'Segurança'], ['plano', 'Plano'], ['dominio', 'Domínio'], ['transportadora', 'Transportadora'], ['dados', 'Exportação']] : []), ['ia', 'Descrição com IA']];
+  const counters = status ? [
+    { n: status.financial_incidents, label: status.financial_incidents === 1 ? 'pendência financeira' : 'pendências financeiras', href: `${base}/pedidos?pending=true`, tone: 'danger' },
+    { n: status.payment_uncertain, label: status.payment_uncertain === 1 ? 'pagamento sem confirmação' : 'pagamentos sem confirmação', href: `${base}/pedidos?pending=true`, tone: 'warning' },
+    { n: status.support_overdue, label: status.support_overdue === 1 ? 'protocolo com prazo vencido' : 'protocolos com prazo vencido', href: `${base}/atendimento?filtro=overdue`, tone: 'danger' },
+    { n: status.notifications_failed, label: status.notifications_failed === 1 ? 'e-mail não entregue' : 'e-mails não entregues', href: `${base}/pedidos`, tone: 'warning' },
+  ] : [];
+  const open = counters.filter((c) => c.n > 0);
   return <>
-    <PageHeader eyebrow="Conta" title="Operação" meta="Alertas, vendas, segurança e configurações da loja." />
-    <nav aria-label="Seções da operação"><ul className="subnav">{sections.map(([id, l]) => <li key={id}><a href={`#${id}`}>{l}</a></li>)}</ul></nav>
+    <PageHeader title="Hoje" meta="O que pede atenção agora. Pedidos e protocolos ficam nas próprias áreas." />
     <Feedback error={error} notice={notice} />
-    {loadError && <Alert tone="danger" role="alert" title="Não foi possível carregar a operação">{loadError}</Alert>}
+    {loadError && <Alert tone="danger" role="alert" title="Não foi possível carregar a situação da loja">{loadError}</Alert>}
     {!status ? !loadError && <Loading label="Carregando situação da loja…" /> : <>
       <section className="surface section stack-sm" id="alertas" aria-labelledby="t-alerts">
         <h2 id="t-alerts">Alertas</h2>
-        {status.alerts.length === 0 ? <Alert tone="success" title="Nenhum alerta ativo">Pagamentos, protocolos, e-mails e processamentos estão em dia.</Alert> :
-          <ul className="stack-sm" style={{ listStyle: 'none' }}>{status.alerts.map((a) => { const h = HELP[a.code] ?? { title: 'Alerta operacional', text: '' }, link = h.link?.(base); return <li key={a.code}>
-            <Alert tone={a.severity === 'critical' ? 'danger' : 'warning'} title={`${h.title} (${a.value})`}><p>{h.text}</p>{link && <p><Link href={link[0]}>{link[1]}</Link></p>}<p className="caption">Código: <code>{a.code}</code></p></Alert></li>; })}</ul>}
-        <dl className="summary small"><dt>Pendências financeiras</dt><dd className="num">{status.financial_incidents}</dd><dt>Pagamentos incertos</dt><dd className="num">{status.payment_uncertain}</dd><dt>Protocolos atrasados</dt><dd className="num">{status.support_overdue}</dd><dt>E-mails pendentes</dt><dd className="num">{status.notifications_pending} (falharam: {status.notifications_failed})</dd></dl>
+        {status.alerts.length === 0 && open.length === 0 ? <p className="ok-line"><span className="badge badge-success">Tudo em dia</span><span className="small muted">Pagamentos, protocolos e e-mails sem pendências.</span></p> : <>
+          {open.length > 0 && <ul className="attention-list">{open.map((c) => <li key={c.label}><Link href={c.href}><span className={`attention-n tone-${c.tone}`}>{c.n}</span><span>{c.label}</span><Icon name="chevron" size={16} /></Link></li>)}</ul>}
+          {status.alerts.length > 0 && <ul className="stack-sm" style={{ listStyle: 'none' }}>{status.alerts.map((a) => { const h = HELP[a.code] ?? { title: 'Alerta operacional', text: 'Verifique o processamento da loja.' }, link = h.link?.(base); return <li key={a.code}>
+            <Alert tone={a.severity === 'critical' ? 'danger' : 'warning'} title={`${h.title} (${a.value})`}><p>{h.text}</p>{link && <p><Link href={link[0]}>{link[1]}</Link></p>}</Alert></li>; })}</ul>}
+        </>}
       </section>
       <section className="surface section stack-sm" id="vendas" aria-labelledby="t-sales">
-        <div className="section-head" style={{ marginBottom: 0 }}><h2 id="t-sales">Vendas</h2>{status.suspended ? <Badge tone="danger">Suspensa pela plataforma</Badge> : status.sales_paused ? <Badge tone="warning">Novas vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>}</div>
-        <p className="small muted">Pausar bloqueia novas compras; pedidos, pagamentos, devoluções e atendimento existentes continuam.</p>
+        <div className="section-head"><h2 id="t-sales">Vendas</h2>{status.suspended ? <Badge tone="danger">Suspensa pela plataforma</Badge> : status.sales_paused ? <Badge tone="warning">Novas vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>}</div>
         {status.suspended ? <Alert tone="danger" title="Loja suspensa pela plataforma">Novas vendas estão bloqueadas pela administração. Pedidos e obrigações anteriores continuam acessíveis.</Alert> :
-          !p.owner ? <p className="small">Somente o Dono pausa ou retoma as vendas.</p> :
-          status.sales_paused ? <div><button className="btn btn-primary" disabled={busy} onClick={() => void run(async () => { await api('sales/resume', 'POST', { reason: 'Retomada pelo Dono' }); await load(); await p.refresh(); }, 'Vendas retomadas.')}>Retomar vendas</button></div> :
-          <form className="cluster" style={{ alignItems: 'end' }} aria-label="Pausar vendas" onSubmit={(e: FormEvent<HTMLFormElement>) => { e.preventDefault(); const f = e.currentTarget, b = fields(f); void run(async () => { await api('sales/pause', 'POST', b); f.reset(); await load(); await p.refresh(); }, 'Novas vendas pausadas.'); }}>
-            <Field label="Motivo da pausa">{(a) => <input className="input" name="reason" required maxLength={500} {...a} />}</Field><button className="btn btn-secondary" disabled={busy}>Pausar novas vendas</button></form>}
+          !p.owner ? <p className="small muted">Somente o Dono pausa ou retoma as vendas.</p> :
+          status.sales_paused ? <><p className="small muted">A loja continua no ar, mas não aceita compras novas.</p><div><button className="btn btn-primary" disabled={busy} onClick={() => void run(async () => { await api('sales/resume', 'POST', { reason: 'Retomada pelo Dono' }); await load(); await p.refresh(); }, 'Vendas retomadas.')}>Retomar vendas</button></div></> :
+          <details className="fold"><summary><span className="fold-title">Pausar novas vendas</span><span className="fold-summary">Para inventário, férias ou falta de estoque. Pedidos já feitos continuam.</span></summary>
+            <form className="cluster fold-body" style={{ alignItems: 'end' }} aria-label="Pausar vendas" onSubmit={(e: FormEvent<HTMLFormElement>) => { e.preventDefault(); const f = e.currentTarget, b = fields(f); void run(async () => { await api('sales/pause', 'POST', b); f.reset(); await load(); await p.refresh(); }, 'Novas vendas pausadas.'); }}>
+              <Field label="Motivo da pausa" hint="Fica registrado; o comprador não vê.">{(a) => <input className="input" name="reason" required maxLength={500} {...a} />}</Field><button className="btn btn-secondary" disabled={busy}>Pausar novas vendas</button></form></details>}
       </section>
-      {p.owner && <CommercialSections tenantId={p.tenantId} csrf={p.csrf} />}
-      {p.owner && <section className="surface section stack-sm" id="dados" aria-labelledby="t-export"><h2 id="t-export">Exportação de dados da loja</h2><p className="small muted">Gera um arquivo JSON com pedidos, pagamentos e protocolos desta loja. O link interno expira em 15 minutos e exige a sessão do Dono.</p><div><button className="btn btn-secondary" disabled={busy} onClick={() => void run(exportStore, 'Exportação gerada.')}>Exportar dados da loja</button></div></section>}
+      <section className="surface section stack-sm" aria-labelledby="t-shortcuts"><h2 id="t-shortcuts">Atalhos</h2>
+        <ul className="shortcut-list">
+          <li><Link href={`${base}?novo=1`}><Icon name="plus" size={16} />Cadastrar produto</Link></li>
+          <li><Link href={`${base}/pedidos`}><Icon name="receipt" size={16} />Ver pedidos</Link></li>
+          {p.owner && <li><Link href={`${base}/aparencia`}><Icon name="brush" size={16} />Editar aparência da loja</Link></li>}
+          <li><a href={`/lojas/${p.store.slug}`}><Icon name="eye" size={16} />Ver loja publicada</a></li>
+        </ul>
+      </section>
     </>}
-    <AiDraftSection tenantId={p.tenantId} csrf={p.csrf} owner={p.owner} />
   </>;
 }

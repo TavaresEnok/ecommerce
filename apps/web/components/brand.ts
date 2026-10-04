@@ -28,3 +28,25 @@ export function storeStyle(color: unknown, font: unknown): Record<string, string
     ...(font === 'serif' ? { '--store-font-family-display': 'var(--store-font-family-display-serif)' } : {}),
   };
 }
+
+// Variáveis CSS completas de uma loja a partir do tema v2: neutros do preset, marca (com o algoritmo acima calculado sobre
+// o fundo do preset), fonte de títulos licenciada, botões, largura, densidade e imagens. Só valores de uma lista fechada.
+type ThemeLike = { preset: 'editorial' | 'essencial' | 'atelie'; brand: { color: string; font: string; button: string }; layout: { width: string; density: string; ratio: string; fit: string } };
+const PRESET_BG: Record<string, string> = { editorial: '#FFFFFF', essencial: '#FFFFFF', atelie: '#FBF9F5' };
+const PRESET_INK: Record<string, string> = { editorial: '#171717', essencial: '#101828', atelie: '#2B2620' };
+export function themeStyle(t: ThemeLike): Record<string, string> {
+  const bg = PRESET_BG[t.preset] ?? STORE_BG, ink = PRESET_INK[t.preset] ?? STORE_INK, b = brandTokens(t.brand.color, bg, ink), v = (n: string) => `var(--store-preset-${t.preset}-${n})`;
+  const display: Record<string, string> = { plex: 'var(--store-font-family-display)', serif: 'var(--store-font-family-display-serif)', bodoni: 'var(--store-font-family-display-bodoni)', archivo: 'var(--store-font-family-display-archivo)', fraunces: 'var(--store-font-family-display-fraunces)' };
+  return {
+    '--store-color-bg': v('bg'), '--store-color-surface': v('surface'), '--store-color-text': v('text'), '--store-color-text-muted': v('text-muted'), '--store-color-border': v('border'), '--store-color-control-border': v('control-border'),
+    '--store-color-accent': b.accent, '--store-color-accent-fill': b.fill, '--store-color-on-accent': b.onFill, '--store-color-accent-border': b.border, '--store-color-accent-text': b.text, '--store-color-accent-tint': b.tint,
+    '--_display': display[t.brand.font] ?? display.plex!,
+    '--_btn-radius': t.brand.button === 'square' ? 'var(--store-radius-button-square)' : t.brand.button === 'pill' ? 'var(--store-radius-button-pill)' : 'var(--store-radius-control)',
+    '--store-layout-content-max': t.layout.width === 'narrow' ? 'var(--store-layout-content-max-narrow)' : t.layout.width === 'wide' ? 'var(--store-layout-content-max-wide)' : '1200px',
+    '--store-layout-media-ratio': t.layout.ratio === 'square' ? 'var(--store-layout-ratio-square)' : t.layout.ratio === 'landscape' ? 'var(--store-layout-ratio-landscape)' : '4 / 5',
+    '--_media-fit': t.layout.fit === 'cover' ? 'cover' : 'contain',
+    '--_gap': t.layout.density === 'compact' ? 'var(--space-12)' : 'var(--space-24)',
+    '--_section-space': t.layout.density === 'compact' ? 'var(--space-32)' : 'var(--space-64)',
+  };
+}
+export function brandReport(t: ThemeLike) { const bg = PRESET_BG[t.preset] ?? STORE_BG, ink = PRESET_INK[t.preset] ?? STORE_INK; return { ...brandTokens(t.brand.color, bg, ink), bg }; }

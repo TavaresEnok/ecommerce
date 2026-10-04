@@ -2,7 +2,7 @@
 // Casca do painel da loja (DESIGN.md §5.1): navegação lateral ≥1024 px, faixa superior abaixo disso (todos os itens
 // visíveis), topo de 64 px com área atual, aviso de pagamentos simulados e estado de vendas. O contexto (loja, papel,
 // CSRF, fuso) é carregado da API a cada troca de loja; nada daqui substitui a autorização do servidor.
-import { createContext, type ReactNode, Suspense, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, type ReactNode, Suspense, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { call, ApiError } from './api';
@@ -67,34 +67,101 @@ export function PanelShell({ tenantId, children }: { tenantId: string; children:
   return <Ctx.Provider value={{ ...load.value, refresh: () => fetchContext(true) }}><Suspense><Frame>{children}</Frame></Suspense></Ctx.Provider>;
 }
 
-function Frame({ children }: { children: ReactNode }) {
-  const p = usePanel(), path = usePathname(), params = useSearchParams(), base = `/painel/${p.tenantId}`, aba = params.get('aba');
-  const items: { group?: string; href: string; label: string; icon: IconName; current: boolean }[] = [
-    { group: 'Loja', href: base, label: 'Catálogo', icon: 'box', current: path === base && !['vitrine', 'frete'].includes(aba || '') },
-    { href: `${base}?aba=vitrine`, label: 'Vitrine e frete', icon: 'brush', current: path === base && ['vitrine', 'frete'].includes(aba || '') },
-    { group: 'Vendas', href: `${base}/pedidos`, label: 'Pedidos', icon: 'receipt', current: path.startsWith(`${base}/pedidos`) },
-    { href: `${base}/atendimento`, label: 'Atendimento', icon: 'chat', current: path.startsWith(`${base}/atendimento`) },
-    { group: 'Conta', href: `${base}/operacao`, label: 'Operação', icon: 'gauge', current: path.startsWith(`${base}/operacao`) },
+// Navegação do painel (DESIGN.md §5.1). Destinos reais, agrupados por tarefa. ≥1024 px: lateral fixa. Abaixo disso: barra
+// compacta com a loja e um botão "Menu" que abre a mesma navegação numa gaveta modal (foco preso, Esc fecha, foco volta ao
+// botão). Nada aqui decide permissão: itens só do Dono ficam ocultos para o Funcionário e o servidor continua recusando.
+type NavItem = { href: string; label: string; icon: IconName; current: boolean; owner?: boolean };
+type NavGroup = { label: string; items: NavItem[] };
+export function useNav(): NavGroup[] {
+  const p = usePanel(), path = usePathname(), params = useSearchParams(), base = `/painel/${p.tenantId}`, aba = params.get('aba') || '';
+  const at = (sub: string) => path === `${base}${sub}` || path.startsWith(`${base}${sub}/`);
+  const catalog = (tab: string) => path === base && (tab ? aba === tab : !['estoque', 'midia', 'organizacao', 'vitrine', 'frete'].includes(aba));
+  const groups: NavGroup[] = [
+    { label: 'Dia a dia', items: [
+      { href: `${base}/operacao`, label: 'Hoje', icon: 'gauge', current: at('/operacao') },
+      { href: `${base}/pedidos`, label: 'Pedidos', icon: 'receipt', current: at('/pedidos') },
+      { href: `${base}/atendimento`, label: 'Atendimento', icon: 'chat', current: at('/atendimento') },
+    ] },
+    { label: 'Catálogo', items: [
+      { href: base, label: 'Produtos', icon: 'box', current: catalog('') },
+      { href: `${base}?aba=estoque`, label: 'Estoque', icon: 'layers', current: catalog('estoque') },
+      { href: `${base}?aba=midia`, label: 'Imagens', icon: 'image', current: catalog('midia') },
+      { href: `${base}?aba=organizacao`, label: 'Categorias e locais', icon: 'tag', current: catalog('organizacao') },
+    ] },
+    { label: 'Loja', items: [
+      { href: `${base}/aparencia`, label: 'Aparência', icon: 'brush', current: at('/aparencia') || (path === base && aba === 'vitrine'), owner: true },
+      { href: `${base}/configuracoes/loja`, label: 'Dados da loja', icon: 'store', current: at('/configuracoes/loja'), owner: true },
+      { href: `${base}/configuracoes/entregas`, label: 'Entregas', icon: 'truck', current: at('/configuracoes/entregas') || (path === base && aba === 'frete'), owner: true },
+      { href: `${base}/configuracoes/dominio`, label: 'Domínio', icon: 'globe', current: at('/configuracoes/dominio'), owner: true },
+    ] },
+    { label: 'Conta', items: [
+      { href: `${base}/configuracoes/seguranca`, label: 'Segurança', icon: 'shield', current: at('/configuracoes/seguranca') },
+      { href: `${base}/configuracoes/plano`, label: 'Plano e faturas', icon: 'card', current: at('/configuracoes/plano'), owner: true },
+      { href: `${base}/configuracoes/dados`, label: 'Dados e IA', icon: 'download', current: at('/configuracoes/dados') },
+    ] },
   ];
-  const area = items.find((i) => i.current)?.label ?? 'Painel';
-  const sales = !p.status ? null : p.status.suspended ? <Badge tone="danger">Loja suspensa</Badge> : p.status.sales_paused ? <Badge tone="warning">Vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>;
+  return groups.map((g) => ({ ...g, items: g.items.filter((i) => p.owner || !i.owner) })).filter((g) => g.items.length);
+}
+
+function SalesState() {
+  const p = usePanel();
+  if (!p.status) return null;
+  return p.status.suspended ? <Badge tone="danger">Loja suspensa</Badge> : p.status.sales_paused ? <Badge tone="warning">Vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>;
+}
+function PaymentTag({ compact }: { compact?: boolean }) {
+  const p = usePanel();
+  if (p.payment === 'SIMULATED') return <span className="env-tag" title="Pagamentos simulados: nenhuma cobrança real é feita">{compact ? <><span aria-hidden>Simulado</span><span className="sr-only">Pagamentos simulados</span></> : 'Pagamentos simulados'}</span>;
+  if (p.payment === 'NONE') return <span className="env-tag">{compact ? 'Sem pagamento' : 'Sem conta de pagamento'}</span>;
+  return null;
+}
+function NavList({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () => void }) {
+  return <nav aria-label="Áreas da loja" className="nav">{groups.map((g) => <div className="nav-group" key={g.label}>
+    <h2 className="nav-group-label" id={`nav-${g.label}`}>{g.label}</h2>
+    <ul aria-labelledby={`nav-${g.label}`}>{g.items.map((i) => <li key={i.href}><Link href={i.href} aria-current={i.current ? 'page' : undefined} onClick={onNavigate}><Icon name={i.icon} />{i.label}</Link></li>)}</ul>
+  </div>)}</nav>;
+}
+function StoreBlock() {
+  const p = usePanel();
+  return <div className="store-block">
+    <p className="store-block-name">{p.store.name}</p>
+    <p className="store-block-meta">{p.owner ? 'Dono' : 'Funcionário'}<span className="sep" aria-hidden>/</span><span className="slug">{p.store.slug}</span></p>
+    <div className="cluster-tight"><SalesState /><PaymentTag /></div>
+  </div>;
+}
+function NavFoot({ onLogout }: { onLogout: () => void }) {
+  const p = usePanel();
+  return <div className="nav-foot">
+    <a href={`/lojas/${p.store.slug}`}><Icon name="eye" size={16} />Ver loja publicada</a>
+    <a href="/"><Icon name="swap" size={16} />Trocar de loja</a>
+    <button type="button" className="link-button" onClick={onLogout}><Icon name="logout" size={16} />Sair <span className="muted small">({p.email})</span></button>
+  </div>;
+}
+
+function Frame({ children }: { children: ReactNode }) {
+  const p = usePanel(), groups = useNav(), path = usePathname(), params = useSearchParams();
+  const current = groups.flatMap((g) => g.items).find((i) => i.current);
+  const drawer = useRef<HTMLDialogElement>(null), opener = useRef<HTMLButtonElement>(null), [open, setOpen] = useState(false);
+  // A gaveta fecha ao trocar de destino (inclusive pelo botão Voltar do navegador).
+  useEffect(() => { if (drawer.current?.open) drawer.current.close(); }, [path, params]);
+  function show() { drawer.current?.showModal(); setOpen(true); (drawer.current?.querySelector('[aria-current="page"]') as HTMLElement | null ?? drawer.current?.querySelector('a') as HTMLElement | null)?.focus(); }
   async function logout() { try { await call('auth/logout', { method: 'POST', csrf: p.csrf }); } finally { location.assign('/'); } }
   return <div className="surface-panel app">
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
-    <aside className="sidebar" aria-label="Navegação do painel"><div className="sidebar-inner">
-      <div className="store-switch"><div><div className="name">{p.store.name}</div><div className="role">{p.owner ? 'Dono' : 'Funcionário'} · {p.store.slug}</div></div><a className="small" href="/">Trocar loja</a></div>
-      <nav aria-label="Áreas da loja"><ul className="nav">{items.map((i) => <li key={i.href} style={{ display: 'contents' }}>{i.group && <span className="nav-group-label caption" aria-hidden>{i.group}</span>}<Link href={i.href} aria-current={i.current ? 'page' : undefined}><Icon name={i.icon} />{i.label}</Link></li>)}</ul></nav>
-      <div className="sidebar-foot"><a href={`/lojas/${p.store.slug}`}>Abrir vitrine</a><a href={`/preview/${p.tenantId}`}>Preview do rascunho</a><button className="btn btn-quiet btn-sm" style={{ paddingLeft: 0 }} onClick={() => void logout()}>Sair</button></div>
-    </div></aside>
+    <aside className="sidebar" aria-label="Navegação do painel"><div className="sidebar-inner"><StoreBlock /><NavList groups={groups} /><NavFoot onLogout={() => void logout()} /></div></aside>
+    <header className="mobile-bar">
+      <button ref={opener} type="button" className="menu-button" aria-haspopup="dialog" aria-expanded={open} aria-controls="painel-menu" onClick={show}><Icon name="menu" /><span>Menu</span></button>
+      <div className="mobile-bar-store"><span className="name">{p.store.name}</span>{current && <span className="area">{current.label}</span>}</div>
+      <PaymentTag compact />
+    </header>
+    <dialog ref={drawer} id="painel-menu" className="drawer" aria-label="Menu do painel" onClose={() => { setOpen(false); opener.current?.focus(); }} onClick={(e) => { if (e.target === drawer.current) drawer.current?.close(); }}>
+      <div className="drawer-inner">
+        <div className="drawer-head"><StoreBlock /><button type="button" className="icon-button" onClick={() => drawer.current?.close()} aria-label="Fechar menu"><Icon name="x" /></button></div>
+        <NavList groups={groups} onNavigate={() => drawer.current?.close()} />
+        <NavFoot onLogout={() => void logout()} />
+      </div>
+    </dialog>
     <div className="main">
-      <header className="topbar">
-        <span className="topbar-area">{area}</span>
-        <div className="cluster-tight">
-          {p.payment === 'SIMULATED' && <span className="env-tag"><Icon name="info" size={16} />Pagamentos simulados</span>}
-          {p.payment === 'NONE' && <span className="env-tag"><Icon name="info" size={16} />Sem conta de pagamento</span>}
-          {sales}<span className="muted">{p.email}</span>
-        </div>
-      </header>
+      <header className="topbar"><span className="topbar-area">{current?.label ?? 'Painel'}</span><div className="cluster-tight"><PaymentTag /><SalesState /></div></header>
       <main className="content" id="conteudo" tabIndex={-1}>{children}</main>
     </div>
   </div>;

@@ -39,6 +39,9 @@ export class CatalogueService {
   create(tenantId:string,actor:Actor,input:unknown) {
     const b=object(input),name=text(b.name),s=slug(b.slug),description=text(b.description??'',8000,true),price=cents(b.price_cents),sku=text(b.sku,80),category=b.category_id?id(b.category_id):null;
     return this.stores.run(id(tenantId),actor,async tx=>{
+      // Which field collided, when it can be known before inserting (the unique constraints still decide races).
+      if((await rows(tx,sql`select 1 from shop.product_slugs where slug=${s}`)).length)throw new ConflictException('Endereço já usado por outro produto desta loja.');
+      if((await rows(tx,sql`select 1 from shop.product_variants where sku=${sku}`)).length)throw new ConflictException('SKU já usado por outra variação desta loja.');
       const productId=newId(),variantId=newId();await tx.execute(sql`insert into shop.products(id,tenant_id,category_id,name,slug,description) values(${productId},${tenantId},${category},${name},${s},${description})`);
       await tx.execute(sql`insert into shop.product_slugs(id,tenant_id,product_id,slug) values(${newId()},${tenantId},${productId},${s})`);
       await tx.execute(sql`insert into shop.product_variants(id,tenant_id,product_id,sku,price_cents,is_default,combination_key) values(${variantId},${tenantId},${productId},${sku},${price},true,'default')`);
