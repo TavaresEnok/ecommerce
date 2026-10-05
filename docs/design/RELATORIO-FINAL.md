@@ -157,7 +157,7 @@ Jornadas exercitadas: navegação do painel; cadastro de produto com erro de SKU
 
 ### 10.1 As cinco falhas apontadas — antes e depois
 
-Antes: capturas da loja de demonstração antiga, removidas do diretório em 04/10 e preservadas no histórico do Git (`git show 240694e:docs/design/evidencias/capturas-locais/<arquivo>`). Conjunto atual completo (45 telas × 390/1440, 04/10): [`evidencias/capturas-locais/`](evidencias/capturas-locais/). Depois: [`evidencias/evolucao-ux/`](evidencias/evolucao-ux/) (lojas de exemplo; conteúdo diferente, mesmas larguras).
+Antes: capturas da loja de demonstração antiga, removidas do diretório em 04/10 e preservadas no histórico do Git (`git show 240694e:docs/design/evidencias/capturas-locais/<arquivo>`). Conjunto atual completo (47 telas × 390/1440, 05/10, depois da rodada Compasso; o conjunto de 04/10 fica no histórico em `9bcc3f2`): [`evidencias/capturas-locais/`](evidencias/capturas-locais/). Depois: [`evidencias/evolucao-ux/`](evidencias/evolucao-ux/) (lojas de exemplo; conteúdo diferente, mesmas larguras).
 
 | Falha | O que mudou | Antes → depois |
 |---|---|---|
