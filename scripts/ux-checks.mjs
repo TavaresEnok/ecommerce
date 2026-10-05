@@ -84,7 +84,7 @@ await step('UI01', async () => {
   await input.setInputFiles({ name: 'contrato.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 teste') });
   await page.waitForTimeout(800); const items = await page.locator('.upload-item').allInnerTexts(), failed = items.find((t) => t.includes('contrato.pdf')) ?? '';
   await page.screenshot({ path: `${out}/UI01-envios-1440.png` });
-  const remove = page.getByRole('button', { name: 'Tirar contrato.pdf da lista' }); const canRemove = await remove.count(); if (canRemove) await remove.click();
+  const remove = page.getByRole('button', { name: 'Tirar da lista contrato.pdf' }); const canRemove = await remove.count(); if (canRemove) await remove.click();
   check('UI01', button?.trim() === 'Adicionar imagens' && seen.has('Pronta') && seen.has('Processando no servidor') && /JPEG|PNG|WebP|formato|tipo/i.test(failed) && canRemove === 1, `botão “${button?.trim()}”; estados vistos no envio válido: ${[...seen].join(' → ')}; arquivo PDF recusado antes do envio com “${failed.replace(/\s+/g, ' ').replace('contrato.pdf', '').trim().slice(0, 90)}” e “Tirar da lista” disponível`);
   await ctx.close();
 });
@@ -95,7 +95,9 @@ await step('UI02', async () => {
   const { ctx, page } = await open(owner, 1440, 900);
   try {
     await page.goto(`${panel}/aparencia`); await page.getByRole('heading', { level: 1, name: 'Aparência' }).waitFor(); await page.waitForLoadState('networkidle');
-    const menu = page.locator('details', { has: page.locator('summary', { hasText: /^Menu/ }) }).first(); await menu.locator('summary').click();
+    // Desktop (≥ 75em): as partes da loja abrem pelo trilho do editor; o bloco aberto vira o painel de propriedades.
+    await page.getByRole('navigation', { name: 'Partes da loja' }).getByRole('button', { name: /^Menu/ }).click();
+    const menu = page.locator('details[data-group="menu"]');
     await menu.getByRole('button', { name: 'Adicionar link' }).click(); await menu.getByLabel('Texto do link').fill('Cestos TESTE'); await menu.getByLabel('Leva para').selectOption({ label: 'Uma categoria' });
     const cats = await menu.getByLabel('Categoria').locator('option').allTextContents(); await menu.getByLabel('Categoria').selectOption({ label: cats.find((c) => /Cest/.test(c)) ?? cats[0] });
     const rows = () => menu.locator('.link-list > li strong').allTextContents(), before = await rows();

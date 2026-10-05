@@ -10,7 +10,7 @@ import { Icon } from '../ui/icons';
 import { bytes } from '../ui/format';
 
 const TYPES = ['image/jpeg', 'image/png', 'image/webp'], MAX_BYTES = 10 * 1024 * 1024, MAX_PIXELS = 40_000_000, PARALLEL = 2;
-type Item = { key: string; file: File; preview: string; state: 'checking' | 'queued' | 'sending' | 'processing' | 'ready' | 'failed'; progress: number; message: string; assetId?: string };
+type Item = { key: string; file: File; preview: string; state: 'checking' | 'queued' | 'sending' | 'processing' | 'ready' | 'failed'; progress: number; message: string; assetId?: string; unlinked?: boolean };
 
 async function check(file: File): Promise<string> {
   if (!TYPES.includes(file.type)) return 'Formato não aceito. Envie JPEG, PNG ou WebP.';
@@ -22,7 +22,8 @@ async function check(file: File): Promise<string> {
   return '';
 }
 
-export function MediaUploader({ onReady, label = 'Adicionar imagens', describe }: { onReady?: (assetId: string) => Promise<string | void>; label?: string; describe?: string }) {
+// compact: quando a galeria já tem imagens, a área de arrastar vira uma linha de ação (sem um grande retângulo permanente).
+export function MediaUploader({ onReady, label = 'Adicionar imagens', describe, compact }: { onReady?: (assetId: string) => Promise<string | void>; label?: string; describe?: string; compact?: boolean }) {
   const p = usePanel(), inputId = useId(), hintId = `${inputId}-hint`, [items, setItems] = useState<Item[]>([]), [over, setOver] = useState(false);
   const live = useRef<HTMLParagraphElement>(null), [announce, setAnnounce] = useState('');
   const patch = (key: string, change: Partial<Item>) => setItems((list) => list.map((i) => (i.key === key ? { ...i, ...change } : i)));
@@ -62,18 +63,22 @@ export function MediaUploader({ onReady, label = 'Adicionar imagens', describe }
       if (!response?.ok) continue;
       const media = ((await response.json()) as { media: { id: string; status: string }[] }).media.find((m) => m.id === assetId);
       if (media?.status === 'READY') {
-        let done = 'Pronta.';
-        if (onReady) { try { done = (await onReady(assetId)) || 'Pronta e vinculada ao produto.'; } catch (e) { patch(key, { state: 'failed', message: `Imagem pronta, mas não vinculada: ${e instanceof Error ? e.message : 'erro'}` }); return; } }
-        patch(key, { state: 'ready', message: done }); setAnnounce(`Imagem pronta. ${done}`); return;
+        await link(key, assetId); return;
       }
       if (media?.status === 'FAILED') { patch(key, { state: 'failed', message: 'O servidor não conseguiu processar esta imagem. Envie outra versão do arquivo.' }); return; }
     }
     patch(key, { state: 'failed', message: 'O processamento está demorando. Atualize a página em instantes; a imagem aparecerá em Imagens quando terminar.' });
   }
+  // Vincula a imagem pronta (onReady); se falhar, o item oferece "Vincular de novo" com a mesma imagem, sem reenviar o arquivo.
+  async function link(key: string, assetId: string) {
+    let done = 'Pronta.';
+    if (onReady) { try { done = (await onReady(assetId)) || 'Pronta e vinculada ao produto.'; } catch (e) { patch(key, { state: 'failed', unlinked: true, message: `Imagem pronta, mas não vinculada: ${e instanceof Error ? e.message : 'erro'}` }); return; } }
+    patch(key, { state: 'ready', unlinked: false, message: done }); setAnnounce(`Imagem pronta. ${done}`);
+  }
   function drop(e: DragEvent) { e.preventDefault(); setOver(false); if (e.dataTransfer.files.length) void add(e.dataTransfer.files); }
   const stateText = (i: Item) => ({ checking: 'Conferindo arquivo…', queued: 'Na fila', sending: `Enviando ${i.progress}%`, processing: 'Processando no servidor…', ready: i.message, failed: i.message })[i.state];
   return <div className="uploader">
-    <div className={`dropzone${over ? ' is-over' : ''}`} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={drop}>
+    <div className={`dropzone${over ? ' is-over' : ''}${compact ? ' is-compact' : ''}`} onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)} onDrop={drop}>
       <Icon name="upload" />
       <div className="dropzone-text">
         <label htmlFor={inputId} className="dropzone-label"><span className="btn btn-secondary">{label}</span><span className="dropzone-or">ou arraste os arquivos para esta área</span></label>
@@ -90,7 +95,8 @@ export function MediaUploader({ onReady, label = 'Adicionar imagens', describe }
       </div>
       <div className="upload-actions">
         {i.state === 'failed' && !i.assetId && TYPES.includes(i.file.type) && i.file.size <= MAX_BYTES && <button type="button" className="btn btn-secondary btn-sm" onClick={() => patch(i.key, { state: 'queued', message: '', progress: 0 })}>Tentar de novo</button>}
-        {['failed', 'ready', 'queued'].includes(i.state) && <button type="button" className="btn btn-quiet btn-sm" onClick={() => { URL.revokeObjectURL(i.preview); setItems((list) => list.filter((x) => x.key !== i.key)); }} aria-label={`Tirar ${i.file.name} da lista`}>{i.state === 'queued' ? 'Cancelar' : 'Tirar da lista'}</button>}
+        {i.state === 'failed' && i.unlinked && i.assetId && <button type="button" className="btn btn-secondary btn-sm" onClick={() => { patch(i.key, { state: 'processing', message: '' }); void link(i.key, i.assetId!); }}>Vincular de novo</button>}
+        {['failed', 'ready', 'queued'].includes(i.state) && <button type="button" className="btn btn-quiet btn-sm" onClick={() => { URL.revokeObjectURL(i.preview); setItems((list) => list.filter((x) => x.key !== i.key)); }} aria-label={`${i.state === 'queued' ? 'Cancelar o envio de' : 'Tirar da lista'} ${i.file.name}`}>{i.state === 'queued' ? 'Cancelar' : 'Tirar da lista'}</button>}
       </div>
     </li>)}</ul>}
     <p className="sr-only" role="status" ref={live}>{announce}</p>

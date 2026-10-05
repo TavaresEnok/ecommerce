@@ -107,18 +107,20 @@ test('Tema v2: esquema, concorrência, histórico, isolamento, contraste e edito
     await check('Editor: prévia ao vivo no mesmo renderizador e conflito visível entre duas sessões (390 e 1440)', async () => {
       const cookieOf = (actor) => [{ name: actor.cookie.split('=')[0], value: actor.cookie.split('=').slice(1).join('='), domain: new URL(origin).hostname, path: '/' }];
       const open = async (actor, width) => { const ctx = await browser.newContext({ viewport: { width, height: 900 } }); await ctx.addCookies(cookieOf(actor)); const page = await ctx.newPage(), errors = []; page.on('pageerror', (e) => errors.push(e.message)); page.on('console', (m) => { if (m.type() === 'error' && /frame|X-Frame/i.test(m.text())) errors.push(m.text()); }); await page.goto(`${origin}/painel/${A}/aparencia`); await page.getByRole('heading', { level: 1, name: 'Aparência' }).waitFor(); return { ctx, page, errors }; };
-      const rename = async (page, title) => { const field = page.getByLabel('Nome da loja', { exact: true }); if (!(await field.isVisible())) await page.getByText('Identidade', { exact: true }).first().click(); await field.fill(title); };
+      const rename = async (page, title) => { const field = page.getByLabel('Nome da loja', { exact: true }); if (!(await field.isVisible())) await page.getByText('Identidade', { exact: true }).filter({ visible: true }).first().click(); await field.fill(title); };
       const one = await open(a.actor, 1440), two = await open(await login(a), 390);
       try {
         await rename(one.page, 'Prévia ao vivo TESTE');
         const frame = one.page.frameLocator('iframe[title="Prévia da loja com as alterações"]');
         // Desktop: controles e prévia lado a lado (a prévia não pode ficar escondida pelo modo do celular).
-        const box = await one.page.locator('iframe[title="Prévia da loja com as alterações"]').boundingBox(); assert.ok(box && box.width > 400 && box.height > 300 && box.x > 600, `prévia visível ao lado dos controles: ${JSON.stringify(box)}`);
+        const box = await one.page.locator('iframe[title="Prévia da loja com as alterações"]').boundingBox(), ctl = await one.page.getByLabel('Nome da loja', { exact: true }).boundingBox();
+        // Espaço de trabalho (trilho | prévia | propriedades): prévia e campo visíveis ao mesmo tempo, lado a lado, sem sobreposição.
+        assert.ok(box && ctl && box.width > 400 && box.height > 300 && (box.x >= ctl.x + ctl.width || ctl.x >= box.x + box.width), `prévia visível ao lado dos controles: prévia ${JSON.stringify(box)}, campo ${JSON.stringify(ctl)}`);
         // O h1 da página inicial é só para leitores de tela (visualmente oculto): espera ele existir com o nome novo.
         await frame.locator('h1', { hasText: 'Prévia ao vivo TESTE' }).waitFor({ state: 'attached', timeout: 15000 }).catch(async (e) => { const f = one.page.frames().find((x) => x.url().includes('/preview/')); throw new Error(`prévia sem o nome novo: frame ${f?.url()} h1=${await f?.evaluate(() => [...document.querySelectorAll('h1')].map((h) => h.textContent).join(' | ')).catch(() => '?')} (${e.message.split('\n')[0]})`); });
         await one.page.getByText('Alterações não salvas').first().waitFor();
-        await two.page.getByRole('tab', { name: 'Prévia' }).click(); await two.page.frameLocator('iframe[title="Prévia da loja com as alterações"]').getByRole('heading', { level: 1 }).waitFor({ state: 'attached', timeout: 15000 });
-        await two.page.getByRole('tab', { name: 'Editar' }).click(); await rename(two.page, 'Sessão celular TESTE');
+        await two.page.getByRole('button', { name: 'Prévia', exact: true }).click(); await two.page.frameLocator('iframe[title="Prévia da loja com as alterações"]').getByRole('heading', { level: 1 }).waitFor({ state: 'attached', timeout: 15000 });
+        await two.page.getByRole('button', { name: 'Editar', exact: true }).click(); await rename(two.page, 'Sessão celular TESTE');
         await one.page.getByRole('button', { name: 'Salvar rascunho' }).click(); await one.page.getByText('Rascunho salvo. A loja publicada só muda quando você publicar.').waitFor();
         await two.page.getByRole('button', { name: 'Salvar rascunho' }).click(); await two.page.getByRole('alert').filter({ hasText: 'O rascunho mudou em outra sessão' }).waitFor();
         assert.equal((await settings()).draft_theme.title, 'Prévia ao vivo TESTE');

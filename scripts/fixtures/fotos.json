@@ -461,5 +461,29 @@
     "original_url": "https://images.rawpixel.com/image_png_1300/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvam9iNjg2LTA2MS1wLnBuZw.png",
     "retrieved": "2026-10-04",
     "modified": "Quadriculado de fundo (desenhado na imagem original) convertido em transparência real (canal alfa), para testar PNG transparente."
+  },
+  "atelie-lotes-queimados.jpg": {
+    "openverse_id": "c3323814-3aac-42b8-8513-e6758450c570",
+    "title": "Old Terra Cotta And Ceramic Spanish Pottery",
+    "creator": "Jennifer Bourn",
+    "license": "cc0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "wordpress",
+    "landing_url": "https://wordpress.org/photos/photo/9726206e7c/",
+    "original_url": "https://pd.w.org/2022/02/9726206e7c2c7ad92.58800475-2048x1365.jpg",
+    "retrieved": "2026-10-04",
+    "note": "Escolhida na rodada Compasso (04/10/2026) para combinar imagem e texto da seção."
+  },
+  "editorial-pasta-couro.jpg": {
+    "openverse_id": "3213eb9e-a74a-432d-9bd4-bf20526bbd64",
+    "title": "Leather Bag",
+    "creator": "Snufkin",
+    "license": "cc0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "stocksnap",
+    "landing_url": "https://stocksnap.io/photo/leather-bag-4JYA4A4D64",
+    "original_url": "https://cdn.stocksnap.io/img-thumbs/960w/4JYA4A4D64.jpg",
+    "retrieved": "2026-10-04",
+    "note": "Rodada Compasso 2 (04/10/2026): substitui a foto de rua (o drinque dominava o quadro). Produto em couro à esquerda e tecido liso à direita, onde fica o texto do destaque. Origem disponível só em 960 px."
   }
 }

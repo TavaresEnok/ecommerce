@@ -42,15 +42,16 @@ function writePending(slug: string, intent: Intent | null) { try { if (intent) s
 const conclusive = (e: unknown) => e instanceof StoreError && (e.status === 400 || e.status === 409) && !/chave reutilizada/i.test(e.message);
 
 type Step = 'delivery' | 'buyer' | 'review';
-export function CartFlow({ slug }: { slug: string }) {
+export function CartFlow({ slug, thumbs = {} }: { slug: string; thumbs?: Record<string, string> }) {
   const [cart, setCart] = useState<CartData | null>(null), [loadError, setLoadError] = useState(''), [busy, setBusy] = useState(false);
   const [step, setStep] = useState<Step>('delivery'), [kind, setKind] = useState('TABLE'), [address, setAddress] = useState<Address | null>(null), [quote, setQuote] = useState<Quote | null>(null);
   const [buyer, setBuyer] = useState({ name: '', email: '', method: 'PIX' }), [methods, setMethods] = useState<{ simulation: boolean; reason: string } | null | undefined>(undefined);
   const [errors, setErrors] = useState<{ cart?: string; delivery?: string; cep?: string; confirm?: string; changed?: boolean }>({}), [info, setInfo] = useState(''), [editItems, setEditItems] = useState(false);
   const [unknown, setUnknown] = useState<{ intent: Intent; detail: string; restored: boolean } | null>(null), [recovered, setRecovered] = useState('');
-  const heading = useRef<HTMLHeadingElement>(null), sending = useRef(false);
+  const sending = useRef(false);
   useEffect(() => { call(slug, 'cart').then(setCart).catch((e) => setLoadError(e.message)); call(slug, 'payment-methods').then(setMethods).catch(() => setMethods(null)); const saved = readPending(slug); if (saved) setUnknown({ intent: saved, detail: '', restored: true }); }, [slug]);
-  useEffect(() => { heading.current?.focus(); }, [step]);
+  const firstStep = useRef(true);
+  useEffect(() => { if (firstStep.current) { firstStep.current = false; return; } document.getElementById({ delivery: 't-delivery', buyer: 't-buyer', review: 't-review' }[step])?.focus(); }, [step]);
   async function change(variant_id: string, quantity: number) {
     if (unknown) return; // mudar itens muda a versão do carrinho: só depois de resolver a confirmação pendente
     setBusy(true); setErrors({}); setInfo('');
@@ -103,11 +104,11 @@ export function CartFlow({ slug }: { slug: string }) {
   const steps: [string, boolean, boolean][] = [['Carrinho', true, false], ['Entrega', !!quote, step === 'delivery'], ['Seus dados', step === 'review', step === 'buyer'], ['Revisão', false, step === 'review']];
   const units = cart.items.reduce((n, i) => n + i.quantity, 0);
   // Mesmo conteúdo no resumo lateral (≥ 64em) e no resumo recolhível do topo (celular): itens, frete e total.
-  const lines = <ul className="line-items">{cart.items.map((i) => <li key={i.variant_id} style={{ gridTemplateColumns: 'minmax(0, 1fr) auto' }}><span>{i.name}<br /><span className="muted">{i.quantity} × {money(i.price_cents)}</span></span><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></li>)}</ul>;
+  const lines = <ul className="line-items">{cart.items.map((i) => <li key={i.variant_id}><span className="line-thumb">{thumbs[i.variant_id] ? <img src={thumbs[i.variant_id]} alt="" width={56} height={56} loading="lazy" /> : null}</span><span>{i.name}<br /><span className="muted">{i.quantity} × {money(i.price_cents)}</span></span><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></li>)}</ul>;
   const totals = <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete{quote ? ` · ${quote.method}` : ''}</dt><dd>{quote ? money(quote.price_cents) : 'calcule na entrega'}</dd></div>{quote && <div className="grand"><dt>Total</dt><dd>{money(quote.total_cents)}</dd></div>}</dl>;
   return <>
-    <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>
-    <h1 ref={heading} tabIndex={-1} style={{ padding: 'var(--space-16) 0 0' }}>Seu carrinho</h1>
+    <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{done && !current ? <Icon name="check" size={16} /> : i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>
+    <h1 style={{ padding: 'var(--space-16) 0 0' }}>Seu carrinho</h1>
     {unknown && (unknown.restored || step !== 'review') && <div style={{ paddingTop: 'var(--space-16)' }}>{pendingPanel}</div>}
     {recovered && <div style={{ paddingTop: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="A confirmação anterior foi recusada pela loja">{recovered} Nenhum pedido foi criado por ela. Revise e confirme de novo.</Alert></div>}
     {cart.items.length === 0 ? <div style={{ padding: 'var(--space-24) 0 var(--space-48)' }}><EmptyState icon="cart" title="Seu carrinho está vazio" action={<a className="btn btn-primary" href={`/lojas/${slug}`}>Ver produtos</a>}>Adicionar itens não reserva estoque; a reserva acontece só ao confirmar a compra.</EmptyState></div> :
@@ -122,45 +123,50 @@ export function CartFlow({ slug }: { slug: string }) {
           {step !== 'delivery' && !editItems ? <p className="small">{cart.items.reduce((n, i) => n + i.quantity, 0)} {cart.items.reduce((n, i) => n + i.quantity, 0) === 1 ? 'unidade' : 'unidades'} · {money(cart.subtotal_cents)}. Mudar itens exige calcular a entrega de novo.</p> : <>
           {errors.cart && <Alert tone="danger" role="alert" title="Não foi possível atualizar o carrinho">{errors.cart}</Alert>}
           {invalid.length > 0 && <Alert tone="warning" role="alert" title="Revise o carrinho">Há item indisponível ou com quantidade acima do disponível. Ajuste para continuar.</Alert>}
-          <ul className="cart-lines">{cart.items.map((i) => { const bad = !i.active || i.status !== 'ACTIVE' || i.quantity > i.available; return <li key={i.variant_id} style={{ gridTemplateColumns: 'minmax(0, 1fr)' }}><div>
-            <p><strong>{i.name}</strong></p><p className="small muted">SKU {i.sku} · {money(i.price_cents)} por unidade</p>
+          <ul className="cart-lines">{cart.items.map((i) => { const bad = !i.active || i.status !== 'ACTIVE' || i.quantity > i.available; return <li key={i.variant_id}><span className="line-thumb">{thumbs[i.variant_id] ? <img src={thumbs[i.variant_id]} alt="" width={56} height={56} loading="lazy" /> : null}</span><div className="cart-line-body">
+            <p className="cart-line-head"><strong>{i.name}</strong><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></p><p className="small muted">{money(i.price_cents)} por unidade, código {i.sku}</p>
             {bad && <p className="error-text"><Icon name="alert" size={16} />{!i.active || i.status !== 'ACTIVE' ? 'Item indisponível. Remova-o para continuar.' : `Só há ${i.available} disponíveis.`}</p>}
-            <form className="cart-line-actions" aria-label={`Quantidade de ${i.name}`} onSubmit={(e) => { const b = fields(e); void change(i.variant_id, Number(b.quantity)); }}>
-              <Field label={<>Quantidade<span className="sr-only"> de {i.name}</span></>}>{(a) => <input className="input" name="quantity" type="number" min={0} max={99} defaultValue={i.quantity} key={i.quantity} required {...a} />}</Field>
-              <button className="btn btn-secondary btn-sm" disabled={busy || !!unknown}>Atualizar quantidade</button>
+            <div className="cart-line-actions">
+              <div className="stepper" role="group" aria-label={`Quantidade de ${i.name}`}>
+                <button type="button" aria-label={`Diminuir quantidade de ${i.name}`} disabled={busy || !!unknown || i.quantity <= 1} onClick={() => void change(i.variant_id, i.quantity - 1)}><Icon name="minus" /></button>
+                <input inputMode="numeric" aria-label={`Quantidade de ${i.name}`} defaultValue={i.quantity} key={i.quantity} disabled={busy || !!unknown} onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur(); }} onBlur={(e) => { const n = Number(e.currentTarget.value.replace(/\D/g, '')); if (Number.isInteger(n) && n >= 0 && n <= 99 && n !== i.quantity) void change(i.variant_id, n); else e.currentTarget.value = String(i.quantity); }} />
+                <button type="button" aria-label={`Aumentar quantidade de ${i.name}`} disabled={busy || !!unknown || i.quantity >= Math.min(99, i.available)} onClick={() => void change(i.variant_id, i.quantity + 1)}><Icon name="plus" /></button>
+              </div>
               <button type="button" className="btn btn-quiet btn-sm" disabled={busy || !!unknown} onClick={() => void change(i.variant_id, 0)} aria-label={`Remover ${i.name}`}>Remover</button>
-            </form></div></li>; })}</ul></>}
+            </div></div></li>; })}</ul></>}
         </section>
         {info && <Alert tone="warning" role="status" title="Recalcule a entrega">{info}</Alert>}
         <section className="step-block" aria-labelledby="t-delivery">
-          <header><h2 id="t-delivery">Entrega</h2>{step !== 'delivery' && quote && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => { setStep('delivery'); setQuote(null); }}>Alterar entrega</button>}</header>
+          <header><h2 id="t-delivery" tabIndex={-1}>Entrega</h2>{step !== 'delivery' && quote && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => { setStep('delivery'); setQuote(null); }}>Alterar entrega</button>}</header>
           {step !== 'delivery' && quote && address ? <dl className="summary"><dt>Método</dt><dd>{quote.method}: {money(quote.price_cents)} · prazo {quote.days} {quote.days === 1 ? 'dia' : 'dias'}</dd><dt>Endereço</dt><dd>{address.street}, {address.number}{address.complement ? `, ${address.complement}` : ''} — {address.city}/{address.state} · CEP {address.cep}</dd></dl> :
           <form className="form" aria-label="Calcular frete" onSubmit={(e) => void quoteDelivery(e)}>
             {errors.delivery && <Alert tone="danger" role="alert" title="Não foi possível calcular a entrega">{errors.delivery}</Alert>}
             {errors.changed && <Alert tone="warning" role="alert" title="Os valores mudaram antes da confirmação">A loja recalculou preço, disponibilidade ou frete. Nenhum pedido foi criado. Calcule a entrega de novo e revise o novo total antes de confirmar; seus dados foram mantidos.</Alert>}
             <fieldset><legend>Como receber</legend><div className="pay-options">
-              {[['TABLE', 'Entrega no endereço', 'Valor e prazo pela tabela de CEP da loja.'], ['PICKUP', 'Retirada na loja', 'Sem frete; a loja avisa quando estiver pronto.'], ['CARRIER', 'Transportadora', 'Cotação integrada, quando a loja oferece.']].map(([k, l, h]) => <label className="pay-option" key={k}><input type="radio" name="kind-ui" checked={kind === k} onChange={() => setKind(k!)} /><span><strong>{l}</strong><br /><span className="small muted">{h}</span></span></label>)}
+              {[['TABLE', 'Entrega no endereço', 'Valor e prazo calculados pelo CEP.'], ['PICKUP', 'Retirada na loja', 'Sem frete; a loja avisa quando estiver pronto.'], ['CARRIER', 'Transportadora', 'Cotação na hora com a transportadora da loja.']].map(([k, l, h]) => <label className="pay-option" key={k}><input type="radio" name="kind-ui" checked={kind === k} onChange={() => setKind(k!)} /><span><strong>{l}</strong><br /><span className="small muted">{h}</span></span></label>)}
             </div></fieldset>
             <div className="form-grid">
               <Field label="CEP" error={errors.cep}>{(a) => <input className="input" name="cep" pattern="[0-9]{5}-?[0-9]{3}" inputMode="numeric" required autoComplete="postal-code" defaultValue={address?.cep} {...a} />}</Field>
-              <Field label="Número">{(a) => <input className="input" name="number" required autoComplete="off" defaultValue={address?.number} {...a} />}</Field>
             </div>
             <Field label="Rua">{(a) => <input className="input" name="street" required autoComplete="address-line1" defaultValue={address?.street} {...a} />}</Field>
             <div className="form-grid">
-              <Field label="Cidade">{(a) => <input className="input" name="city" required autoComplete="address-level2" defaultValue={address?.city} {...a} />}</Field>
-              <Field label="UF">{(a) => <input className="input" name="state" minLength={2} maxLength={2} required autoComplete="address-level1" defaultValue={address?.state} {...a} />}</Field>
+              <Field label="Número">{(a) => <input className="input" name="number" required autoComplete="off" defaultValue={address?.number} {...a} />}</Field>
+              <Field label="Complemento" optional>{(a) => <input className="input" name="complement" autoComplete="address-line2" defaultValue={address?.complement} {...a} />}</Field>
             </div>
-            <Field label="Complemento" optional>{(a) => <input className="input" name="complement" autoComplete="address-line2" defaultValue={address?.complement} {...a} />}</Field>
+            <div className="form-grid">
+              <Field label="Cidade">{(a) => <input className="input" name="city" required autoComplete="address-level2" defaultValue={address?.city} {...a} />}</Field>
+              <Field label="UF">{(a) => <input className="input" name="state" minLength={2} maxLength={2} required autoComplete="address-level1" autoCapitalize="characters" defaultValue={address?.state} {...a} />}</Field>
+            </div>
             {kind === 'PICKUP' && <p className="hint">O endereço fica registrado no pedido mesmo na retirada.</p>}
             <div><button className="btn btn-primary" disabled={busy || !cart.valid || invalid.length > 0 || !!unknown}>{busy ? 'Calculando…' : 'Calcular frete'}</button></div>
           </form>}
         </section>
         {quote && step !== 'delivery' && <section className="step-block" aria-labelledby="t-buyer">
-          <header><h2 id="t-buyer">Seus dados</h2>{step === 'review' && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => setStep('buyer')}>Corrigir dados</button>}</header>
+          <header><h2 id="t-buyer" tabIndex={-1}>Seus dados</h2>{step === 'review' && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => setStep('buyer')}>Corrigir dados</button>}</header>
           {methods === undefined ? <p role="status" className="small">Consultando meios de pagamento…</p> : !methods?.simulation ? <Alert tone="warning" title="Pagamento indisponível">{methods?.reason || 'A loja ainda não tem meio de pagamento habilitado.'} Nenhum pedido será criado.</Alert> :
           step === 'buyer' ? <form className="form" aria-label="Dados do comprador" onSubmit={(e) => { const b = fields(e); setBuyer({ name: b.name!, email: b.email!, method: b.method! }); setStep('review'); }}>
             <Field label="Nome completo">{(a) => <input className="input" name="name" required maxLength={100} defaultValue={buyer.name} autoComplete="name" {...a} />}</Field>
-            <Field label="E-mail para comprovante" hint="Enviamos o comprovante e o link de acompanhamento para este e-mail.">{(a) => <input className="input" name="email" type="email" required maxLength={200} defaultValue={buyer.email} autoComplete="email" {...a} />}</Field>
+            <Field label="E-mail para comprovante" hint="Enviamos o comprovante e o link de acompanhamento para este e-mail.">{(a) => <input className="input" name="email" type="email" required maxLength={200} defaultValue={buyer.email} autoComplete="email" spellCheck={false} {...a} />}</Field>
             <fieldset><legend>Forma de pagamento</legend><div className="pay-options">
               <label className="pay-option"><input type="radio" name="method" value="PIX" defaultChecked={buyer.method === 'PIX'} /><span><strong>Pix</strong> <span className="small muted">(simulado)</span><br /><span className="small muted">O pedido só é confirmado quando a loja recebe a confirmação do pagamento.</span></span></label>
               <label className="pay-option"><input type="radio" name="method" value="CARD" defaultChecked={buyer.method === 'CARD'} /><span><strong>Cartão</strong> <span className="small muted">(simulado)</span><br /><span className="small muted">Em operação real, os dados do cartão são digitados no formulário do meio de pagamento, não nesta loja.</span></span></label>
@@ -169,7 +175,7 @@ export function CartFlow({ slug }: { slug: string }) {
           </form> : <dl className="summary"><dt>Nome</dt><dd>{buyer.name}</dd><dt>E-mail para comprovante</dt><dd>{buyer.email}</dd><dt>Pagamento</dt><dd>{buyer.method === 'PIX' ? 'Pix' : 'Cartão'} (simulado)</dd></dl>}
         </section>}
         {quote && step === 'review' && methods?.simulation && <section className="confirm" aria-labelledby="t-review">
-          <h2 id="t-review">Revise antes de confirmar</h2>
+          <h2 id="t-review" tabIndex={-1}>Revise antes de confirmar</h2>
           <Alert tone="warning" title="Ambiente SIMULADO">Nenhum valor real é cobrado. Meios de pagamento reais aguardam homologação.</Alert>
           <div className="review-items"><h3 className="small">Itens</h3>{lines}</div>
           <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete ({quote.method})</dt><dd>{money(quote.price_cents)}</dd></div><div className="grand"><dt>Total a pagar</dt><dd>{money(quote.total_cents)}</dd></div></dl>

@@ -44,11 +44,12 @@ export default function Operation() {
     {!status ? !loadError && <Loading label="Carregando situação da loja…" /> : <>
       <section className="surface section stack-sm" id="alertas" aria-labelledby="t-alerts">
         <h2 id="t-alerts">Alertas</h2>
-        {status.alerts.length === 0 && open.length === 0 ? <p className="ok-line"><span className="badge badge-success">Tudo em dia</span><span className="small muted">Pagamentos, protocolos e e-mails sem pendências.</span></p> : <>
+        {status.alerts.length === 0 && open.length === 0 ? <p className="ok-line"><span className="badge badge-success">Sem alertas</span><span className="small muted">Pagamentos, protocolos e e-mails sem pendências.</span></p> : <>
           {open.length > 0 && <ul className="attention-list">{open.map((c) => <li key={c.label}><Link href={c.href}><span className={`attention-n tone-${c.tone}`}>{c.n}</span><span>{c.label}</span><Icon name="chevron" size={16} /></Link></li>)}</ul>}
           {status.alerts.length > 0 && <ul className="stack-sm" style={{ listStyle: 'none' }}>{status.alerts.map((a) => { const h = HELP[a.code] ?? { title: 'Alerta operacional', text: 'Verifique o processamento da loja.' }, link = h.link?.(base); return <li key={a.code}>
             <Alert tone={a.severity === 'critical' ? 'danger' : 'warning'} title={`${h.title} (${a.value})`}><p>{h.text}</p>{link && <p><Link href={link[0]}>{link[1]}</Link></p>}</Alert></li>; })}</ul>}
         </>}
+        <p className="small"><Link href={`${base}/pedidos?payment_status=PAID&fulfillment_status=UNFULFILLED`}>Ver pedidos pagos a enviar</Link><span className="muted"> · os alertas não incluem a fila de envio</span></p>
       </section>
       <section className="surface section stack-sm" id="vendas" aria-labelledby="t-sales">
         <div className="section-head"><h2 id="t-sales">Vendas</h2>{status.suspended ? <Badge tone="danger">Suspensa pela plataforma</Badge> : status.sales_paused ? <Badge tone="warning">Novas vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>}</div>

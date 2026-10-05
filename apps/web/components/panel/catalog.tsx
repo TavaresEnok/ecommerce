@@ -3,7 +3,7 @@
 // Usa exatamente os endpoints existentes de /tenants/:id/catalogue (DESIGN.md §6 e §9; TELAS-E-FLUXOS R02).
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { type FormEvent, type SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { type FormEvent, type SyntheticEvent, useEffect, useMemo, useState, useRef } from 'react';
 import { call, ApiError, fields, useAction } from './api';
 import { usePanel } from './Shell';
 import { Alert, Badge, EmptyState, Feedback, Field, MoneyInput, PageHeader, StatusBadge, useLeaveGuard, useTitle } from '../ui/kit';
@@ -35,10 +35,12 @@ export function ProductList({ catalogue }: { catalogue: Catalogue }) {
   // Busca e filtros vivem na URL: o botão Voltar do editor (e do navegador) devolve a mesma lista.
   const query = params.get('q') ?? '', status = params.get('status') ?? 'all', category = params.get('categoria') ?? '';
   const [draft, setDraft] = useState(query), [filtersOpen, setFiltersOpen] = useState(false);
-  useEffect(() => setDraft(query), [query]);
+  const pushed = useRef(query);
+  useEffect(() => { if (query !== pushed.current) { pushed.current = query; setDraft(query); } }, [query]);
   function setParams(next: Record<string, string>) {
     const u = new URLSearchParams(params.toString());
     for (const [k, v] of Object.entries(next)) { if (v && v !== 'all') u.set(k, v); else u.delete(k); }
+    if (next.q !== undefined) pushed.current = next.q;
     const qs = u.toString(); router.replace(qs ? `${base}?${qs}` : base, { scroll: false });
     try { sessionStorage.setItem(LIST_KEY(p.tenantId), qs); } catch { /* sem storage */ }
   }
@@ -60,7 +62,7 @@ export function ProductList({ catalogue }: { catalogue: Catalogue }) {
       <div className="list-toolbar" role="search" aria-label="Buscar e filtrar produtos">
         <div className="search-field">
           <label htmlFor="q-prod">{atLimit ? `Buscar nos primeiros ${LIST_LIMIT} produtos (A–Z)` : `Buscar em ${total} ${total === 1 ? 'produto' : 'produtos'}`}</label>
-          <div className="search-input"><Icon name="search" /><input className="input" id="q-prod" type="search" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Nome, endereço ou SKU" autoComplete="off" enterKeyHint="search" /></div>
+          <div className="search-input"><Icon name="search" /><input className="input" id="q-prod" type="search" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Nome, endereço ou SKU…" autoComplete="off" spellCheck={false} enterKeyHint="search" /></div>
         </div>
         <button type="button" className="btn btn-secondary filter-toggle" aria-expanded={filtersOpen} aria-controls="filtros-produtos" onClick={() => setFiltersOpen(!filtersOpen)}><Icon name="filter" />Filtros{activeFilters > 0 && <span className="count-pill" aria-label={`${activeFilters} ativos`}>{activeFilters}</span>}</button>
         <div id="filtros-produtos" className={`filter-panel${filtersOpen ? '' : ' is-collapsed'}`}>
@@ -75,21 +77,24 @@ export function ProductList({ catalogue }: { catalogue: Catalogue }) {
       </div>}
       {atLimit && <p className="scope-note"><Icon name="info" size={16} />O painel carrega os primeiros {LIST_LIMIT} produtos em ordem alfabética. Produtos depois deles não aparecem nesta lista nem nesta busca.</p>}
       {shown.length === 0 ? <EmptyState icon="search" title={query ? `Nada encontrado para “${query}”` : 'Nenhum produto com estes filtros'} action={<button className="btn btn-secondary btn-sm" onClick={() => { setDraft(''); setParams({ q: '', status: 'all', categoria: '' }); }}>Limpar busca e filtros</button>}>{query ? 'Confira a grafia ou procure pelo SKU.' : 'Remova um filtro para ver mais produtos.'}</EmptyState> : <>
+        {/* Celular: nome inteiro (até duas linhas) e, abaixo, preço e saldo — o intervalo de preço nunca espreme o nome. */}
         <ul className="product-rows" aria-label="Produtos">{shown.map((x, i) => { const s = stockOf(x); return <li key={x.id} {...(i === 0 ? { 'data-first-item': '' } : {})}>
-          <Thumb tenant={p.tenantId} product={x} />
-          <div className="pr-main"><Link href={editHref(x.id)} className="pr-name">{x.name}</Link><span className="pr-sub">{categoryName(x.category_id) ?? 'Sem categoria'}{s.active.length > 1 ? `, ${s.active.length} variações` : ''}</span></div>
-          <div className="pr-side"><PriceRange p={x} /><span className="pr-stock">{s.available <= 0 ? <Badge tone="warning">Sem saldo</Badge> : `${s.available} disponíveis`}</span>{x.status !== 'ACTIVE' && <StatusBadge map={PRODUCT_STATUS} value={x.status} />}</div>
+          <Thumb tenant={p.tenantId} product={x} size={56} />
+          <div className="pr-main"><Link href={editHref(x.id)} className="pr-name">{x.name}</Link>
+            <span className="pr-figures"><span className="pr-price"><PriceRange p={x} /></span><span className="pr-stock">{s.available <= 0 ? <span className="stock-out">Sem saldo</span> : <span>{s.available} {s.available === 1 ? 'disponível' : 'disponíveis'}</span>}</span></span>
+            <span className="pr-sub">{x.status !== 'ACTIVE' && <><StatusBadge map={PRODUCT_STATUS} value={x.status} /> </>}{categoryName(x.category_id) ?? 'Sem categoria'}{s.active.length > 1 ? `, ${s.active.length} variações` : ''}</span></div>
           <Icon name="chevron" />
         </li>; })}</ul>
+        {/* Desktop: a linha inteira abre a edição pelo link do nome (sem uma coluna de botões “Editar” repetidos). */}
         <table className="data product-table">
-          <caption className="sr-only">Produtos carregados. Disponível = em estoque menos reservado, somando as variações ativas.</caption>
-          <thead><tr><th scope="col">Produto</th><th scope="col">Situação</th><th scope="col" className="num">Disponível</th><th scope="col" className="num">Preço</th><th scope="col"><span className="sr-only">Ações</span></th></tr></thead>
+          <caption className="sr-only">Produtos carregados. Disponível = em estoque menos reservado, somando as variações ativas. Abra um produto pelo nome para editar.</caption>
+          <thead><tr><th scope="col">Produto</th><th scope="col">Situação</th><th scope="col" className="num">Disponível</th><th scope="col" className="num">Preço</th><th scope="col"><span className="sr-only">Abrir</span></th></tr></thead>
           <tbody>{shown.map((x, i) => { const s = stockOf(x); return <tr key={x.id} {...(i === 0 ? { 'data-first-item': '' } : {})}>
-            <td className="primary"><div className="cell-main"><Thumb tenant={p.tenantId} product={x} size={40} /><span><Link href={editHref(x.id)}>{x.name}</Link><span className="cell-sub">{categoryName(x.category_id) ?? 'Sem categoria'}{s.active.length > 1 ? `, ${s.active.length} variações` : `, SKU ${s.active[0]?.sku ?? '—'}`}</span></span></div></td>
+            <td className="primary"><div className="cell-main"><Thumb tenant={p.tenantId} product={x} size={48} /><span className="cell-text"><Link href={editHref(x.id)} className="row-link">{x.name}</Link><span className="cell-sub">{categoryName(x.category_id) ?? 'Sem categoria'}{s.active.length > 1 ? `, ${s.active.length} variações` : `, SKU ${s.active[0]?.sku ?? '—'}`}</span></span></div></td>
             <td><StatusBadge map={PRODUCT_STATUS} value={x.status} /></td>
-            <td className="num">{s.available <= 0 ? <Badge tone="warning">Sem saldo</Badge> : <span>{s.available}{s.soldOut > 0 && <span className="muted"> ({s.soldOut} esgotada{s.soldOut > 1 ? 's' : ''})</span>}</span>}</td>
-            <td className="num"><PriceRange p={x} /></td>
-            <td><Link className="btn btn-secondary btn-sm" href={editHref(x.id)} aria-label={`Editar ${x.name}`}>Editar</Link></td>
+            <td className="num">{s.available <= 0 ? <span className="stock-out">Sem saldo</span> : <span>{s.available}{s.soldOut > 0 && <span className="muted"> ({s.soldOut} esgotada{s.soldOut > 1 ? 's' : ''})</span>}</span>}</td>
+            <td className="num price-cell"><PriceRange p={x} /></td>
+            <td className="row-go" aria-hidden="true"><Icon name="chevron" /></td>
           </tr>; })}</tbody>
         </table>
         <p className="list-foot" role="status">{shown.length === total ? `${total} ${total === 1 ? 'produto' : 'produtos'}` : `${shown.length} de ${total} produtos`}</p>
@@ -154,8 +159,8 @@ export function ProductEditor({ catalogue, product, reload }: { catalogue: Catal
   const api = (path: string, method = 'GET', body?: unknown) => call(`tenants/${p.tenantId}/catalogue/${path}`, { method, body, csrf: p.csrf });
   const after = async (task: () => Promise<unknown>, done: string) => run(async () => { await task(); await reload(); }, done);
   const active = product.variants.filter((v) => v.active), single = active.length === 1 ? active[0] : null, s = stockOf(product);
-  const listQuery = (() => { try { return sessionStorage.getItem(LIST_KEY(p.tenantId)) || ''; } catch { return ''; } })();
-  const backHref = listQuery ? `${base}?${listQuery}` : base;
+  const [backHref, setBackHref] = useState(base);
+  useEffect(() => { try { const q = sessionStorage.getItem(LIST_KEY(p.tenantId)); if (q) setBackHref(`${base}?${q}`); } catch { /* sem storage */ } }, [base, p.tenantId]);
   const totals = catalogue.inventory.filter((i) => active.some((v) => v.id === i.variant_id)).reduce((t, i) => ({ on: t.on + i.on_hand, res: t.res + i.reserved }), { on: 0, res: 0 });
   const locationsUsed = new Set(catalogue.inventory.filter((i) => active.some((v) => v.id === i.variant_id)).map((i) => i.location_id)).size;
   function save(e: FormEvent<HTMLFormElement>) {
@@ -176,7 +181,9 @@ export function ProductEditor({ catalogue, product, reload }: { catalogue: Catal
     }, 'Alterações salvas.');
   }
   const publicUrl = `/lojas/${p.store.slug}/produtos/${product.slug}`;
-  const section = (key: string) => ({ open: open[key] ?? false, onToggle: (e: SyntheticEvent<HTMLDetailsElement>) => { const isOpen = e.currentTarget.open; setOpen((o) => (o[key] === isOpen ? o : { ...o, [key]: isOpen })); } });
+  // Atalhos do formulário abrem o bloco, levam a tela até ele e o foco ao seu título.
+  const reveal = (key: string) => { setOpen((o) => ({ ...o, [key]: true })); requestAnimationFrame(() => { const el = document.getElementById(`bloco-${key}`); el?.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); el?.querySelector('summary')?.focus({ preventScroll: true }); }); };
+  const section = (key: string) => ({ id: `bloco-${key}`, open: open[key] ?? false, onToggle: (e: SyntheticEvent<HTMLDetailsElement>) => { const isOpen = e.currentTarget.open; setOpen((o) => (o[key] === isOpen ? o : { ...o, [key]: isOpen })); } });
   return <>
     {guard}
     <PageHeader back={{ href: backHref, label: 'Produtos' }} title={product.name}
@@ -190,8 +197,8 @@ export function ProductEditor({ catalogue, product, reload }: { catalogue: Catal
           <Field label="Nome" error={errors.name}>{(a) => <input className="input" name="name" defaultValue={product.name} required maxLength={200} {...a} />}</Field>
           <div className="form-grid">
             {single ? <Field label="Preço" error={errors.price}>{(a) => <MoneyInput name="price" defaultCents={single.price_cents} a11y={a} required />}</Field> :
-              <div className="field"><span className="label">Preço</span><p className="value-line"><PriceRange p={product} /></p><p className="hint">Cada variação tem seu preço. <button type="button" className="btn btn-quiet btn-sm inline" onClick={() => setOpen((o) => ({ ...o, variacoes: true }))}>Editar nas variações</button></p></div>}
-            <div className="field"><span className="label">Disponível para venda</span><p className="value-line num">{s.available <= 0 ? <Badge tone="warning">Sem saldo</Badge> : <strong>{s.available} {s.available === 1 ? 'unidade' : 'unidades'}</strong>}</p><p className="hint"><button type="button" className="btn btn-quiet btn-sm inline" onClick={() => setOpen((o) => ({ ...o, estoque: true }))}>Ajustar estoque</button></p></div>
+              <div className="field"><span className="label">Preço</span><p className="value-line"><PriceRange p={product} /></p><p className="hint">Cada variação tem seu preço. <button type="button" className="btn btn-quiet btn-sm inline" onClick={() => reveal('variacoes')}>Editar nas variações</button></p></div>}
+            <div className="field"><span className="label">Disponível para venda</span><p className="value-line num">{s.available <= 0 ? <Badge tone="warning">Sem saldo</Badge> : <strong>{s.available} {s.available === 1 ? 'unidade' : 'unidades'}</strong>}</p><p className="hint"><button type="button" className="btn btn-quiet btn-sm inline" onClick={() => reveal('estoque')}>Ajustar estoque</button></p></div>
           </div>
           <Field label="Situação" hint={product.status === 'ACTIVE' ? 'Arquivar tira o produto da loja e mantém os pedidos.' : 'Ativo exige uma variação com preço; o produto passa a aparecer na loja publicada.'}>{(a) => <select className="select" name="status" defaultValue={product.status} {...a}><option value="DRAFT">Rascunho (não aparece na loja)</option><option value="ACTIVE">Ativo (aparece na loja)</option><option value="ARCHIVED">Arquivado</option></select>}</Field>
           <Field label="Descrição" optional hint="Texto simples, até 8.000 caracteres.">{(a) => <textarea className="textarea" name="description" defaultValue={product.description} maxLength={8000} rows={5} {...a} />}</Field>
@@ -202,9 +209,9 @@ export function ProductEditor({ catalogue, product, reload }: { catalogue: Catal
               <Field label="Endereço na loja" error={errors.slug} hint="Ao mudar, o endereço antigo leva para o novo.">{(a) => <input className="input" name="slug" defaultValue={product.slug} pattern="[a-z0-9]+(-[a-z0-9]+)*" required {...a} />}</Field>
             </div>
           </details>
-          <div className="form-actions sticky-actions"><button className="btn btn-primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar alterações'}</button>{dirty && <span className="action-note">Salva nome, preço, situação, descrição, categoria e endereço.</span>}</div>
+          <div className={`form-actions${dirty ? ' sticky-actions' : ''}`}><button className="btn btn-primary" disabled={busy}>{busy ? 'Salvando…' : 'Salvar alterações'}</button>{dirty && <span className="action-note">Salva nome, preço, situação, descrição, categoria e endereço.</span>}</div>
         </form>
-        <Images catalogue={catalogue} product={product} busy={busy} after={after} api={api} />
+        <div className="editor-media"><Images catalogue={catalogue} product={product} busy={busy} after={after} api={api} /></div>
         <details className="surface fold fold-section" {...section('variacoes')}>
           <summary><span className="fold-title">Variações</span><span className="fold-summary">{active.length > 1 ? `${active.length} variações, ${priceRange(product) ?? 'sem preço'}` : 'Uma variação (sem cor ou tamanho)'}</span></summary>
           <div className="fold-body"><Variants product={product} busy={busy} after={after} api={api} /></div>
@@ -280,18 +287,19 @@ function Variants({ product, busy, after, api }: SectionProps & { product: Produ
 function Images({ catalogue, product, busy, after, api }: SectionProps & { catalogue: Catalogue; product: Product }) {
   const p = usePanel(), linked = new Set(product.media.map((m) => m.id)), full = product.media.length >= 10;
   const ready = catalogue.media.filter((m) => m.status === 'READY' && !linked.has(m.id));
-  return <section className="surface section" aria-labelledby="t-images">
-    <div className="section-head"><h2 id="t-images">Imagens</h2><p>{product.media.length}/10, a primeira é a capa</p></div>
-    {product.media.length === 0 ? <p className="small muted no-media-note"><Icon name="image" size={16} />Sem imagens, a loja mostra um espaço neutro com o nome do produto.</p> :
-      <ul className="media-grid">{product.media.map((m, i) => <li key={m.id}><span className="frame"><img src={thumbUrl(p.tenantId, m.id, 'large')} alt={`${product.name}, imagem ${i + 1}`} loading="lazy" /></span><span className="small">{i === 0 ? 'Capa' : `Imagem ${i + 1}`}</span></li>)}</ul>}
+  const has = product.media.length > 0;
+  return <section className="surface section product-gallery" aria-labelledby="t-images">
+    <div className="section-head"><h2 id="t-images">Imagens</h2><p className="num small muted">{product.media.length} {product.media.length === 1 ? 'imagem' : 'imagens'} · até 10</p></div>
+    {!has ? <p className="small muted no-media-note"><Icon name="image" size={16} />Sem imagens: a loja mostra um espaço neutro com a categoria.</p> :
+      <ul className="gallery-grid">{product.media.map((m, i) => <li key={m.id} className={i === 0 ? 'is-cover' : undefined}><span className="frame"><img src={thumbUrl(p.tenantId, m.id, 'large')} alt={`${product.name}, imagem ${i + 1}`} loading="lazy" width={320} height={320} /></span><span className="small">{i === 0 ? 'Capa' : `Imagem ${i + 1}`}</span></li>)}</ul>}
+    {has && <p className="small muted">A ordem segue a do envio e a primeira é a capa. Reordenar ou remover imagens ainda não está disponível.</p>}
     {full ? <p className="small muted">Limite de 10 imagens atingido para este produto.</p> :
-      <MediaUploader describe="JPEG, PNG ou WebP, até 10 MB e 40 megapixels. Cada imagem é vinculada a este produto quando o processamento termina."
+      <MediaUploader compact={has} describe="JPEG, PNG ou WebP, até 10 MB e 40 megapixels. A imagem entra neste produto quando o processamento termina."
         onReady={async (assetId) => { await api(`products/${product.id}/media`, 'POST', { asset_id: assetId }); await after(async () => {}, 'Imagem adicionada ao produto.'); return 'Pronta e adicionada a este produto.'; }} />}
     {ready.length > 0 && !full && <details className="fold">
       <summary><span className="fold-title">Usar uma imagem já enviada</span><span className="fold-summary">{ready.length} {ready.length === 1 ? 'disponível' : 'disponíveis'}</span></summary>
-      <ul className="media-grid fold-body">{ready.map((m) => <li key={m.id}><span className="frame"><img src={thumbUrl(p.tenantId, m.id)} alt="" loading="lazy" /></span><span className="small muted">{bytes(m.stored_bytes)}</span><button type="button" className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void after(() => api(`products/${product.id}/media`, 'POST', { asset_id: m.id }), 'Imagem adicionada ao produto.')}>Adicionar</button></li>)}</ul>
+      <ul className="media-grid fold-body">{ready.map((m, i) => { const used = catalogue.products.filter((x) => x.media.some((y) => y.id === m.id)).map((x) => x.name); return <li key={m.id}><span className="frame"><img src={thumbUrl(p.tenantId, m.id)} alt="" loading="lazy" width={160} height={160} /></span><span className="small muted">{used.length ? `Usada em ${used.join(', ')}` : 'Ainda sem produto'} · {bytes(m.stored_bytes)}</span><button type="button" className="btn btn-secondary btn-sm" aria-label={`Adicionar a imagem ${i + 1} a este produto`} disabled={busy} onClick={() => void after(() => api(`products/${product.id}/media`, 'POST', { asset_id: m.id }), 'Imagem adicionada ao produto.')}>Adicionar</button></li>; })}</ul>
     </details>}
-    <p className="small muted">Reordenar ou remover imagens de um produto ainda não é possível neste painel.</p>
   </section>;
 }
 export function Stock({ catalogue, products, busy, after, api, compact }: SectionProps & { catalogue: Catalogue; products: Product[]; compact?: boolean }) {
@@ -352,7 +360,7 @@ export function MediaTab({ catalogue, reload }: { catalogue: Catalogue; reload: 
     <section className="surface section stack-sm" aria-labelledby="t-upload"><h2 id="t-upload">Enviar imagens</h2><MediaUploader onReady={async () => { await after(async () => {}, 'Lista atualizada.'); return 'Pronta. Vincule-a na edição do produto.'; }} /></section>
     {catalogue.media.length === 0 ? <EmptyState icon="image" title="Nenhuma imagem enviada">Envie as fotos aqui ou direto na edição de cada produto.</EmptyState> :
       <div className="table-wrap"><table className="data stack"><caption>Mostra as 100 imagens mais recentes.</caption><thead><tr><th scope="col">Imagem</th><th scope="col">Situação</th><th scope="col" className="num">Tamanho</th><th scope="col">Usada em</th></tr></thead>
-        <tbody>{catalogue.media.map((m) => <tr key={m.id}><td className="primary"><div className="cell-main">{m.status === 'READY' ? <span className="thumb"><img src={thumbUrl(p.tenantId, m.id)} alt="" loading="lazy" /></span> : <span className="thumb no-photo"><Icon name="image" size={16} /></span>}<span className="cell-sub">Enviada{usedBy(m.id).length ? '' : ', ainda sem produto'}</span></div></td><td data-label="Situação"><StatusBadge map={MEDIA_STATUS} value={m.status} /></td><td className="num" data-label="Tamanho">{bytes(m.stored_bytes)}</td><td data-label="Usada em">{usedBy(m.id).join(', ') || <span className="muted">Não vinculada</span>}</td></tr>)}</tbody></table></div>}
+        <tbody>{catalogue.media.map((m) => <tr key={m.id}><td className="primary"><div className="cell-main">{m.status === 'READY' ? <span className="thumb"><img src={thumbUrl(p.tenantId, m.id)} alt="" loading="lazy" width={48} height={48} /></span> : <span className="thumb no-photo"><Icon name="image" size={16} /></span>}<span className="cell-sub">Enviada{usedBy(m.id).length ? '' : ', ainda sem produto'}</span></div></td><td data-label="Situação"><StatusBadge map={MEDIA_STATUS} value={m.status} /></td><td className="num" data-label="Tamanho">{bytes(m.stored_bytes)}</td><td data-label="Usada em">{usedBy(m.id).join(', ') || <span className="muted">Não vinculada</span>}</td></tr>)}</tbody></table></div>}
     <details className="disclosure small"><summary>Manutenção de mídia</summary><p className="muted">Recalcula o espaço usado e retoma processamentos interrompidos. Use se uma imagem ficar presa em “Processando”.</p><button className="btn btn-secondary btn-sm" disabled={busy} onClick={() => void after(() => call(`tenants/${p.tenantId}/catalogue/media/maintenance`, { method: 'POST', csrf: p.csrf }), 'Manutenção solicitada.')}>Reconciliar mídia e retomar pendências</button></details>
   </>;
 }

@@ -214,3 +214,65 @@ node scripts/fixtures/seed-presets.mjs   # seis lojas de exemplo (só se ainda n
 ```
 
 Abra os endereços `store` de `.local/demo-presets.json` (chaves `editorial`, `essencial`, `atelie`, `vazia`, `um`, `contraste`) — por exemplo `/lojas/atelier-norte-<sufixo>`, `/lojas/essencial-casa-<sufixo>`, `/lojas/barro-e-trama-<sufixo>` — e o editor em `/painel/<tenantId>/aparencia` com a conta correspondente.
+
+## 11. Rodada Compasso: identidade da plataforma e correções de UX (04/10/2026)
+
+Pedido: integrar a direção “Compasso” (nome interno) ao DESIGN.md, corrigir os problemas apontados no painel, no editor, nas lojas e no checkout, e entregar comparações antes/depois com verificação real. Base: commit `9bcc3f2`. Evidências curadas em [`evidencias/compasso-9bcc3f2/`](evidencias/compasso-9bcc3f2/README.md).
+
+### 11.1 Ferramentas: disponíveis × usadas
+
+| Ferramenta | Situação real | Uso |
+|---|---|---|
+| Skill Frontend Design | disponível | Direção e acabamento do painel e do editor |
+| Skill UI/UX Pro Max | disponível; **Python ausente** (o script de busca não roda) | Consulta direta aos CSV, sem instalar nada. Aplicadas: #113 (não cortar texto essencial → títulos de seção em até 2 linhas), #115 (chips que quebram linha), #100 (foco não encoberto → `scroll-padding-bottom` com a barra de salvar), #19 (sem saltos de conteúdo). Paletas sugeridas (vibrantes) recusadas por contrariar a direção |
+| Skill Web Design Guidelines | disponível; fonte baixada | Revisão dos arquivos alterados (achados na §11.4) |
+| Skill Impeccable | disponível (`.claude/skills/impeccable`) | `context`, contrato de direção em `apps/web/.impeccable/surfaces/apps-web-components-panel.md`, `detect` (só “fonte muito usada”: Fraunces do Ateliê, mantida pela autonomia dos modelos), crítica/acabamento por revisor em rodada limitada; caminho por código (sem geração de imagem). Esta seção faz o papel do registro final (“documentador”) |
+| Agentes UI Designer / UX Architect / Brand Guardian | **não existem como tipos de agente** nesta sessão | Dois revisores somente leitura com agente genérico + arquivo de perfil: “acabamento Impeccable” e “UX Architect + Web Interface Guidelines”. Um integrador (esta sessão) editou; revisores não editaram arquivos |
+| Playwright MCP | **não carregado** nesta sessão (nenhuma ferramenta `playwright` disponível) | Alternativa declarada: Playwright do contêiner `tests` (`capture-pages.mjs`, `ux-checks.mjs`, `zoom-check.mjs`) |
+| Figma | não usado (opcional) | — |
+
+### 11.2 Problema → mudança
+
+| Área | Problema | Mudança |
+|---|---|---|
+| Painel | Cinza + cartões brancos; “Recebendo pedidos”/“Pagamentos simulados” repetidos no topo e na lateral | Lateral `canvas` 224 px, plano branco, seções por divisórias, sem barra de topo no desktop; estado só no bloco da loja; títulos em Manrope; seleção #EEF2FF/azul (D-31, D-32) |
+| Catálogo | Primeiro produto baixo no celular; faixa de preço espremia o nome | Linhas com miniatura de 56 px, nome inteiro e preço/saldo em linha própria; desktop em tabela de 72 px com linha clicável e preço à direita; 1º produto a y = 300 px em 390×844. Sem paginação, lote ou busca global inventados |
+| Edição de produto | Vazios; galeria e envio pouco claros; atalhos que “não faziam nada” | Coluna de Imagens fixa (capa grande + grade, “N imagens · até 10”, envio compacto); “Ajustar estoque”/“Editar nas variações” rolam até o bloco e levam o foco; barra de salvar fixa só com alterações; “Vincular de novo” se o vínculo da imagem falhar; reutilizar imagem mostra onde ela já é usada |
+| Mídia | Reordenar/remover pedidos | **Não implementado** (D-36): `product_media` sem coluna de posição (ordem = `order by id`), papel da aplicação sem `DELETE`, só rota de vincular. A tela diz isso em texto, sem controles falsos |
+| Editor | Modelos sempre abertos; títulos de seção cortados; prévia pequena sem escala; “Publicar” sempre ativo | Trilho com modelo atual + “Trocar modelo” sob demanda (miniaturas comparáveis); partes da loja no trilho e propriedades de uma parte por vez; títulos em até 2 linhas; seções em linhas divididas; “Largura de 1280 px, em N%” + “Ampliar prévia” (43% → 90% em 1440); “No ar, sem alterações pendentes” desabilita Publicar; “Salvando…”/“Publicando…”; campo hexadecimal digitável; contorno da seção sem rolar a cada tecla; celular com “Editar/Prévia” (`aria-pressed`) e “Aplicar/Cancelar” dentro da Prévia. Rascunho, publicação exata, restaurar e proteção ao sair inalterados (D-33) |
+| Ateliê | Foto de “Como fazemos” sem relação com o texto | Foto CC0 de peças queimadas em lote |
+| Editorial | Abertura com close de orelha; depois, foto de rua dominada por um drinque | Foto CC0 de bolsa/pasta de couro (StockSnap, Snufkin); texto em faixa à direita sobre o tecido liso no desktop e **abaixo** da foto no celular. Origem só em 960 px: no desktop largo a foto fica levemente suave (pendência) |
+| Essencial | Busca e categorias pouco comerciais; fotos pequenas em molduras; categorias em meia largura e alturas diferentes | Busca larga no cabeçalho; categorias em blocos de mesma altura na largura toda (e no menu); grade sem cartões com a foto ocupando o lado maior do palco. Sem banners nem métricas |
+| Checkout | Bloco de item alto; rótulos de entrega vagos; rodapé completo durante a compra; foco voltava ao topo | Miniatura + nome + total na linha; quantidade −/+ que grava na hora (campo digitável) e “Remover” na mesma linha; entrega/pagamento em linhas divididas; endereço CEP → rua → número → complemento → cidade/UF; foco no título da etapa nova; rodapé compacto. Idempotência, “Não sabemos se a compra foi registrada” e recálculo inalterados |
+| Pedidos | Cartões de ~200 px no celular; só “Nº” clicável; visões interceptavam o clique | Cartão compacto (Nº + total, próximo passo, situação + data); linha inteira abre o pedido; visões são links reais (Ctrl/clique do meio funcionam) |
+| Hoje | “Tudo em dia” com pedidos pagos esperando envio | “Sem alertas” + atalho “Ver pedidos pagos a enviar” (a API de situação não conta a fila; nenhum número inventado) |
+| Administração | “Sair da administração” não saía; mensagem de MFA sem saída | “Voltar às suas lojas”; texto condicional com link |
+
+### 11.3 Lotes
+
+- **A:** linha de base (`compasso-antes`, 94 capturas), catálogo, produto e editor no desktop/celular; inspeção antes de propagar (`compasso-a1`).
+- **B:** propagação para todas as rotas do inventário de `capture-pages.mjs` (acesso, painel, configurações ×6, administração, prévia, vitrine e as seis lojas de exemplo) — `compasso-b1`/`compasso-depois`.
+- **C:** revisão por dois revisores, correções em um lote, recaptura (`compasso-r2`, 94 + 24 limites), zoom real, verificações e documentação.
+
+### 11.4 Revisão: achados e destino
+
+Revisor de acabamento (veredito “corrigir”) e revisor de UX + Web Interface Guidelines. **Corrigidos:** palco do Essencial, foto do Editorial, rótulos/ordem/foco do checkout, bloco do item, “Últimas 1 unidades” → “Última unidade”, seções e modelo sem caixa dentro de caixa, captura da troca de modelo, vazios e barra de salvar da edição, “Hoje”, prévia pequena, estado de publicação, campo hexadecimal, rolagem da prévia a cada tecla, `summary` que esvaziava a coluna pelo teclado, rádios sem `name`, `tablist` sem painéis, nomes repetidos (“Usar esta imagem”, “Adicionar”), foco do trilho, `sessionStorage` lido na renderização (divergência de hidratação), busca que podia apagar teclas, link do carrinho sem nome no celular, categorias desiguais, `.thumb` duplicado, `overscroll-behavior` do menu, `touch-action`, `aria-label` que não continha o texto visível, cliques do meio nas visões de pedidos, rótulos de grupo da navegação como `h2` antes do `h1` (ids com espaço), slug colado à borda, contraste da seta das linhas. **Não corrigidos (pendências):** mostrar só os modos de entrega que a loja oferece (a API pública não expõe isso; exige mudança de API), barra fixa de salvar no editor celular, imagem repetida na loja de um produto só, rodapé no fim da página em telas curtas, largura do logo (sem dimensão conhecida), placeholder com exemplo de SKU.
+
+### 11.5 Verificações (resultados reais)
+
+- **Verificador oficial** `node scripts/verify.mjs --phase=7` (05/10/2026, início 02:50 UTC, árvore de trabalho sobre `9bcc3f2` com as mudanças desta rodada): **código 2 com as 18 etapas locais aprovadas** (build Node LTS, tipos, núcleo transacional, worker real com interface e T27, fase 2 com Playwright, **tema v2 e editor em 390/1440**, regressões, logs, S3, CLI, backup, restore, PITR). O 2 vem só das homologações externas (Mercado Pago e demais). Execuções anteriores: uma interrompida por mim para aplicar a correção da faixa lateral (sem resultado); uma com **código 1**: `tests/theme.test.mjs` exigia a prévia em x > 600 px (posição do layout antigo, controles à esquerda); no espaço de trabalho a prévia fica na coluna central (x = 529). A asserção passou a exigir a intenção — prévia e campo “Nome da loja” visíveis ao mesmo tempo, lado a lado e sem sobreposição — e o seletor do modo passou de `tab` para botão com `aria-pressed`. Nenhum teste removido, nenhum limite aumentado.
+- Tipos do web (`tsc --noEmit`) sem erros; `node docs/design/verificar.mjs` coerente (52 contrastes, 17 rotas); `node docs/design/tokens-css.mjs --check` em dia; `node --test docs/design/tokens-css.test.mjs` 8/8.
+- `scripts/ux-checks.mjs` (rodada `compasso-r2`, projeto de desenvolvimento): UX02, UX04, UX06, UI02, AX01 e CK-RESUMO aprovados; UI01 falhou só pelo seletor antigo (“Tirar contrato.pdf da lista”; o nome acessível passou a conter o texto visível, “Tirar da lista contrato.pdf”) e passou após atualizar o seletor (`compasso-r2-ui01`).
+- **Zoom real** (`scripts/zoom-check.mjs`, Chromium completo com a extensão `zoom-ext`, janela de 1280 px): 200% (largura CSS 640) e 400% (largura CSS 320) em painel-produtos, painel-produto, painel-aparência, painel-pedidos, loja Essencial, produto e carrinho — rolagem horizontal 0 px, título visível, sem erros de página (`compasso-zoom` antes do lote de correções e `compasso-r2-zoom` depois). A primeira tentativa falhou porque o `chromium-headless-shell` não carrega extensões; resolvido com o canal `chromium`.
+- **Capturas:** `compasso-r2` com 94 telas (1440×900 e 390×844) e `compasso-r2-limites` com 24 (768 e 320): 0 erros, rolagem horizontal 0 px; 1º produto do catálogo a y = 300 px em 390×844. `compasso-r3` (carrinho e editor) depois da 2ª rodada de veredito.
+- **Imagens examinadas** nesta rodada: catálogo, edição de produto, aparência (padrão, modelos, ampliada, celular), pedidos 390, carrinho 390 (r2 e r3), Essencial início 1440, Editorial início 1440/390 (duas fotos), zoom 400% de produtos.
+- **2ª rodada de veredito** (revisor de acabamento): itens 1, 2 e 4–8 resolvidos; a regressão apontada (faixa lateral de 3 px na opção de entrega escolhida) virou fundo + contorno de 1 px, e o passo concluído do checkout ganhou ✓. Ficaram abertos: o título “Seu carrinho” durante a etapa Entrega (mantido porque os roteiros de aceite esperam esse título) e a Transportadora exibida mesmo quando a loja não oferece (depende da API).
+
+### 11.6 Pendências reais
+
+- **Aprovação visual humana** desta rodada (não houve).
+- Reordenar/remover imagens do produto (D-36) e modos de entrega por loja no checkout: exigem mudança de API/banco.
+- Foto de abertura do Editorial com origem de 960 px (suave em telas largas); trocar por foto CC0 de maior resolução quando houver.
+- Leitor de tela não foi exercitado; percurso completo de Tab só nas telas cobertas por `ux-checks.mjs`/`verificar-teclado.mjs`.
+- `verificar-aceite.mjs`/`verificar-teclado.mjs` (ambiente `ecommerce-design-demo`) não rodaram nesta rodada; o seletor do carrinho em `verificar-aceite.mjs` foi atualizado para o novo controle de quantidade.
+- Integrações continuam **simuladas**: pagamento (Mercado Pago aguarda homologação), e-mail transacional e domínio público. Nada foi publicado em lojas reais; temas foram publicados só nas lojas de teste.

@@ -51,7 +51,7 @@ function AddToCart({ slug, product, cartHref, contactHref }: { slug: string; pro
       <input type="radio" name="variant" id={`v-${v.id}`} value={v.id} checked={selected === v.id} disabled={v.available < 1} onChange={() => { setSelected(v.id); setAdded(''); setQtyError(''); setQty(1); }} />
       <label htmlFor={`v-${v.id}`}><span className="tick"><Icon name="tick" size={16} /></span>{variantName(v)}{v.available < 1 && <span className="option-out">esgotada</span>}</label>
     </div>)}</div></fieldset>}
-    <p className="availability">{allOut ? <strong>Esgotado</strong> : variant && variant.available > 0 ? <><Icon name="check" size={16} /><span>{variant.available <= 5 ? `Últimas ${variant.available} unidades` : 'Em estoque'}</span></> : <span>Esta opção está esgotada</span>}</p>
+    <p className="availability">{allOut ? <strong>Esgotado</strong> : variant && variant.available > 0 ? <><Icon name="check" size={16} /><span>{variant.available === 1 ? 'Última unidade' : variant.available <= 5 ? `Últimas ${variant.available} unidades` : 'Em estoque'}</span></> : <span>Esta opção está esgotada</span>}</p>
     {allOut ? <p className="small muted">Volte mais tarde ou <a href={contactHref}>fale com a loja</a> para saber se haverá reposição.</p> : <>
       <div className={`qty${qtyError ? ' is-invalid' : ''}`}>
         <label htmlFor="qty-input">Quantidade</label>
@@ -101,10 +101,10 @@ function ProductCard({ p, href, url, category, eager, feature }: { p: Product; h
 // ---------- Seções ----------
 type Ctx = { theme: Theme; data: StoreData; url: (id: string, size: string) => string; link: (to: string, label: ReactNode, o?: { className?: string; current?: boolean }) => ReactNode; href: (to: string) => string | null; themeHref: (l: ThemeLink) => { href: string; external?: boolean } | null; categoryName: (id?: string | null) => string | undefined; mediaUrl: (id: string, size: string) => string };
 function SectionView({ s, ctx, first }: { s: Section; ctx: Ctx; first: boolean }) {
-  const H = first ? 'h2' : 'h2';
+  const H = 'h2';
   if (s.type === 'hero') {
     const cta = s.cta ? ctx.themeHref(s.cta) : null, img = s.image ? ctx.mediaUrl(s.image, 'large') : null, layout = img ? s.layout : 'stacked';
-    return <section className={`sec hero hero-${layout}${img ? '' : ' no-image'}`} aria-label={s.heading || 'Destaque'}>
+    return <section data-section={s.id} className={`sec hero hero-${layout}${img ? '' : ' no-image'}`} aria-label={s.heading || 'Destaque'}>
       {img && <div className="hero-media"><img src={img} alt="" style={{ objectPosition: `${s.focal.x}% ${s.focal.y}%` }} width={1600} height={1000} fetchPriority={first ? 'high' : 'auto'} /></div>}
       <div className="hero-text">{s.heading && <H className="display hero-title">{s.heading}</H>}{s.text && <p className="hero-lead">{s.text}</p>}{s.cta && cta && <a className="btn btn-primary" href={cta.href} {...(cta.external ? { rel: 'noopener noreferrer', target: '_blank' } : {})}>{s.cta.label}{cta.external && <span className="sr-only"> (abre outro site)</span>}</a>}</div>
     </section>;
@@ -114,7 +114,7 @@ function SectionView({ s, ctx, first }: { s: Section; ctx: Ctx; first: boolean }
     const list = (s.source === 'manual' ? s.products.map((id) => all.find((p) => p.id === id)).filter((p): p is Product => !!p) : s.source === 'category' ? all.filter((p) => p.category_id && p.category_id === catId) : all).slice(0, s.limit);
     const more = s.source === 'category' && s.category ? `/categorias/${s.category}` : '/produtos';
     if (!list.length) return null;
-    return <section className="sec products" aria-labelledby={`t-${s.id}`} id={s.id}>
+    return <section data-section={s.id} className="sec products" aria-labelledby={`t-${s.id}`} id={s.id}>
       <div className="sec-head">{s.heading ? <h2 id={`t-${s.id}`} className="display">{s.heading}</h2> : <h2 id={`t-${s.id}`} className="sr-only">Produtos</h2>}{(s.source !== 'manual' && all.length > list.length) && ctx.link(more, 'Ver todos', { className: 'sec-more' })}</div>
       <ul className={`cards${list.length === 1 ? ' is-single' : list.length === 2 ? ' is-pair' : ''}`}>{list.map((p, i) => <ProductCard key={p.id} p={p} href={ctx.href(`/produtos/${p.slug}`)} url={ctx.url} category={ctx.categoryName(p.category_id)} eager={first && i < 4} feature={list.length === 1} />)}</ul>
     </section>;
@@ -123,19 +123,19 @@ function SectionView({ s, ctx, first }: { s: Section; ctx: Ctx; first: boolean }
     const cats = s.categories.length ? s.categories.map((slug) => ctx.data.categories.find((c) => c.slug === slug)).filter((c): c is Category => !!c) : ctx.data.categories;
     if (!cats.length) return null;
     const count = (c: Category) => ctx.data.products.filter((p) => c.id && p.category_id === c.id).length;
-    return <section className="sec categories" aria-labelledby={`t-${s.id}`}>
+    return <section data-section={s.id} className="sec categories" aria-labelledby={`t-${s.id}`}>
       <div className="sec-head">{s.heading ? <h2 id={`t-${s.id}`} className="display">{s.heading}</h2> : <h2 id={`t-${s.id}`} className="sr-only">Categorias</h2>}</div>
       <ul className="category-list">{cats.map((c) => <li key={c.slug}>{ctx.link(`/categorias/${c.slug}`, <><span className="cat-name">{c.name}</span>{count(c) > 0 && <span className="cat-count">{count(c)} {count(c) === 1 ? 'produto' : 'produtos'}</span>}</>)}</li>)}</ul>
     </section>;
   }
   if (s.type === 'image_text') {
     const img = s.image ? ctx.mediaUrl(s.image, 'large') : null;
-    return <section className={`sec image-text side-${s.side}${img ? '' : ' no-image'}`} aria-labelledby={`t-${s.id}`}>
+    return <section data-section={s.id} className={`sec image-text side-${s.side}${img ? '' : ' no-image'}`} aria-labelledby={`t-${s.id}`}>
       {img && <div className="it-media"><img src={img} alt="" loading="lazy" style={{ objectPosition: `${s.focal.x}% ${s.focal.y}%` }} width={1200} height={900} /></div>}
       <div className="it-text">{s.heading && <h2 id={`t-${s.id}`} className="display">{s.heading}</h2>}{s.text && <p className="prose">{s.text}</p>}</div>
     </section>;
   }
-  return <section className="sec text-block" aria-labelledby={`t-${s.id}`}>{s.heading && <h2 id={`t-${s.id}`} className="display">{s.heading}</h2>}<p className="prose">{s.text}</p></section>;
+  return <section data-section={s.id} className="sec text-block" aria-labelledby={`t-${s.id}`}>{s.heading && <h2 id={`t-${s.id}`} className="display">{s.heading}</h2>}<p className="prose">{s.text}</p></section>;
 }
 
 // ---------- Página ----------
@@ -158,7 +158,9 @@ export default function Storefront({ data, path = [], preview = false, previewTe
   const grid = (list: Product[], label: string) => list.length ? <ul className="cards" aria-label={label}>{list.map((p, i) => <ProductCard key={p.id} p={p} href={href(`/produtos/${p.slug}`)} url={url} category={categoryName(p.category_id)} eager={i < 4} />)}</ul> : null;
   const categoryNav = (currentSlug?: string) => data.categories.length > 0 && <nav className="category-strip" aria-label="Categorias"><ul><li>{link('/produtos', 'Todos', { current: catalog && !currentSlug })}</li>{data.categories.map((c) => <li key={c.slug}>{link(`/categorias/${c.slug}`, c.name, { current: currentSlug === c.slug })}</li>)}</ul></nav>;
   let content: ReactNode;
-  if (path[0] === 'carrinho') content = preview ? unavailable : <CartFlow slug={route.slug} />;
+  // Miniaturas do carrinho vêm dos produtos já carregados pela página (a API do carrinho não devolve imagens).
+  const thumbs: Record<string, string> = Object.fromEntries(data.products.flatMap((p) => (p.media[0] ? p.variants.map((v) => [v.id, url(p.media[0]!.id, 'small')] as [string, string]) : [])));
+  if (path[0] === 'carrinho') content = preview ? unavailable : <CartFlow slug={route.slug} thumbs={thumbs} />;
   else if (path[0] === 'atendimento') content = preview ? unavailable : <ContactPage slug={route.slug} />;
   else if (path[0] === 'pedidos' && path[1]) content = preview ? unavailable : <OrderView slug={route.slug} orderId={path[1]} />;
   else if (product) { const cat = categoryName(product.category_id), catSlug = data.categories.find((c) => c.id && c.id === product.category_id)?.slug; content = <div className="pdp-page">
@@ -203,7 +205,7 @@ export default function Storefront({ data, path = [], preview = false, previewTe
   const brandMark = theme.brand.logo ? <img className="store-logo" src={url(theme.brand.logo, 'small')} alt={theme.title} height={40} /> : <span className="store-title display">{theme.title}</span>;
   const search = !preview && <form className="store-search" action={base} role="search">
     <label className="sr-only" htmlFor="store-q">Buscar produtos</label>
-    <input className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produtos" enterKeyHint="search" />
+    <input className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produtos…" enterKeyHint="search" />
     <button className="btn btn-secondary" aria-label="Buscar"><Icon name="search" size={20} /></button>
   </form>;
   return <div className="surface-store" data-store={route.slug} data-preset={theme.preset} data-density={theme.layout.density} style={themeStyle(theme) as CSSProperties}>
@@ -214,24 +216,30 @@ export default function Storefront({ data, path = [], preview = false, previewTe
       <button type="button" className="store-menu-toggle" onClick={() => menuRef.current?.showModal()} aria-haspopup="dialog" aria-controls="menu-loja"><Icon name="menu" /><span className="sr-only">Menu da loja</span></button>
       <div className="store-brand">{home && !q ? link('/', brandMark) : link('/', brandMark)}</div>
       <nav className="store-nav" aria-label="Navegação da loja"><ul>{navItems}</ul></nav>
+      {/* Essencial: a busca é parte do cabeçalho (sempre visível); os outros modelos a abrem pela lupa. */}
+      {search && theme.preset === 'essencial' && <div className="head-search" id="busca-loja">{search}</div>}
       <div className="head-actions">
         {!preview && theme.preset !== 'essencial' && <button type="button" className="icon-link search-toggle" aria-expanded={searchOpen} aria-controls="busca-loja" onClick={() => setSearchOpen(!searchOpen)}><Icon name="search" /><span className="sr-only">{searchOpen ? 'Esconder busca' : 'Mostrar busca'}</span></button>}
         {!preview && <a className="icon-link store-cart" href={`${base}/carrinho`} aria-current={here === '/carrinho' ? 'page' : undefined}><Icon name="cart" /><span className="cart-label">Carrinho</span></a>}
       </div>
     </div>
-      {search && <div id="busca-loja" className={`store-wrap search-row${theme.preset === 'essencial' || searchOpen || q ? '' : ' is-collapsed'}`}>{search}</div>}
+      {search && theme.preset !== 'essencial' && <div id="busca-loja" className={`store-wrap search-row${searchOpen || q ? '' : ' is-collapsed'}`}>{search}</div>}
     </header>
     <dialog ref={menuRef} id="menu-loja" className="drawer store-drawer" aria-label="Menu da loja" onClick={(e) => { if (e.target === menuRef.current) menuRef.current?.close(); }}>
       <div className="drawer-inner"><div className="drawer-head"><span className="store-title display">{theme.title}</span><button type="button" className="icon-button" onClick={() => menuRef.current?.close()} aria-label="Fechar menu"><Icon name="x" /></button></div>
         <nav aria-label="Navegação da loja (menu)"><ul className="drawer-links">{navItems}{data.categories.map((c) => <li key={c.slug}>{link(`/categorias/${c.slug}`, c.name)}</li>)}</ul></nav></div>
     </dialog>
     <main id="conteudo" className="store-main" tabIndex={-1}><div className="store-wrap">{content}</div></main>
+    {path[0] === 'carrinho' && supplier ? <footer className="store-footer is-checkout"><div className="store-wrap checkout-foot">
+      <section aria-labelledby="t-supplier"><h2 id="t-supplier" className="foot-title">Fornecedor e atendimento</h2><p className="small"><strong>{supplier.name}</strong>{supplier.document && <>, CPF/CNPJ {supplier.document}</>}. {supplier.address}</p><p className="small"><a href={`mailto:${supplier.email}`}>{supplier.email}</a>, {supplier.phone}. {link('/atendimento', 'Fale com a loja')}</p></section>
+      <section aria-labelledby="t-policies"><h2 id="t-policies" className="foot-title">Políticas</h2><details className="small"><summary>Trocas, arrependimento e privacidade</summary><p className="prose">{supplier.policies}</p></details><details className="small"><summary>Entrega e restrições</summary><p className="prose">{supplier.delivery}</p></details>{supplier.synthetic && <p className="small muted">Ambiente de teste: contatos e políticas fictícios.</p>}</section>
+    </div></footer> :
     <footer className="store-footer"><div className="store-wrap footer-grid">
       <section aria-labelledby="t-foot-store"><p id="t-foot-store" className="foot-title">{theme.title}</p>{theme.description && <p className="small muted">{theme.description}</p>}
         {(theme.footer.links.length > 0 || theme.pages.length > 0) && <ul className="foot-links">{(theme.footer.links.length ? theme.footer.links : theme.pages.map((p) => ({ label: p.title, to: { kind: 'page' as const, ref: p.slug } }))).map((l, i) => { const h = themeHref(l); return <li key={i}>{h ? <a href={h.href} {...(h.external ? { rel: 'noopener noreferrer', target: '_blank' } : {})}>{l.label}</a> : <span className="muted">{l.label}</span>}</li>; })}</ul>}
         {theme.footer.note && <p className="small muted prose">{theme.footer.note}</p>}</section>
       {supplier && <section aria-labelledby="t-supplier"><h2 id="t-supplier" className="foot-title">Fornecedor e atendimento</h2><p className="small"><strong>{supplier.name}</strong>{supplier.document && <><br />CPF/CNPJ {supplier.document}</>}<br />{supplier.address}</p><p className="small"><a href={`mailto:${supplier.email}`}>{supplier.email}</a><br />{supplier.phone}</p><p className="small">{link('/atendimento', 'Fale com a loja')}</p></section>}
       {supplier && <section aria-labelledby="t-policies"><h2 id="t-policies" className="foot-title">Políticas</h2><details className="small"><summary>Trocas, arrependimento e privacidade</summary><p className="prose">{supplier.policies}</p></details><details className="small"><summary>Entrega e restrições</summary><p className="prose">{supplier.delivery}</p></details>{supplier.synthetic && <p className="small muted">Ambiente de teste: contatos e políticas fictícios.</p>}</section>}
-    </div></footer>
+    </div></footer>}
   </div>;
 }

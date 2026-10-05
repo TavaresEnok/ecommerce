@@ -115,9 +115,9 @@ function PaymentTag({ compact }: { compact?: boolean }) {
   return null;
 }
 function NavList({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () => void }) {
-  return <nav aria-label="Áreas da loja" className="nav">{groups.map((g) => <div className="nav-group" key={g.label}>
-    <h2 className="nav-group-label" id={`nav-${g.label}`}>{g.label}</h2>
-    <ul aria-labelledby={`nav-${g.label}`}>{g.items.map((i) => <li key={i.href}><Link href={i.href} aria-current={i.current ? 'page' : undefined} onClick={onNavigate}><Icon name={i.icon} />{i.label}</Link></li>)}</ul>
+  return <nav aria-label="Áreas da loja" className="nav">{groups.map((g, n) => <div className="nav-group" key={g.label}>
+    <p className="nav-group-label" id={`nav-grupo-${n}`}>{g.label}</p>
+    <ul aria-labelledby={`nav-grupo-${n}`}>{g.items.map((i) => <li key={i.href}><Link href={i.href} aria-current={i.current ? 'page' : undefined} onClick={onNavigate}><Icon name={i.icon} />{i.label}</Link></li>)}</ul>
   </div>)}</nav>;
 }
 function StoreBlock() {
@@ -125,7 +125,8 @@ function StoreBlock() {
   return <div className="store-block">
     <p className="store-block-name">{p.store.name}</p>
     <p className="store-block-meta">{p.owner ? 'Dono' : 'Funcionário'}<span className="sep" aria-hidden>/</span><span className="slug">{p.store.slug}</span></p>
-    <div className="cluster-tight"><SalesState /><PaymentTag /></div>
+    {/* Situação da loja num só lugar (lateral ou gaveta); a barra do celular mostra só “Simulado”. */}
+    <div className="store-status"><SalesState /><PaymentTag /></div>
   </div>;
 }
 function NavFoot({ onLogout }: { onLogout: () => void }) {
@@ -161,7 +162,6 @@ function Frame({ children }: { children: ReactNode }) {
       </div>
     </dialog>
     <div className="main">
-      <header className="topbar"><span className="topbar-area">{current?.label ?? 'Painel'}</span><div className="cluster-tight"><PaymentTag /><SalesState /></div></header>
       <main className="content" id="conteudo" tabIndex={-1}>{children}</main>
     </div>
   </div>;

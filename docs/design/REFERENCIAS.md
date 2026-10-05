@@ -59,3 +59,5 @@ Limitações: a loja de demonstração da Nuvemshop e as páginas de demonstraç
 |---|---|---|---|
 | Bodoni Moda 500/600, Archivo 500/600/700, Fraunces 400/600 (subconjunto latino, WOFF2) | pacotes npm `@fontsource/bodoni-moda`, `@fontsource/archivo`, `@fontsource/fraunces` 5.3.0 (registro npm) | SIL OFL 1.1 | `apps/web/app/fonts/` com `OFL-*.txt` |
 | 42 imagens de demonstração (41 fotos + 1 ilustração PNG) | Openverse (API pública), filtro `cc0,pdm`, maioria do diretório de fotos do WordPress; uma ilustração com o quadriculado de fundo convertido em transparência real | CC0 / domínio público; origem, autor e URL de cada arquivo em `scripts/fixtures/fotos.json` | `scripts/fixtures/fotos/` (só para dados de demonstração; uma foto com marca visível foi descartada) |
+| Manrope 500/600/700 (subconjunto latino, WOFF2) — rodada Compasso | pacote npm `@fontsource/manrope` 5.3.0 | SIL OFL 1.1 | `apps/web/app/fonts/` com `OFL-Manrope.txt` |
+| 2 fotos de demonstração novas (Ateliê “Como fazemos”; abertura do Editorial) — rodada Compasso | Openverse: Jennifer Bourn (c3323814, CC0) e Snufkin/StockSnap (3213eb9e, CC0) | CC0 | `scripts/fixtures/fotos/` + `fotos.json` |

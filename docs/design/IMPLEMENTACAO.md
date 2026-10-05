@@ -109,6 +109,10 @@ Critérios em [ACEITE.md §3](ACEITE.md) (UX01–QA01). Contratos financeiros, d
 
 Testes novos: `tests/theme-schema.test.mjs` (esquema, v1→v2, leitura tolerante) e `tests/theme.test.mjs` (duas sessões, publicação exata, histórico, isolamento entre lojas, contraste de cor clara, editor com prévia em 390/1440) — ambos no verificador oficial a partir da fase 2. Verificações de interação reproduzíveis no projeto de desenvolvimento: `scripts/ux-checks.mjs`; capturas: `scripts/design-review.mjs`; dados: `scripts/fixtures/seed-presets.mjs`.
 
+### Rodada Compasso (04/10/2026)
+
+Identidade da plataforma (tokens com novos valores e mesmos nomes, Manrope, lateral 224 px, sem topo no desktop, seções por divisórias), editor como espaço de trabalho, Essencial/Editorial/Ateliê e checkout corrigidos. Arquivos: `docs/design/tokens.json`, `apps/web/app/style.css`, `apps/web/app/fonts/manrope-*`, `components/panel/{Shell,catalog,appearance,MediaUploader}.tsx`, `components/{storefront,checkout,preview-live,theme-model}.tsx`, `app/painel/[tenantId]/{operacao,pedidos}/page.tsx`, `app/plataforma/page.tsx`, fixtures em `scripts/fixtures/`. Seletores alterados junto com os testes: modo do editor passou de `tab` para botão com `aria-pressed` (`tests/theme.test.mjs`), botão “Tirar da lista arquivo” (`scripts/ux-checks.mjs`), quantidade do carrinho com “Aumentar quantidade de …” (`docs/design/verificar-aceite.mjs`). Registro completo: RELATORIO-FINAL §11.
+
 ## 5. Contrato de seletores usados pelos testes (preservar)
 
 **Alterações da evolução de 03/10/2026 (mesmo commit, asserções preservadas):** `commercial-ui` navega para `/configuracoes/seguranca|plano|dominio|entregas` (antes tudo em `/operacao`), botão “Ativar verificação em duas etapas” (antes “Configurar MFA”), form “Confirmar código de verificação” (antes “Confirmar MFA”), campo “Endereço do domínio” (antes “Hostname”); `storefront` usa searchbox “Buscar produtos” e botão “Buscar” (antes “Buscar produto ou SKU”/“Pesquisar”).

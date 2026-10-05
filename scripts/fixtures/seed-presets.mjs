@@ -22,7 +22,7 @@ const photo = (name) => readFileSync(join(here, 'fotos', name));
 const t = (s) => `${s} TESTE`;
 
 const STORES = [
-  { key: 'atelie', themeImages: ['atelie-copos.jpg', 'atelie-tecidos.jpg'], name: t('Barro & Trama'), slug: `barro-e-trama-${suffix}`, preset: 'atelie', color: '#2F5D50',
+  { key: 'atelie', themeImages: ['atelie-copos.jpg', 'atelie-lotes-queimados.jpg'], name: t('Barro & Trama'), slug: `barro-e-trama-${suffix}`, preset: 'atelie', color: '#2F5D50',
     description: 'Cerâmica, cestaria e peças de mesa feitas em pequenos lotes.', categories: ['Cerâmica', 'Cestaria', 'Mesa e cozinha', 'Decoração'],
     products: [
       { name: 'Copos de cerâmica torneada', cat: 'Mesa e cozinha', price: '4800', photos: ['atelie-copos.jpg'], desc: 'Copos torneados à mão em argila vermelha, com acabamento fosco por fora e esmalte transparente por dentro. Capacidade aproximada de 250 ml. Cada peça tem pequenas variações de cor e altura.', variants: [['Unidade', '4800', 12], ['Jogo com 4', '17900', 5]], opt: 'Quantidade' },
@@ -41,7 +41,7 @@ const STORES = [
     theme: (img, ids) => ({ preset: 'atelie', sections: [
       { id: 'abertura', type: 'hero', hidden: false, heading: 'Peças de uso diário, feitas devagar', text: 'Cerâmica torneada, cestaria e madeira de pequenos produtores. Cada lote é pequeno e cada peça é um pouco diferente.', image: img['atelie-copos.jpg'], focal: { x: 50, y: 55 }, layout: 'split', cta: { label: 'Conhecer as peças', to: { kind: 'catalog' } } },
       { id: 'selecao', type: 'products', hidden: false, heading: 'Peças da semana', source: 'manual', category: null, products: [ids['Bule de porcelana verde'], ids['Copos de cerâmica torneada'], ids['Cesto trançado em palha tingida'], ids['Trio de tigelas de madeira']], limit: 4 },
-      { id: 'processo', type: 'image_text', hidden: false, heading: 'Como fazemos', text: 'Trabalhamos com ateliês parceiros do interior. As peças são queimadas em lotes de até vinte unidades e passam por conferência antes do envio.', image: img['atelie-tecidos.jpg'], focal: { x: 50, y: 50 }, side: 'end' },
+      { id: 'processo', type: 'image_text', hidden: false, heading: 'Como fazemos', text: 'Trabalhamos com ateliês parceiros do interior. As peças são queimadas em lotes de até vinte unidades e passam por conferência antes do envio.', image: img['atelie-lotes-queimados.jpg'], focal: { x: 50, y: 50 }, side: 'end' },
       { id: 'mais', type: 'products', hidden: false, heading: 'Decoração', source: 'category', category: 'decoracao', products: [], limit: 8 },
     ], pages: [{ slug: 'sobre', title: 'Sobre o ateliê', body: 'Somos uma loja de demonstração. Os textos e contatos são fictícios.' }, { slug: 'trocas', title: 'Trocas e cuidados', body: 'Peças artesanais podem ter pequenas variações. Trocas em até 7 dias do recebimento.' }],
       menu: [{ label: 'Cerâmica', to: { kind: 'category', ref: 'ceramica' } }, { label: 'Mesa e cozinha', to: { kind: 'category', ref: 'mesa-e-cozinha' } }, { label: 'Sobre', to: { kind: 'page', ref: 'sobre' } }] }) },
@@ -70,8 +70,8 @@ const STORES = [
       { id: 'categorias', type: 'categories', hidden: false, heading: 'Categorias', categories: [] },
       { id: 'produtos', type: 'products', hidden: false, heading: 'Todos os produtos', source: 'all', category: null, products: [], limit: 24 },
     ], pages: [{ slug: 'garantia', title: 'Garantia', body: 'Loja de demonstração: garantia fictícia de 90 dias.' }],
-      menu: [{ label: 'Áudio', to: { kind: 'category', ref: 'audio' } }, { label: 'Teclados e mouses', to: { kind: 'category', ref: 'teclados-e-mouses' } }, { label: 'Casa e escritório', to: { kind: 'category', ref: 'casa-e-escritorio' } }] }) },
-  { key: 'editorial', themeImages: ['editorial-brinco.jpg', 'editorial-botas-2.jpg'], name: t('Atelier Norte'), slug: `atelier-norte-${suffix}`, preset: 'editorial', color: '#1F2A44',
+      menu: [{ label: 'Áudio', to: { kind: 'category', ref: 'audio' } }, { label: 'Teclados e mouses', to: { kind: 'category', ref: 'teclados-e-mouses' } }, { label: 'Casa e escritório', to: { kind: 'category', ref: 'casa-e-escritorio' } }, { label: 'Garrafas e mochilas', to: { kind: 'category', ref: 'garrafas-e-mochilas' } }] }) },
+  { key: 'editorial', themeImages: ['editorial-pasta-couro.jpg', 'editorial-botas-2.jpg'], name: t('Atelier Norte'), slug: `atelier-norte-${suffix}`, preset: 'editorial', color: '#1F2A44',
     description: 'Bolsas, óculos e acessórios em couro e metal, com produção em pequena escala.', categories: ['Bolsas', 'Óculos', 'Acessórios', 'Calçados'],
     products: [
       { name: 'Bolsa estruturada rosa', cat: 'Bolsas', price: '42900', photos: ['editorial-bolsa-rosa.jpg'], desc: 'Bolsa de mão estruturada com textura de croco e fecho magnético. 24 × 15 cm.', stock: 4 },
@@ -87,7 +87,7 @@ const STORES = [
       { name: 'Lenço de seda estampado com acabamento em bainha feita à mão e embalagem para presente', cat: 'Acessórios', price: '17900', photos: [], desc: 'Lenço quadrado de seda, 90 × 90 cm. Foto em produção.', stock: 6 },
     ],
     theme: (img, ids) => ({ preset: 'editorial', sections: [
-      { id: 'abertura', type: 'hero', hidden: false, heading: 'Coleção de inverno', text: 'Couro, metal e acabamento à mão. Peças pensadas para durar mais de uma estação.', image: img['editorial-brinco.jpg'], focal: { x: 40, y: 45 }, layout: 'overlay', cta: { label: 'Ver a coleção', to: { kind: 'catalog' } } },
+      { id: 'abertura', type: 'hero', hidden: false, heading: 'Coleção de inverno', text: 'Couro, metal e acabamento à mão. Peças pensadas para durar mais de uma estação.', image: img['editorial-pasta-couro.jpg'], focal: { x: 8, y: 65 }, layout: 'overlay', cta: { label: 'Ver a coleção', to: { kind: 'catalog' } } },
       { id: 'novidades', type: 'products', hidden: false, heading: 'Novidades', source: 'manual', category: null, products: [ids['Bolsa estruturada rosa'], ids['Óculos de sol aviador'], ids['Colar coração dourado'], ids['Sapato de couro marrom']], limit: 4 },
       { id: 'historia', type: 'image_text', hidden: false, heading: 'Feito para durar', text: 'Trabalhamos com curtumes certificados e oficinas de até cinco pessoas. Cada par de sapatos passa por doze etapas de acabamento.', image: img['editorial-botas-2.jpg'], focal: { x: 50, y: 60 }, side: 'start' },
       { id: 'categorias', type: 'categories', hidden: false, heading: 'Explore', categories: [] },

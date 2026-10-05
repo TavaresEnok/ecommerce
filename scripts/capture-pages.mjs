@@ -18,7 +18,7 @@ const ok=(r,s=201)=>{if(r.status!==s)throw new Error(`${r.status} ${JSON.stringi
 // Owner session and one paid order, created through the same public/admin endpoints the interface uses.
 const login=ok(await api('auth/login',{method:'POST',body:{email:store.email,password:store.password}}));
 const actor={csrf:login.body.csrf,cookie:login.headers.get('set-cookie').split(';')[0]};
-const catalogue=ok(await api(`tenants/${store.tenantId}/catalogue`,{actor}),200).body,product=catalogue.products.find(p=>p.status==='ACTIVE'&&p.variants.some(v=>v.active&&v.available>0))??catalogue.products.find(p=>p.status==='ACTIVE'),variant=(product.variants.find(v=>v.active&&v.available>0)??product.variants[0]).id;
+const catalogue=ok(await api(`tenants/${store.tenantId}/catalogue`,{actor}),200).body,product=catalogue.products.find(p=>p.status==='ACTIVE'&&p.variants.some(v=>v.active&&v.available>1))??catalogue.products.find(p=>p.status==='ACTIVE'),variant=(product.variants.find(v=>v.active&&v.available>1)??product.variants[0]).id;
 const address={cep:'01001000',street:'Rua Demonstração',number:'1',city:'São Paulo',state:'SP',complement:''};
 const add=()=>api(`public/stores/${slug}/cart/items`,{method:'POST',body:{variant_id:variant,quantity:1}});
 let order=null,orderCart=null;
@@ -28,6 +28,8 @@ try{const a=ok(await add());orderCart=a.headers.get('set-cookie').split(';')[0];
  await new Promise(r=>setTimeout(r,3000));}catch(e){console.log('Pedido de demonstração não criado:',e.message);}
 const cart=ok(await add()).headers.get('set-cookie').split(';')[0];
 const cookieOf=c=>({name:c.split('=')[0],value:c.split('=').slice(1).join('='),domain:new URL(base).hostname,path:'/'});
+// Produto mostrado nas capturas (edição, busca, página): CAPTURE_PRODUCT=<slug> fixa o mesmo produto entre rodadas antes/depois.
+const focus=catalogue.products.find(p=>p.slug===process.env.CAPTURE_PRODUCT)??product;
 const panel=`/painel/${store.tenantId}`,shop=`/lojas/${slug}`;
 // [name, path, session: 'none'|'owner'|'cart', optional action after load]
 const pages=[
@@ -36,12 +38,15 @@ const pages=[
  ['acesso-recuperar','/','none',async p=>{await p.getByRole('button',{name:'Esqueci minha senha'}).click();}],
  ['suas-lojas','/','owner'],
  ['painel-catalogo',panel,'owner'],
- ['painel-produto-editar',panel,'owner',async p=>{await p.getByRole('link',{name:new RegExp(product.name)}).first().click();}],
+ ['painel-produto-editar',panel,'owner',async p=>{await p.getByRole('link',{name:new RegExp(focus.name)}).first().click();}],
  ['painel-novo-produto',`${panel}?novo=1`,'owner'],
  ['painel-estoque',`${panel}?aba=estoque`,'owner'],
  ['painel-imagens',`${panel}?aba=midia`,'owner'],
  ['painel-categorias-locais',`${panel}?aba=organizacao`,'owner'],
  ['painel-aparencia',`${panel}/aparencia`,'owner',async p=>{await p.waitForTimeout(2500);}],
+ // Troca de modelo sob demanda: miniaturas comparáveis e o modelo em teste na prévia (nada é aplicado nem salvo).
+ ['painel-aparencia-modelos',`${panel}/aparencia`,'owner',async p=>{await p.getByRole('button',{name:'Trocar modelo'}).click();await p.getByRole('radio',{name:/Editorial/}).check();await p.waitForTimeout(2500);}],
+ ['painel-aparencia-ampliada',`${panel}/aparencia`,'owner',async p=>{await p.getByRole('button',{name:'Ampliar prévia'}).click().catch(()=>{});await p.waitForTimeout(2500);}],
  ['painel-aparencia-celular',`${panel}/aparencia`,'owner',async p=>{await p.getByRole('button',{name:'Celular'}).click().catch(()=>{});await p.waitForTimeout(2500);}],
  ['painel-pedidos',`${panel}/pedidos`,'owner'],
  ['painel-pedido-detalhe',`${panel}/pedidos`,'owner',async p=>{await p.getByRole('link',{name:/^Nº \d+$/}).first().click();await p.getByRole('heading',{name:'Expedição'}).waitFor({timeout:10000});}],
@@ -52,8 +57,8 @@ const pages=[
  ['preview-rascunho',`/preview/${store.tenantId}`,'owner'],
  ['vitrine-inicio',shop,'none'],
  ['vitrine-catalogo',`${shop}/produtos`,'none'],
- ['vitrine-busca',`${shop}?q=${encodeURIComponent(product.name.split(' ')[0])}`,'none'],
- ['vitrine-produto',`${shop}/produtos/${product.slug}`,'none'],
+ ['vitrine-busca',`${shop}?q=${encodeURIComponent(focus.name.split(' ')[0])}`,'none'],
+ ['vitrine-produto',`${shop}/produtos/${focus.slug}`,'none'],
  ['vitrine-carrinho',`${shop}/carrinho`,'cart'],
  ['vitrine-atendimento',`${shop}/atendimento`,'none'],
  ...(order?[['vitrine-pedido-comprovante',`${shop}/pedidos/${order.id}`,'order']]:[]),

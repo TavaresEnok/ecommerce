@@ -26,9 +26,10 @@ export const FONT_LABEL: Record<Font, string> = { plex: 'IBM Plex Sans (sem seri
 export const SECTION_LABEL: Record<SectionType, string> = { hero: 'Destaque com imagem', products: 'Produtos', categories: 'Categorias', image_text: 'Imagem com texto', text: 'Texto' };
 
 // Três composições diferentes na hierarquia, no uso de imagem e na ordem das seções — não só na cor.
-export const PRESETS: Record<Preset, { name: string; summary: string; brand: Pick<Theme['brand'], 'font' | 'button'>; layout: Theme['layout']; color: string; sections: (t: { title: string; description: string }) => Section[] }> = {
+export const PRESETS: Record<Preset, { name: string; tagline: string; summary: string; brand: Pick<Theme['brand'], 'font' | 'button'>; layout: Theme['layout']; color: string; sections: (t: { title: string; description: string }) => Section[] }> = {
   editorial: {
     name: 'Editorial',
+    tagline: 'Foto grande na abertura, serifa elegante e produtos em retrato.',
     summary: 'Para moda e acessórios: fotografia grande no topo, títulos em serifa de alto contraste, produtos em retrato com bastante respiro e blocos de imagem com texto para contar a coleção.',
     brand: { font: 'bodoni', button: 'square' }, layout: { width: 'wide', density: 'comfortable', ratio: 'portrait', fit: 'cover' }, color: '#1F2A44',
     sections: (t) => [
@@ -40,6 +41,7 @@ export const PRESETS: Record<Preset, { name: string; summary: string; brand: Pic
   },
   essencial: {
     name: 'Essencial',
+    tagline: 'Busca e categorias primeiro, grade densa para comparar.',
     summary: 'Para utilidades e tecnologia: busca em destaque, categorias logo no início e grade densa para comparar preço e disponibilidade; imagens quadradas e inteiras sobre fundo claro.',
     brand: { font: 'archivo', button: 'rounded' }, layout: { width: 'wide', density: 'compact', ratio: 'square', fit: 'contain' }, color: '#1D4ED8',
     sections: () => [
@@ -49,6 +51,7 @@ export const PRESETS: Record<Preset, { name: string; summary: string; brand: Pic
   },
   atelie: {
     name: 'Ateliê',
+    tagline: 'Foto e texto lado a lado, peças quadradas com respiro.',
     summary: 'Para casa e artesanato: abertura dividida entre foto e texto, poucos produtos por vez em formato quadrado e espaço para apresentar quem faz e como é feito.',
     brand: { font: 'fraunces', button: 'pill' }, layout: { width: 'regular', density: 'comfortable', ratio: 'square', fit: 'cover' }, color: '#2F5D50',
     sections: (t) => [

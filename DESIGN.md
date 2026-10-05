@@ -1,6 +1,6 @@
 # DESIGN.md — interface da Plataforma
 
-**Versão:** 2.0 · **Data:** 03/10/2026 · **Estado:** rotas redesenhadas (lotes 1–3) e evolução de UX/personalização (lotes A–C): navegação do painel por tarefas, configurações por assunto, catálogo e edição progressiva, editor de aparência com três modelos (presets), tema versionado v2 e prévia ao vivo. Estado detalhado em [STATUS.md](docs/design/STATUS.md).
+**Versão:** 2.1 · **Data:** 04/10/2026 · **Estado:** rotas redesenhadas (lotes 1–3), evolução de UX/personalização (lotes A–C) e **direção Compasso** para a identidade da plataforma (painel, acesso e administração; §2.1): navegação do painel por tarefas, configurações por assunto, catálogo e edição progressiva, editor de aparência como espaço de trabalho (trilho, prévia, propriedades), três modelos de loja (presets), tema versionado v2 e prévia ao vivo. Estado detalhado em [STATUS.md](docs/design/STATUS.md). A aprovação visual humana desta rodada continua pendente.
 
 Este documento orienta toda mudança de interface em `apps/web`. Ele **complementa** `docs/especificacao.md` (v1.1) e não altera regras de pagamento, estoque, pedidos, permissões, isolamento entre lojas, privacidade ou obrigações ao consumidor. Quando houver conflito, a especificação vence e este documento deve ser corrigido.
 
@@ -49,6 +49,17 @@ Princípio: a interface transmite **organização, confiança e cuidado com o ca
 7. Cor orienta ações e estados; não decora.
 8. Divulgação progressiva: o que é raro (endereço do produto, variações, estoque por local, pausa de vendas, conta de pagamento) fica em blocos recolhíveis com resumo visível no título.
 
+### 2.1 Direção Compasso (identidade da plataforma)
+
+“Compasso” é o **nome interno** da direção visual do painel, do acesso e da administração — não é nome de produto, marca nem logotipo (a regra “Plataforma” acima continua). Integrada em 04/10/2026 a partir do DESIGN.md anexado à rodada, preservando todas as regras funcionais deste documento.
+
+- **Tese:** uma mesa de trabalho mineral e precisa. Lateral em `canvas` (#F4F6F8, 224 px), plano de trabalho branco, seções separadas por **divisórias**, não por caixas; azul (#2548D8) **só** para ação, seleção e foco.
+- **Tipos:** títulos (h1–h3 do painel, nome da loja na lateral, título do bloco aberto no editor) em **Manrope** 600/700 com tracking −0,01 em; corpo, rótulos, números e formulários em IBM Plex Sans (D-02 e D-06 continuam).
+- **Forma:** raios 8 (controles) / 12 (superfícies) / 16 px (diálogos); pílula só em filtros segmentados, visões rápidas e selos. Sombra só em camada sobreposta (`shadow-overlay`, `shadow-menu`).
+- **Primeira dobra:** título + ação principal à direita, busca larga e o primeiro item da lista visível em 390×844 (produto a y ≈ 300 px).
+- **Sem caixa dentro de caixa:** listas de seções, links do tema, opções de entrega/pagamento e o modelo atual do editor são **linhas divididas**; o selecionado ganha fundo `selection`/marcador de 3 px, não outra moldura.
+- **Lojas:** a direção **não** se aplica às vitrines. Cada modelo (Editorial, Essencial, Ateliê) mantém neutros, fontes e composição próprios (§11), e as personalizações existentes continuam valendo. Os tokens `store-*` da “Casa Ipê” do material anexado ficam registrados só como **direção de demonstração** (D-35): não viraram tokens nem fixture, e nenhuma loja existente (Barro & Trama, Atelier Norte, Essencial Casa Digital) foi renomeada.
+
 **Proibido:** transformar toda informação em card; métricas/gráficos decorativos; blocos promocionais em telas operacionais; WebGL; animação ao rolar; bibliotecas novas apenas para ornamentar.
 
 ## 3. Fundamentos
@@ -59,22 +70,23 @@ Os valores abaixo são os de [tokens.json](docs/design/tokens.json). O verificad
 
 | Token | Valor | Uso | Contraste conferido |
 |---|---|---|---|
-| `canvas` | `#F5F7F8` | Fundo do painel | texto 13,63:1 |
-| `surface` | `#FFFFFF` | Área de trabalho e formulários | texto 14,65:1 |
-| `surface-subtle` | `#EEF2F3` | Cabeçalho de tabela, agrupamentos, botão desabilitado | secundário 5,55:1 |
-| `text` | `#172B35` | Texto principal | — |
-| `text-muted` | `#52636B` | Ajuda e metadados | 6,26:1 em surface |
-| `border` | `#D8E1E5` | **Só** separadores decorativos | 1,33:1 — nunca limite de controle |
-| `control-border` | `#71838D` | Limite de campos, checkbox, botão secundário | 3,94:1 em surface (≥ 3:1) |
-| `action` | `#006B60` | Botão principal (texto branco) e links | 6,42:1 |
-| `action-hover` | `#00574E` | Hover/pressionado | 8,49:1 com branco |
-| `selection` | `#E5F3EF` | Fundo de selecionado, sempre com marcador `action` | texto 12,84:1 |
-| `focus` | `#2459C4` | Contorno de foco 2 px, afastamento 2 px | 6,36:1 em surface |
-| `danger` | `#B42318` | Erro, incidente, ação destrutiva | 6,57:1; 5,70:1 em `danger-subtle` |
-| `warning` | `#8A4B08` | Pendente/aviso, sempre com texto | 6,14:1 em `warning-subtle` |
-| `success` | `#166534` | Sucesso **confirmado** | 6,30:1 em `success-subtle` |
+| `canvas` | `#F4F6F8` | Lateral do painel, palco da prévia, hover de linha | texto 15,04:1 |
+| `surface` | `#FFFFFF` | Plano de trabalho e formulários | texto 16,29:1 |
+| `surface-subtle` | `#EDF0F4` | Agrupamentos, prefixo de campo, botão desabilitado | secundário 5,63:1 |
+| `text` | `#17212B` | Texto principal | — |
+| `text-muted` | `#526070` | Ajuda e metadados | 6,43:1 em surface |
+| `border` | `#DCE2E8` | **Só** divisórias | 1,31:1 — nunca limite de controle |
+| `control-border` | `#778391` | Limite de campos, checkbox, botão secundário | 3,86:1 em surface (≥ 3:1) |
+| `action` | `#2548D8` | Botão principal (texto branco) e links | 7,01:1 |
+| `action-hover` | `#1937B5` | Hover | 9,31:1 com branco |
+| `action-pressed` | `#142C91` | Pressionado (`:active`) | 11,67:1 com branco |
+| `selection` | `#EEF2FF` | Fundo de selecionado, texto/marcador em `action` | `action` 6,27:1; texto 14,57:1 |
+| `focus` | `#2548D8` | Contorno de foco 2 px, afastamento 2 px | 7,01:1 em surface |
+| `danger` | `#B42332` | Erro, incidente, ação destrutiva | 6,51:1; 5,88:1 em `danger-subtle` (#FFF0F1) |
+| `warning` | `#805000` | Pendente/aviso, sempre com texto | 6,22:1 em `warning-subtle` (#FFF3D8) |
+| `success` | `#176247` | Sucesso **confirmado** | 6,54:1 em `success-subtle` (#EAF5EE) |
 
-Adições necessárias (registradas como decisão D-03): `on-action` (#FFFFFF), `focus-on-dark` (#8DB0F7), `danger-subtle` (#FCEBEA), `warning-subtle` (#FDF2E2), `success-subtle` (#E7F4EC), `context-global` (#172B35) com `on-context-global` (#FFFFFF) e `on-context-global-muted` (#C9D6DC), `scrim` (rgba 23,43,53,0.48). Nenhum valor inicial foi alterado: todas as combinações usadas passaram.
+Valores da direção Compasso (§2.1, D-31) com os **nomes de token anteriores** — nenhum componente mudou de nome. Continuam (D-03): `on-action` (#FFFFFF), `focus-on-dark` (#8DB0F7), `context-global` (#17212B) com `on-context-global` (#FFFFFF) e `on-context-global-muted` (#C9D6DC), `scrim` (rgba 23,33,43,0.48). O verificador confere 52 combinações.
 
 Regras:
 - Estado nunca depende só de cor: sempre texto + forma do marcador.
@@ -96,19 +108,20 @@ Sobre fotos (texto do destaque e controles da galeria): `store.color.overlay-scr
 
 ### 3.3 Tipografia
 
-- **Família:** IBM Plex Sans (SIL OFL 1.1), hospedada no projeto — subconjunto Latin-1 nos pesos 400, 500 e 600 (`docs/design/preview/fonts/`, ~65 KB no total). Cobre acentos do português, `R$`, `–`, `—`, `·`, `…`, `×`. **Fallback efetivo:** `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. Sem carregamento remoto. Na implementação, servir de `apps/web/public/fonts/` com `font-display: swap`.
+- **Títulos da plataforma (Compasso):** Manrope 500/600/700 (SIL OFL 1.1, npm `@fontsource/manrope` 5.3.0, subconjunto latino em `apps/web/app/fonts/` com a licença ao lado; token `font.family.display`, fallback IBM Plex Sans). Aplicada a h1–h3 do painel/acesso/administração (h1 e h2 em 700), ao nome da loja na lateral e ao título do bloco aberto do editor. Nunca em corpo, tabela, preço ou formulário.
+- **Família do corpo:** IBM Plex Sans (SIL OFL 1.1), hospedada no projeto — subconjunto Latin-1 nos pesos 400, 500 e 600 (`docs/design/preview/fonts/`, ~65 KB no total). Cobre acentos do português, `R$`, `–`, `—`, `·`, `…`, `×`. **Fallback efetivo:** `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`. Sem carregamento remoto. Na implementação, servir de `apps/web/public/fonts/` com `font-display: swap`.
 - **Mono** (`font.family.mono`) apenas para identificadores técnicos: ID externo de pagamento, protocolo, registro TXT. SKU pode usar mono em tabelas técnicas; na vitrine usa a família principal.
 - **Escala:** 12 / 14 / 16 / 20 / 24 / 32 px em rem (`--font-size-12` … `--font-size-32`). Formulários sempre 16 px (evita zoom no iOS e melhora leitura). Tabelas 14 px com altura de linha 1,43. 12 px só para legendas/metadados — nunca informação essencial isolada (preço, estado, erro).
 - **Pesos:** 400 texto; 500 rótulos, botões, navegação; 600 títulos e totais.
-- **Títulos:** h1 32 px desktop / 24 px celular; h2 20 px; h3 16 px. Altura de linha 1,25.
+- **Títulos:** h1 32 px desktop / 24 px celular; h2 de seção no painel 18 px/700; h3 16 px. Altura de linha 1,25.
 - **Números:** valores monetários, quantidades e horários com `tabular-nums`. IBM Plex Sans possui algarismos tabulares (verificado no protótipo: “R$ 111,11” e “R$ 888,88” têm a mesma largura).
 - **Vitrine:** `theme.brand.font` controla só a família de **títulos**: `plex` → IBM Plex Sans; `bodoni` → Bodoni Moda (serifa de alto contraste, Editorial); `archivo` → Archivo (sem serifa firme, Essencial); `fraunces` → Fraunces (serifa suave, Ateliê); `serif` → Georgia/serif do sistema. Todas OFL 1.1, hospedadas em `apps/web/app/fonts/` (subconjunto latino, com as licenças ao lado), sem carregamento remoto. Corpo, formulários e preços continuam em IBM Plex Sans (D-06: algarismos tabulares e legibilidade).
 
 ### 3.4 Espaço, raio, sombra, ícone
 
 - Escala de espaço: 4, 8, 12, 16, 24, 32, 48, 64 px (`--space-N`). Nada fora da escala.
-- Raios: 6 px controles (`radius-control`), 8 px superfícies (`radius-surface`), 12 px diálogos (`radius-dialog`). No painel, pílula (`radius-pill`) **somente** para filtro segmentado, visões rápidas e selo de estado. Na vitrine, o formato dos botões vem do tema (`brand.button`: arredondado, reto ou pílula — `store.radius.button-*`).
-- Sombra: `shadow-overlay` só em camada sobreposta (diálogo). Superfícies normais usam borda, não sombra.
+- Raios (Compasso): 8 px controles (`radius-control`), 12 px superfícies (`radius-surface`), 16 px diálogos (`radius-dialog`). No painel, pílula (`radius-pill`) **somente** para filtro segmentado, visões rápidas e selo de estado. Na vitrine, o formato dos botões vem do tema (`brand.button`: arredondado, reto ou pílula — `store.radius.button-*`).
+- Sombra: `shadow-overlay` só em camada sobreposta (diálogo) e `shadow-menu` em menus e no quadro do celular da prévia. Superfícies normais usam divisória, não sombra.
 - Ícones: não há biblioteca de ícones no projeto e **não** se adiciona uma só para isso. Usar o conjunto mínimo de SVG em traço 1,6 px, 20×20 (16 px em texto pequeno), `currentColor`, definido no protótipo (busca, mais, alerta, confirmação, relógio, info, fechar, sem imagem, enviar, catálogo, vitrine, pedidos, atendimento, operação, olho, voltar). Ícone sempre acompanha texto ou tem `aria-label`; decorativo recebe `aria-hidden="true"`.
 
 ### 3.5 Movimento
@@ -132,19 +145,20 @@ Sobre fotos (texto do destaque e controles da galeria): `store.color.overlay-scr
 ```
 ≥1024 px                                    <1024 px
 ┌────────────┬─────────────────────────┐    ┌──────────────────────────────┐
-│ Loja·papel │ Topo: área · simulado · │    │ [≡ Menu] Loja / área [Simul.]│  ← barra de 56 px
-│ vendas     │ estado de vendas        │    ├──────────────────────────────┤
-│ Dia a dia  │─────────────────────────│    │ Título (h1)                  │
-│  Hoje      │ ‹ Voltar (quando houver)│    │ [Ação principal]             │
-│  Pedidos   │ Título (h1)     [Ações] │    │ Conteúdo em coluna única     │
-│  Atendim.  │ Conteúdo                │    └──────────────────────────────┘
-│ Catálogo   │                         │    Menu = <dialog> com os mesmos grupos,
-│ Loja (Dono)│                         │    fecha ao navegar e devolve o foco.
-│ Conta      │                         │
+│ Loja       │ ‹ Voltar (quando houver)│    │ [≡ Menu] Loja / área [Simul.]│  ← barra de 56 px
+│ Dono/slug  │ Título (h1)     [Ações] │    ├──────────────────────────────┤
+│ ● vendas   │ meta                    │    │ Título (h1)                  │
+│ ○ simulado │─────────────────────────│    │ [Ação principal]             │
+│ Dia a dia  │ Seção (divisória)       │    │ Conteúdo em coluna única     │
+│ Catálogo   │ Seção (divisória)       │    └──────────────────────────────┘
+│ Loja (Dono)│                         │    Menu = <dialog> com os mesmos grupos,
+│ Conta      │  plano branco           │    fecha ao navegar e devolve o foco.
 └────────────┴─────────────────────────┘
+ lateral canvas 224 px
 ```
 
-- Lateral 240 px (`--layout-sidebar`) a partir de 1024 px. Abaixo disso, barra fixa com **botão “Menu”** (`aria-expanded`, `aria-controls`) que abre um `<dialog>` com a mesma navegação. Motivo (D-23): a faixa com todos os itens empurrava o primeiro produto para y = 1068 px em 390×844; com o menu, ele aparece a y ≈ 300 px.
+- **Sem barra de topo no desktop** (Compasso, D-32): área e estado já estavam na lateral e no título; “Recebendo pedidos” e “Pagamentos simulados” aparecem uma vez só, no bloco da loja. Seções do conteúdo são separadas por divisórias (sem caixa branca sobre cinza); tabelas sem moldura lateral.
+- Lateral 224 px (`--layout-sidebar`) a partir de 1024 px. Abaixo disso, barra fixa com **botão “Menu”** (`aria-expanded`, `aria-controls`) que abre um `<dialog>` com a mesma navegação. Motivo (D-23): a faixa com todos os itens empurrava o primeiro produto para y = 1068 px em 390×844; com o menu, ele aparece a y ≈ 300 px.
 - Bloco de contexto da loja: nome, papel (Dono/Funcionário), slug, estado de vendas e “Pagamentos simulados” enquanto a conta for SIMULADA; “Trocar loja” e “Sair” no rodapé do menu.
 - Grupos por tarefa (rótulos do usuário, não da arquitetura):
   - **Dia a dia:** Hoje (`/operacao`: alertas, contadores que levam às listas filtradas, pausa de vendas recolhida e atalhos), Pedidos, Atendimento.
@@ -152,8 +166,10 @@ Sobre fotos (texto do destaque e controles da galeria): `store.color.overlay-scr
   - **Loja** (só Dono): Aparência (`/aparencia`), Dados da loja, Entregas, Domínio (`/configuracoes/loja|entregas|dominio`).
   - **Conta:** Segurança, Plano e faturas (Dono), Dados e IA (`/configuracoes/seguranca|plano|dados`).
   - Endereços antigos continuam válidos: `?aba=vitrine` → Aparência; `?aba=frete` → Entregas; âncoras de `/operacao` (`#seguranca`, `#plano`, `#dominio`, `#transportadora`, `#dados`, `#ia`) → página correspondente.
-- Item atual: `aria-current="page"`, fundo `selection`, marcador 3 px `action`.
-- Conteúdo: margens fluidas `clamp(16px, 3vw, 40px)`; tabelas ocupam a largura útil; formulários longos têm coluna principal de até 52rem e barra de salvar fixa no rodapé da área (`sticky-actions`) quando o formulário passa da tela.
+- Item atual: `aria-current="page"`, fundo `selection` e texto/ícone em `action`. Rótulos dos grupos são texto (`<p>`), não títulos, para que o primeiro título da página seja o h1.
+- **Produtos (lista):** desktop em tabela de linhas de 72 px com miniatura de 48 px, nome como link que cobre a linha, situação, saldo e preço alinhado à direita, seta de abrir; celular em linhas com miniatura de 56 px, nome inteiro e preço/saldo em linha própria (a faixa de preço não espreme o nome). Sem paginação, ações em lote ou busca global — a API não oferece.
+- Conteúdo: até 80rem (`layout.content-max`) + margens de 32 px; tabelas ocupam a largura útil; formulários longos têm coluna principal de até 46–52rem. A barra de salvar só fica fixa no rodapé (`sticky-actions`) **enquanto há alterações não salvas**, com `scroll-padding-bottom` para não cobrir o campo em foco.
+- **Edição de produto:** a partir de 1200 px, formulário à esquerda e Imagens numa coluna lateral fixa (capa grande, demais em grade, “N imagens · até 10”, envio compacto). Atalhos “Ajustar estoque” e “Editar nas variações” abrem o bloco, rolam até ele e levam o foco ao título. **Limite real da API:** não há reordenar nem remover imagem do produto (`product_media` não tem coluna de posição — a ordem é a do envio, `order by id` —, o papel da aplicação não tem `DELETE` nessa tabela e só existe a rota de vincular); a tela diz isso em texto e não mostra controles falsos.
 - Telas de edição têm link “‹ Voltar” para a lista (preservando busca e filtros) e protegem alterações não salvas: sair por link interno ou fechar a aba pergunta “Descartar alterações?”.
 
 ### 5.2 Vitrine
@@ -168,6 +184,7 @@ Sobre fotos (texto do destaque e controles da galeria): `store.color.overlay-scr
 
 - Cabeçalho reduzido: nome da loja + “Continuar comprando”. Sem menu e sem busca.
 - Etapas visíveis: Carrinho → Entrega → Seus dados → Revisão. Etapa concluída vira resumo com botão “Alterar…”.
+- Itens com miniatura de 56 px, nome e total da linha na mesma linha, preço unitário e código abaixo, quantidade com o mesmo seletor −/+ da página do produto (grava na hora; o campo aceita digitar e grava ao sair) e “Remover” ao lado. Entrega e pagamento como linhas divididas dentro do bloco da etapa. Endereço na ordem usual: CEP, rua, número, complemento, cidade, UF. Ao mudar de etapa, o foco vai para o título da etapa nova. Rodapé compacto durante a compra (fornecedor, contato e políticas continuam acessíveis).
 - Desktop: coluna principal (até 46rem) + resumo do pedido fixo à direita (22rem). Celular (< 1024 px): **resumo recolhível no topo** com o total (ou subtotal, antes do frete) sempre visível na própria linha; ao abrir, itens, frete e total. Na revisão, itens, entrega (forma, prazo, endereço) e total ficam junto do botão “Confirmar compra de R$ X” (D-25).
 
 ### 5.4 Administração da plataforma
@@ -183,7 +200,7 @@ Sobre fotos (texto do destaque e controles da galeria): `store.color.overlay-scr
 | 768–1023 px | Navegação pelo botão “Menu”; tabelas completas (rolagem horizontal **dentro** da tabela só como último recurso); colunas laterais descem; editor alterna “Editar”/“Prévia” |
 | < 768 px | Coluna única; lista de produtos em linhas compactas (foto, nome, preço, saldo) e filtros atrás de “Filtros”; demais tabelas viram lista empilhada (`data-label`); botões de ação quebram linha; nada essencial escondido |
 
-Testar 390, 768 e 1440 px. Zoom de 200% e reflow de 320 px CSS não podem cortar conteúdo nem exigir rolagem horizontal da página. No CSS os pontos de quebra são escritos em `em` (48em = 768 px e 64em = 1024 px com a fonte padrão de 16 px) para que quem aumenta a fonte do navegador receba o layout mais estreito em vez de colunas espremidas (D-22). A lista de pedidos do painel, com seis colunas de texto, empilha até 1279 px.
+Testar 390, 768 e 1440 px (e 320 px como limite). Zoom de 200% e 400% (zoom **real** do navegador — `scripts/zoom-check.mjs` usa `chrome.tabs.setZoom` numa janela de 1280 px; mudar o viewport não comprova zoom) e reflow de 320 px CSS não podem cortar conteúdo nem exigir rolagem horizontal da página. No CSS os pontos de quebra são escritos em `em` (48em = 768 px e 64em = 1024 px com a fonte padrão de 16 px) para que quem aumenta a fonte do navegador receba o layout mais estreito em vez de colunas espremidas (D-22). A lista de pedidos do painel, com seis colunas de texto, empilha até 1279 px.
 
 ## 6. Componentes
 
@@ -209,15 +226,15 @@ Implementar como componentes React em `apps/web/components/ui/` (ver IMPLEMENTAC
 | **ContextBar** | Loja (lateral), plataforma (`context-global`), inspeção, prévia privada (`warning` + ícone olho), ambiente simulado. |
 | **Fold** | `<details class="fold">` com título + resumo do conteúdo no `summary` e seta que gira; abre sozinho quando há erro dentro (ex.: endereço do produto repetido). |
 | **LeaveGuard** | `useLeaveGuard(dirty)`: intercepta links internos e `beforeunload` e pergunta “Descartar alterações?” num ConfirmDialog. |
-| **MediaUploader** | Botão “Adicionar imagens” (input de arquivo nativo associado) + área de arrastar; confere tipo, 10 MB e 40 megapixels antes de enviar; fila de 2; progresso real por arquivo (“Enviando 45%”), “Processando no servidor…”, “Pronta”, erro com “Tentar de novo” e “Tirar da lista”. Na edição do produto, a imagem pronta já é vinculada. |
+| **MediaUploader** | Botão “Adicionar imagens” (input de arquivo nativo associado) + área de arrastar (versão compacta quando o produto já tem imagens); confere tipo, 10 MB e 40 megapixels antes de enviar; fila de 2; progresso real por arquivo (“Enviando 45%”), “Processando no servidor…”, “Pronta”, erro com “Tentar de novo” e “Tirar da lista”. Na edição do produto, a imagem pronta já é vinculada; se o vínculo falhar, “Vincular de novo” repete só o vínculo, sem reenviar o arquivo. Nome acessível contém o texto visível (“Tirar da lista arquivo.jpg”). |
 | **Busca e filtros de lista** | Rótulo declara o escopo real (“Buscar em 12 produtos”; no limite, “Buscar nos primeiros 100 produtos (A–Z)” + aviso); filtros na URL; no celular atrás de “Filtros” com contagem; filtros aplicados como chips removíveis. |
 | **Visões rápidas** | Links em pílula (`nav.view-tabs`, `aria-current`) que aplicam combinações de filtros do servidor (ex.: Pedidos → “Precisam de atenção”, “A enviar”, “Enviados”). |
 | **StoreProductCard** | Imagem na proporção do tema, nome (link, até 3 linhas), preço “a partir de” quando variações têm preços diferentes, “Esgotado” ou “N opções” em texto. Sem foto: área com ícone e o nome da categoria. Um só produto na seção vira destaque (foto + nome + “Ver produto”); dois não deixam meia grade vazia. |
 | **VariantPicker** | Rádios nativos estilizados como opções; selecionada: borda 2 px `store.accent-text` + `accent-tint` + ícone ✓; esgotada: tracejada, `disabled`, “esgotada” no rótulo. A opção escolhida aparece na legenda (“Opção · Azul”). |
 | **Stepper de quantidade** | − / campo / +, botões de 44 px; limite pela disponibilidade carregada; erro do servidor junto ao campo. |
 | **Galeria** | Foto principal + contador “1 de N” com anterior/próxima sobre a foto e miniaturas (`aria-current`); sem foto: quadro baixo “foto ainda não enviada”. |
-| **Editor de aparência** | Modelos com prévia tentativa; painéis Identidade, Layout e fotos, Página inicial (seções), Menu, Rodapé, Páginas, Histórico; prévia ao vivo (iframe com o mesmo renderizador da loja) em celular/desktop. Ver §11. |
-| **Lista de seções** | Reordenar **sem arrastar** (botões ↑/↓ com anúncio em `aria-live`), editar, ocultar, duplicar, remover (com confirmação), adicionar por tipo. |
+| **Editor de aparência** | Espaço de trabalho (Compasso): **trilho** com o modelo atual (miniatura esquemática + resumo + “Trocar modelo”) e as partes da loja; **prévia** ao centro; **propriedades** da parte escolhida à direita (≥ 1200 px; entre 1024 e 1199 px trilho e propriedades à esquerda; abaixo, “Editar”/“Prévia” com botões `aria-pressed`). Trocar modelo abre sob demanda miniaturas comparáveis na mesma escala; no celular, “Ver na prévia” e uma faixa “Aplicar / Cancelar” na própria Prévia. A prévia de computador é desenhada em 1280 px e reduzida, com a escala escrita (“Largura de 1280 px, em 43%”); “Ampliar prévia” esconde trilho e propriedades (≈ 90% em 1440 px). Seção em edição ganha contorno na prévia sem rolar a cada tecla. Ver §11. |
+| **Lista de seções** | Linhas divididas (número, título até 2 linhas — nunca cortado em uma —, tipo; ações na mesma linha quando o painel tem ≥ 30rem, abaixo do título quando é estreito). Reordenar **sem arrastar** (botões ↑/↓ com anúncio em `aria-live`), editar, ocultar, duplicar, remover (com confirmação), adicionar por tipo. |
 | **Editor de links** | Cada link = texto + “Leva para” (início, catálogo, categoria, produto, página, carrinho, atendimento; endereço externo `https://` como opção avançada). Destino inexistente é recusado no servidor. |
 
 ## 7. Estados de tela (todas as rotas)
@@ -311,15 +328,15 @@ Os rótulos de comprador já existentes em `components/checkout.tsx` (`labels`) 
 | | Editorial | Essencial | Ateliê |
 |---|---|---|---|
 | Para | Moda e acessórios | Utilidades e tecnologia | Casa e artesanato |
-| Abertura | Foto em tela cheia com texto sobre faixa escura | Categorias primeiro, sem foto grande | Foto e texto lado a lado |
-| Produtos | Retrato 4:5, grade arejada, nomes em peso regular | Grade densa em cartões, quadrada, foto inteira em fundo claro, busca sempre visível | Quadrada, 4 por linha, nomes na serifa suave, preço discreto |
+| Abertura | Foto em tela cheia; texto em faixa escura à direita no desktop (fora do produto) e **abaixo** da foto no celular | Categorias primeiro (blocos de mesma altura na largura toda), sem foto grande nem banner | Foto e texto lado a lado |
+| Produtos | Retrato 4:5, grade arejada, nomes em peso regular | Grade densa **sem cartões**: palco claro de proporção única, foto inteira ocupando o lado maior; busca comercial no cabeçalho | Quadrada, 4 por linha, nomes na serifa suave, preço discreto |
 | Títulos | Bodoni Moda | Archivo | Fraunces |
 | Botões | Retos | Arredondados | Pílula |
 | Cabeçalho (desktop) | Nome centralizado | Nome à esquerda + busca larga | Nome à esquerda |
 
 - **Trocar de modelo** mostra a prévia antes de aplicar, explica o que muda (composição, fontes, botões, proporção) e o que fica (textos, imagens, menu, páginas, cor); usar as seções sugeridas do modelo é opcional (as imagens já escolhidas são reaproveitadas).
 - **Prévia ao vivo:** o editor envia o tema ainda não salvo por `postMessage` (mesma origem) para `/preview/[id]?editor=1`, que usa o **mesmo componente** da loja pública; alterna celular (390 px) e largura total. Só `/preview/*` pode ser exibido em quadro, e só pela própria origem (`X-Frame-Options: SAMEORIGIN` + `frame-ancestors 'self'`); o resto continua `DENY` (Next e Caddy).
-- **Estados do editor:** “Alterações não salvas” · “Rascunho salvo” · “Rascunho salvo, loja ainda não publicada” · publicado (“Aparência publicada na loja.”) · erro com motivo; sair com alterações pergunta antes.
+- **Estados do editor:** “Alterações não salvas” · “Rascunho salvo, loja ainda não publicada” · “Rascunho salvo, ainda não publicado” (rascunho diferente do que está no ar) · “No ar, sem alterações pendentes” (conteúdo do rascunho igual ao da publicação; “Publicar” fica desabilitado) · “Rascunho salvo” (quando a revisão não está entre as 20 recentes e não dá para comparar) · publicado (“Aparência publicada na loja.”) · erro com motivo. Botões dizem a ação em curso (“Salvando…”, “Publicando…”); sair com alterações pergunta antes.
 
 **Algoritmo de marca** (`apps/web/components/brand.ts`, idêntico ao do verificador; `themeStyle()` aplica sobre o fundo do modelo):
 
@@ -350,7 +367,7 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 - Alvos de toque: **ações principais com no mínimo 44×44 px** (`layout.touch-target` = 2,75 rem) em telas < 768 px ou ponteiro grosso — botões não compactos, opções de variação, rádios de entrega/pagamento, links de navegação da loja e categorias, miniaturas da galeria, campos. Ações secundárias compactas dentro de linhas (`btn-sm`: Editar, Remover, Copiar) ficam com 40 px nessas telas e 32 px no desktop; nada fica abaixo de 24×24 px (WCAG 2.2, 2.5.8). Padrão de controle no desktop: 40 px.
 - Formulários: rótulos, instruções, erros identificados em texto e associados; dados preservados após erro; sem pedir de novo o que já foi informado no mesmo fluxo.
 - Mensagens de estado anunciadas (`role="status"`/`alert`) sem mover foco.
-- Redimensionamento: 200% de zoom e 320 px CSS sem perda de conteúdo.
+- Redimensionamento: 200% e 400% de zoom real e 320 px CSS sem perda de conteúdo (verificado em 7 telas representativas com `scripts/zoom-check.mjs`; registro no RELATORIO-FINAL).
 - Idioma `lang="pt-BR"`, títulos de página únicos, link “Ir para o conteúdo”, landmarks (`header`, `nav`, `main`, `aside`, `footer`).
 
 ## 14. Manutenção
@@ -358,7 +375,7 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 1. **Mudar um token:** editar `tokens.json` → `node docs/design/tokens-css.mjs` (regenera o bloco `:root` entre `/* tokens:inicio */` e `/* tokens:fim */` em `apps/web/app/style.css` e no `styles.css` do protótipo; `--check` só confere) → `node docs/design/verificar.mjs` → registrar decisão na §15.
 2. **Novo componente:** especificar nesta seção 6 (estados e acessibilidade) → acrescentar à prancha do protótipo se for reutilizado em mais de uma tela → linha no ACEITE.
 3. **Nova tela/rota:** inventário em TELAS-E-FLUXOS.md (código Rnn), cenário no ACEITE.md, lote no IMPLEMENTACAO.md — o verificador cruza os três.
-4. **Revisão visual:** lojas de demonstração dos três modelos e casos difíceis com `node scripts/fixtures/seed-presets.mjs` (fotos CC0 com origem em `scripts/fixtures/fotos.json`; contas em `.local/demo-presets.json`, fora do Git) e capturas com `scripts/design-review.mjs` (`REVIEW_LABEL`, `REVIEW_ONLY=loja|painel`, `REVIEW_SIZES`; mede rolagem horizontal, posição do primeiro item e erros de console). `node docs/design/capturar-preview.mjs` (protótipo); para as rotas reais, preparar o ambiente isolado e os dados com [`docs/design/ambiente/`](docs/design/ambiente/README.md) e rodar `node docs/design/capturar-rotas.mjs <rótulo>` (390/768/1440; `--widths=320` para reflow; `--widths=1280 --zoom=2` **simula** o reflow do zoom de 200% — não aciona o zoom do navegador; `--texto=200` aumenta a fonte-raiz como a configuração de tamanho de fonte do navegador; `--only=R10,R12-dados` filtra), `node docs/design/verificar-teclado.mjs` e `node docs/design/verificar-aceite.mjs`. Ler o HTML não substitui olhar as capturas; registrar quais imagens foram examinadas.
+4. **Revisão visual:** lojas de demonstração dos três modelos e casos difíceis com `node scripts/fixtures/seed-presets.mjs` (fotos CC0 com origem em `scripts/fixtures/fotos.json`; contas em `.local/demo-presets.json`, fora do Git) e capturas com `scripts/design-review.mjs` (`REVIEW_LABEL`, `REVIEW_ONLY=loja|painel`, `REVIEW_SIZES`; mede rolagem horizontal, posição do primeiro item e erros de console). `node docs/design/capturar-preview.mjs` (protótipo); para as rotas reais, preparar o ambiente isolado e os dados com [`docs/design/ambiente/`](docs/design/ambiente/README.md) e rodar `node docs/design/capturar-rotas.mjs <rótulo>` (390/768/1440; `--widths=320` para reflow; `--widths=1280 --zoom=2` **simula** o reflow do zoom de 200% — não aciona o zoom do navegador; `--texto=200` aumenta a fonte-raiz como a configuração de tamanho de fonte do navegador; `--only=R10,R12-dados` filtra), `node docs/design/verificar-teclado.mjs` e `node docs/design/verificar-aceite.mjs`. No projeto de desenvolvimento: `scripts/capture-pages.mjs` (`CAPTURE_LABEL`, `CAPTURE_SIZES`, `CAPTURE_ONLY`, `CAPTURE_PRODUCT` para manter o mesmo produto antes/depois), `scripts/ux-checks.mjs` e `scripts/zoom-check.mjs` (zoom real 200/400%), todos no contêiner `tests`. Ler o HTML não substitui olhar as capturas; registrar quais imagens foram examinadas.
 5. Não alterar a stack, não adicionar biblioteca de UI/ícones/animação sem problema concreto e solicitação explícita.
 6. Toda tela nova preserva os seletores usados pelos testes ou atualiza os testes no mesmo commit (lista em IMPLEMENTACAO.md).
 7. **Tema:** mudar o esquema exige atualizar `apps/api/src/theme.ts` (validação + conversão), `apps/web/components/theme-model.ts` (tipos e modelos), `tests/theme-schema.test.mjs` e `tests/theme.test.mjs` (rodam no verificador oficial a partir da fase 2) e a tabela da §11.
@@ -397,3 +414,9 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 | D-28 | Proporção (`portrait`/`square`/`landscape`) e enquadramento (`cover`/`contain`) das fotos viram escolhas do tema, com ponto focal nas imagens de seção | Modelos precisam compor de forma diferente (retrato arejado × quadrado denso × foto inteira em fundo claro) |
 | D-29 | Três modelos (Editorial, Essencial, Ateliê) com neutros, fontes, botões, cabeçalho e seções próprios; trocar de modelo preserva o conteúdo e mostra a prévia antes | Lojas de segmentos diferentes ficavam iguais; o lojista não perde o que já escreveu |
 | D-30 | Imagens de demonstração só CC0/domínio público (Openverse, maioria do diretório de fotos do WordPress), com origem registrada; nenhuma foto de concorrente, marca ou pessoa identificável usada como modelo | Licença verificável; demonstração honesta e sem identidade de terceiros |
+| D-31 | Direção **Compasso** para a plataforma: mesmos nomes de token com novos valores (canvas #F4F6F8, ação/foco #2548D8, seleção #EEF2FF, estados recalibrados), `action-pressed`, raios 8/12/16, lateral 224 px, `content-max` 80rem, títulos em Manrope | Identidade própria e mais precisa para a ferramenta de trabalho sem renomear tokens nem tocar nas vitrines; contraste conferido (52 combinações) |
+| D-32 | Sem barra de topo no desktop do painel; estado de vendas e pagamento simulado só no bloco da loja; seções do conteúdo com divisórias, sem caixa branca | Remove a repetição de “Recebendo pedidos”/“Pagamentos simulados” e a composição cinza + cartões brancos |
+| D-33 | Editor de aparência como espaço de trabalho (trilho, prévia com escala informada e opção de ampliar, propriedades de uma parte por vez; no desktop o bloco aberto não fecha pelo título) e estado “No ar, sem alterações pendentes” calculado comparando o conteúdo das revisões | Títulos de seção cortados, prévia minúscula sem escala e “Publicar” sempre ativo induziam publicação desnecessária; nenhuma regra de rascunho/publicação mudou |
+| D-34 | Essencial com busca no cabeçalho, categorias em blocos de mesma altura, grade sem cartões e foto inteira no palco; Editorial com texto fora do produto (à direita no desktop, abaixo no celular) e nova foto CC0 de abertura; Ateliê com foto do processo coerente com o texto | Problemas apontados na revisão: busca e categorias pouco comerciais, foto da abertura sem o produto e imagem sem relação com o texto |
+| D-35 | Tokens `store-*` “Casa Ipê” do material da direção ficam só registrados como exemplo de demonstração, sem fixture nem token | Uma fonte única de tokens; não renomear lojas de exemplo existentes nem impor identidade às vitrines |
+| D-36 | Mídia do produto sem reordenar/remover na interface | Limite real da API (sem coluna de posição, sem `DELETE` para o papel da aplicação, só rota de vincular); exige decisão de produto e migração |

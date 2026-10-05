@@ -107,7 +107,7 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 - **Usuário:** Dono e Funcionário (pausar/retomar: só Dono).
 - **Tarefa:** ver o que pede atenção agora e ir direto para a lista certa.
-- **Hierarquia:** PageHeader “Hoje” → Alertas (“Tudo em dia” ou contadores — pedidos com pendência, aguardando pagamento, protocolos — que abrem as listas filtradas, mais os alertas operacionais com instrução) → Vendas (estado; pausa num bloco recolhível com motivo obrigatório) → Atalhos (cadastrar produto, ver pedidos, editar aparência, ver loja publicada).
+- **Hierarquia:** PageHeader “Hoje” → Alertas (“Sem alertas” ou contadores — pedidos com pendência, aguardando pagamento, protocolos — que abrem as listas filtradas, mais os alertas operacionais com instrução) → Vendas (estado; pausa num bloco recolhível com motivo obrigatório) → Atalhos (cadastrar produto, ver pedidos, editar aparência, ver loja publicada).
 - **Dados/API:** `GET operations/status`, `POST operations/sales/pause|resume`.
 - **Estados:** sem alertas; alertas críticos; loja suspensa; vendas pausadas.
 - **Endereços antigos:** `#seguranca`, `#plano`, `#dominio`, `#transportadora`, `#dados`, `#ia` redirecionam para R16.

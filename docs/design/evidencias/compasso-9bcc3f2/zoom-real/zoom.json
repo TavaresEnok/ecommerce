@@ -1,0 +1,174 @@
+{
+  "date": "2026-10-05T02:36:16.853Z",
+  "window": 1280,
+  "results": [
+    {
+      "name": "painel-produtos",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Produtos",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-produto",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Cesto trançado em palha tingida",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-aparencia",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Aparência",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-pedidos",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Pedidos",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-essencial",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Essencial Casa Digital",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-produto",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Cesto trançado em palha tingida",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-carrinho",
+      "zoom": "200%",
+      "dpr": 2,
+      "inner": 640,
+      "overflow": 0,
+      "heading": {
+        "text": "Seu carrinho",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-produtos",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Produtos",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-produto",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Cesto trançado em palha tingida",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-aparencia",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Aparência",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "painel-pedidos",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Pedidos",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-essencial",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Essencial Casa Digital",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-produto",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Cesto trançado em palha tingida",
+        "visible": true
+      },
+      "errors": []
+    },
+    {
+      "name": "loja-carrinho",
+      "zoom": "400%",
+      "dpr": 4,
+      "inner": 320,
+      "overflow": 0,
+      "heading": {
+        "text": "Seu carrinho",
+        "visible": true
+      },
+      "errors": []
+    }
+  ]
+}

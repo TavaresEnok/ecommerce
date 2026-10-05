@@ -1,5 +1,7 @@
 # Status dos materiais de design
 
+> **Rodada Compasso (04/10/2026, sobre `9bcc3f2`):** identidade da plataforma integrada ao [DESIGN.md](../../DESIGN.md) (§2.1, D-31–D-36), painel/editor/lojas/checkout corrigidos, zoom real 200/400% verificado, verificador oficial **código 2 com 18 etapas locais aprovadas** (05/10), evidências em [evidencias/compasso-9bcc3f2/](evidencias/compasso-9bcc3f2/README.md). Resultados e pendências: [RELATORIO-FINAL.md §11](RELATORIO-FINAL.md). Aprovação visual humana pendente.
+
 **Data:** 04/10/2026 · **Branch:** `main` (commits locais, sem push) · **Último código:** `17383a9`
 **Estado:** redesign das rotas R01–R14 + **evolução de UX e personalização** (03/10): navegação do painel por tarefas com menu móvel, configurações por assunto (R16), catálogo e edição progressiva, envio de imagens com estados reais, pedidos com próximo passo, checkout móvel com total no topo, **editor de aparência** (R15) com três modelos, tema v2 versionado, prévia ao vivo, histórico e proteção contra sobrescrita, catálogo da loja (R17).
 **Verificação:** `scripts/verify.mjs --phase=7` em `17383a9` → **código 2 com as 18 etapas locais aprovadas** (o 2 vem só das homologações externas exigidas pelo projeto). ACEITE §3: UX01–UX06, UI01–UI03, TH01–TH04, FN01, FN02, QA01 aprovados; **AX01 parcial** (sem zoom real 200/400%, sem percurso completo de Tab nas telas novas, sem leitor de tela). Linhas antigas do ACEITE cujas telas mudaram estão como **“reexecutar”** (scripts atualizados, não reexecutados no ambiente `ecommerce-design-demo`).

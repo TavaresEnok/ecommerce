@@ -128,8 +128,8 @@ await step('A-R05-02', async () => {
 // A-R06-02 MFA pendente; A-R06-03/04 consultar, suspender e reativar a loja C
 await step('A-R06', async () => {
   const pre = await session(demo.admin.email, demo.admin.password);
-  let [ctx, page] = await open(1440, pre); await page.goto(`${base}/plataforma`); await page.getByRole('form', { name: 'Confirmar MFA' }).waitFor();
-  check('A-R06-02', (await page.getByRole('heading', { name: 'Lojas' }).count()) === 0, 'sem MFA: só o formulário “Confirmar MFA”, nenhuma lista'); await shot(page, 'A-R06-02-1440'); await ctx.close();
+  let [ctx, page] = await open(1440, pre); await page.goto(`${base}/plataforma`); await page.getByRole('form', { name: 'Confirmar código de verificação' }).waitFor();
+  check('A-R06-02', (await page.getByRole('heading', { name: 'Lojas' }).count()) === 0, 'sem verificação confirmada: só o formulário “Confirmar código de verificação”, nenhuma lista'); await shot(page, 'A-R06-02-1440'); await ctx.close();
   const step0 = Math.floor(Date.now() / 30000); await sleep((step0 + 1) * 30000 - Date.now() + 500);
   const admin = await session(demo.admin.email, demo.admin.password); await api('auth/mfa/verify', { method: 'POST', actor: admin, body: { code: totp(demo.admin.secret, Math.floor(Date.now() / 30000)) } });
   [ctx, page] = await open(1440, admin); await page.goto(`${base}/plataforma`); await page.getByRole('heading', { name: 'Lojas' }).waitFor();
@@ -246,7 +246,7 @@ await step('CK-02', async () => {
   const before = await orderCount(); const [ctx, page] = await open(1440); await toReview(page, A.slug); await buyerData(page);
   await loseResponse(page); await page.getByRole('button', { name: /^Confirmar compra de/ }).click(); await unknownAlert(page).waitFor(); const created = (await latestOrder()).id;
   await page.reload(); await page.getByText('ficou sem resposta').waitFor();
-  const locked = (await page.getByRole('button', { name: 'Atualizar quantidade' }).first().isDisabled()) && (await page.getByRole('button', { name: 'Calcular frete' }).isDisabled());
+  const locked = (await page.getByRole('button', { name: /^Aumentar quantidade/ }).first().isDisabled()) && (await page.getByRole('button', { name: 'Calcular frete' }).isDisabled());
   await shot(page, 'CK-02-1440');
   await page.getByRole('button', { name: 'Verificar compra' }).click(); await page.waitForURL(orderUrl); await sleep(800);
   const id = page.url().split('/').at(-1), after = await orderCount(), stored = await page.evaluate(() => Object.keys(sessionStorage).filter((k) => k.startsWith('checkout-pendente')).length);
@@ -401,7 +401,7 @@ await step('A-R02-12', async () => {
   const ownerC = await session(C.email, C.password), [ctx, page] = await open(1440, ownerC), title = `Loja C pela interface ${randomBytes(2).toString('hex')}`;
   const pubBefore = (await api(`public/stores/${C.slug}`)).body.theme.title;
   await page.goto(`${base}/painel/${C.id}/aparencia`); await page.getByRole('heading', { level: 1, name: 'Aparência' }).waitFor();
-  const name = page.getByLabel('Nome da loja', { exact: true }); if (!(await name.isVisible())) await page.getByText('Identidade', { exact: true }).first().click(); await name.fill(title);
+  const name = page.getByLabel('Nome da loja', { exact: true }); if (!(await name.isVisible())) await page.getByText('Identidade', { exact: true }).filter({ visible: true }).first().click(); await name.fill(title);
   await page.getByRole('button', { name: 'Salvar rascunho' }).focus(); await page.keyboard.press('Enter'); await page.getByText(/Rascunho salvo\. A loja publicada só muda/).waitFor();
   const [pctx, preview] = await open(1440, ownerC); await preview.goto(`${base}/preview/${C.id}`); const inPreview = await preview.getByRole('heading', { level: 1, name: title }).count(); await pctx.close();
   await page.route('**/storefront/publish', (route) => route.abort('connectionrefused'), { times: 1 });
