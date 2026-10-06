@@ -51,16 +51,28 @@ export default function Home() {
 
   const codeBox = localToken && <Alert tone="warning" title="Código LOCAL — não é entrega de e-mail"><p>Ambiente local: o código aparece aqui porque nenhuma mensagem real é enviada.</p><div className="copyable"><output data-testid="local-token"><code>{localToken}</code></output><CopyButton value={localToken} label="Copiar código" /><button type="button" className="btn btn-quiet btn-sm" onClick={() => setLocalToken('')}>Ocultar código</button></div></Alert>;
 
-  if (!user) return <div className="surface-panel auth">
+  if (!user) return <div className="surface-panel auth auth-entry">
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
     <header className="auth-head"><a className="wordmark" href="/">Plataforma</a><span className="small muted">Acesso para lojistas e equipes</span></header>
-    <main className="auth-main" id="conteudo">
+    <div className="auth-layout">
+      <aside className="auth-intro" aria-labelledby="intro-title">
+        <span className="caption">SEU ESPAÇO DE TRABALHO</span>
+        <h2 id="intro-title">Da primeira ideia<br />ao próximo pedido.</h2>
+        <p>Cuide dos produtos, acompanhe as vendas e dê à sua loja a sua cara.</p>
+        <ul className="auth-features">
+          <li><Icon name="box" /><div><strong>Um catálogo organizado</strong><span>Produtos, imagens e estoque juntos.</span></div></li>
+          <li><Icon name="receipt" /><div><strong>A rotina à vista</strong><span>Pedidos e atendimentos em suas próprias áreas.</span></div></li>
+          <li><Icon name="brush" /><div><strong>Uma loja com identidade</strong><span>Escolha um modelo e personalize a vitrine.</span></div></li>
+        </ul>
+        <div className="auth-intro-note"><Icon name="shield" size={16} /><span>Acesso separado para você e sua equipe.</span></div>
+      </aside>
+      <main className="auth-main" id="conteudo">
       {offline && <Alert tone="danger" role="alert" title="Serviço indisponível">{offline}</Alert>}
-      <Alert title="Ambiente local">Códigos de e-mail aparecem nesta tela; nenhuma mensagem real é enviada. Lojas criadas aqui são rascunhos.</Alert>
       <Feedback error={error} notice={notice} />
       {codeBox}
       {view === 'login' && <section className="surface section stack-sm" aria-labelledby="t-login">
         <h1 id="t-login">Entrar</h1>
+        <p className="muted small">Acesse sua conta para continuar cuidando da loja.</p>
         <form className="form" aria-label="Entrar" onSubmit={submit(async (d) => { const r = await api('auth/login', 'POST', d); signedIn.current = true; setUser(r.user); setCsrf(r.csrf); setLocalToken(''); if (r.mfaRequired) { setMfaPending(true); return; } await refresh(r.csrf); })}>
           <Field label="E-mail">{(a) => <input className="input" name="email" type="email" required autoComplete="username" {...a} />}</Field>
           <Field label="Senha">{(a) => <input className="input" name="password" type="password" minLength={12} maxLength={128} required autoComplete="current-password" {...a} />}</Field>
@@ -102,7 +114,9 @@ export default function Home() {
         </form>
         <button type="button" className="btn btn-quiet btn-sm" onClick={() => setView('login')}><Icon name="back" size={16} />Voltar para entrar</button>
       </section>}
+      <Alert title="Ambiente local">Códigos de e-mail aparecem nesta tela; nenhuma mensagem real é enviada. Lojas criadas aqui são rascunhos.</Alert>
     </main>
+    </div>
     <footer className="auth-foot">Plataforma (nome provisório) · ambiente local, sem homologação externa nem liberação operacional</footer>
   </div>;
 

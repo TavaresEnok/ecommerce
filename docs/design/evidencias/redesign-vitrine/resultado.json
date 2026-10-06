@@ -1,0 +1,184 @@
+{
+  "scope": "Frontend SSR + navegador com servidor HTTP sintético; sem RLS/gateways reais",
+  "checks": [
+    {
+      "label": "loja-atelie",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-editorial",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-essencial",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "produto",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "carrinho",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "checkout-revisao",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "comprovante",
+      "width": 320,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-atelie",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-editorial",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-essencial",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "produto",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "carrinho",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "checkout-revisao",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "comprovante",
+      "width": 390,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-atelie",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-editorial",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-essencial",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "produto",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "carrinho",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "checkout-revisao",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "comprovante",
+      "width": 768,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-atelie",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-editorial",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "loja-essencial",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "produto",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "carrinho",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "checkout-revisao",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    },
+    {
+      "label": "comprovante",
+      "width": 1440,
+      "overflow": 0,
+      "pageErrors": []
+    }
+  ],
+  "scenarios": [
+    "presets e reflow",
+    "busca com foco e Escape",
+    "menu modal com foco e estado",
+    "galeria e opção esgotada",
+    "adicionar item e calcular entrega",
+    "dados e revisão com foco",
+    "503 sem conclusão, recarga e mesma intenção/chave na verificação",
+    "comprovante aguarda confirmação",
+    "troca de vitrine e carrinho vazio"
+  ]
+}

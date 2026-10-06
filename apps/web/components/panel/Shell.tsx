@@ -1,6 +1,6 @@
 'use client';
-// Casca do painel da loja (DESIGN.md §5.1): navegação lateral ≥1024 px, faixa superior abaixo disso (todos os itens
-// visíveis), topo de 64 px com área atual, aviso de pagamentos simulados e estado de vendas. O contexto (loja, papel,
+// Casca do painel da loja (DESIGN.md §5.1): navegação lateral ≥1024 px, menu modal abaixo disso.
+// Identidade da plataforma, contexto da loja e situação das vendas. O contexto (loja, papel,
 // CSRF, fuso) é carregado da API a cada troca de loja; nada daqui substitui a autorização do servidor.
 import { createContext, type ReactNode, Suspense, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -123,6 +123,7 @@ function NavList({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () =
 function StoreBlock() {
   const p = usePanel();
   return <div className="store-block">
+    <div className="store-block-heading"><span className="store-avatar" aria-hidden="true"><Icon name="store" /></span><span className="caption">Sua loja</span></div>
     <p className="store-block-name">{p.store.name}</p>
     <p className="store-block-meta">{p.owner ? 'Dono' : 'Funcionário'}<span className="sep" aria-hidden>/</span><span className="slug">{p.store.slug}</span></p>
     {/* Situação da loja num só lugar (lateral ou gaveta); a barra do celular mostra só “Simulado”. */}
@@ -134,7 +135,8 @@ function NavFoot({ onLogout }: { onLogout: () => void }) {
   return <div className="nav-foot">
     <a href={`/lojas/${p.store.slug}`}><Icon name="eye" size={16} />Ver loja publicada</a>
     <a href="/"><Icon name="swap" size={16} />Trocar de loja</a>
-    <button type="button" className="link-button" onClick={onLogout}><Icon name="logout" size={16} />Sair <span className="muted small">({p.email})</span></button>
+    <div className="nav-account"><span className="account-avatar" aria-hidden="true">{p.email.slice(0, 1).toUpperCase()}</span><span className="account-detail"><span>{p.owner ? 'Dono da loja' : 'Equipe da loja'}</span><span className="account-email">{p.email}</span></span></div>
+    <button type="button" className="link-button" onClick={onLogout}><Icon name="logout" size={16} />Sair</button>
   </div>;
 }
 
@@ -148,7 +150,7 @@ function Frame({ children }: { children: ReactNode }) {
   async function logout() { try { await call('auth/logout', { method: 'POST', csrf: p.csrf }); } finally { location.assign('/'); } }
   return <div className="surface-panel app">
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
-    <aside className="sidebar" aria-label="Navegação do painel"><div className="sidebar-inner"><StoreBlock /><NavList groups={groups} /><NavFoot onLogout={() => void logout()} /></div></aside>
+    <aside className="sidebar" aria-label="Navegação do painel"><div className="sidebar-inner"><a className="sidebar-wordmark" href="/">Plataforma<span className="caption">PAINEL DA LOJA</span></a><StoreBlock /><NavList groups={groups} /><NavFoot onLogout={() => void logout()} /></div></aside>
     <header className="mobile-bar">
       <button ref={opener} type="button" className="menu-button" aria-haspopup="dialog" aria-expanded={open} aria-controls="painel-menu" onClick={show}><Icon name="menu" /><span>Menu</span></button>
       <div className="mobile-bar-store"><span className="name">{p.store.name}</span>{current && <span className="area">{current.label}</span>}</div>

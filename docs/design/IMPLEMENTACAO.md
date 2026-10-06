@@ -141,3 +141,11 @@ node docs/design/tokens-css.mjs --check        # :root do CSS em dia com tokens.
 Evolução de UX (projeto de desenvolvimento, dados de teste): `node scripts/fixtures/seed-presets.mjs` cria as seis lojas de exemplo (três modelos + vazia, um produto, cor clara/imagens irregulares) e grava os acessos em `.local/demo-presets.json`; `scripts/design-review.mjs` e `scripts/ux-checks.mjs` rodam no contêiner `tests` (comandos no cabeçalho de cada arquivo).
 
 Capturas das rotas reais: usar o seed (`node scripts/seed.mjs --local`) e Playwright em 390/768/1440, gravando em `artifacts/` (ignorado) e registrando o resultado no ACEITE. Se Docker não estiver disponível no ambiente, registrar “não executado” com o motivo — não marcar como aprovado.
+
+## Redesign do espaço de trabalho — 05/10/2026 (D-37)
+
+R01: `apps/web/app/page.tsx`; R02: `components/panel/catalog.tsx`; R05: `app/painel/[tenantId]/operacao/page.tsx`; todas as rotas do painel: `components/panel/Shell.tsx` + `app/style.css`. Sem mudança de endpoints, bibliotecas ou seletores de negócio. Teste de interface: `scripts/redesign-check.mjs`; capturas e limitações em [evidencias/redesign-workspace/README.md](evidencias/redesign-workspace/README.md).
+
+## Vitrine e compra — 06/10/2026 (D-38)
+
+R08/R09/R17: composição por preset e categorias em `app/style.css` + `components/storefront.tsx`; R10: bloco de compra e trilho de miniaturas; R12: cabeçalho, etapas e hierarquia em `components/checkout.tsx` e CSS. Interações de busca/menu incluem foco e estado expandido. Nenhuma dependência nova ou mudança no backend, valores monetários ou protocolo de confirmação. Teste reproduzível: `scripts/vitrine-redesign-check.mjs`; evidências e limitações em [redesign-vitrine](evidencias/redesign-vitrine/README.md).

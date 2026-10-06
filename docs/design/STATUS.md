@@ -1,5 +1,9 @@
 # Status dos materiais de design
 
+> **Continuação — 06/10/2026 (D-38):** três vitrines, página do produto e checkout atualizados. Tipos, build, tokens e testes de UI aprovados em 320/390/768/1440 px com API HTTP sintética. Evidências e limites: [redesign-vitrine](evidencias/redesign-vitrine/README.md). Integração real e aprovação visual humana pendentes.
+
+> **Novo redesign — 05/10/2026 (D-37):** acesso, lateral compartilhada do painel, catálogo e Hoje implementados sobre `91c0680`. Tipos, build e verificador de design aprovados. Testes de interface com API sintética em quatro larguras; integração completa não executada (Docker ausente). Registro da rodada e capturas: [redesign-workspace](evidencias/redesign-workspace/README.md). Aprovação visual humana pendente. Os registros abaixo pertencem às rodadas anteriores.
+
 > **Rodada Compasso (04/10/2026, sobre `9bcc3f2`):** identidade da plataforma integrada ao [DESIGN.md](../../DESIGN.md) (§2.1, D-31–D-36), painel/editor/lojas/checkout corrigidos, zoom real 200/400% verificado, verificador oficial **código 2 com 18 etapas locais aprovadas** (05/10), evidências em [evidencias/compasso-9bcc3f2/](evidencias/compasso-9bcc3f2/README.md). Resultados e pendências: [RELATORIO-FINAL.md §11](RELATORIO-FINAL.md). Aprovação visual humana pendente.
 
 **Data:** 04/10/2026 · **Branch:** `main` (commits locais, sem push) · **Último código:** `17383a9`

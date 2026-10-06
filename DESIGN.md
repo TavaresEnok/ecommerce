@@ -1,6 +1,6 @@
 # DESIGN.md — interface da Plataforma
 
-**Versão:** 2.1 · **Data:** 04/10/2026 · **Estado:** rotas redesenhadas (lotes 1–3), evolução de UX/personalização (lotes A–C) e **direção Compasso** para a identidade da plataforma (painel, acesso e administração; §2.1): navegação do painel por tarefas, configurações por assunto, catálogo e edição progressiva, editor de aparência como espaço de trabalho (trilho, prévia, propriedades), três modelos de loja (presets), tema versionado v2 e prévia ao vivo. Estado detalhado em [STATUS.md](docs/design/STATUS.md). A aprovação visual humana desta rodada continua pendente.
+**Versão:** 2.3 · **Data:** 06/10/2026 · **Estado:** rotas redesenhadas (lotes 1–3), evolução de UX/personalização (lotes A–C) e **direção Compasso** para a identidade da plataforma (painel, acesso e administração; §2.1): navegação do painel por tarefas, configurações por assunto, catálogo e edição progressiva, editor de aparência como espaço de trabalho (trilho, prévia, propriedades), três modelos de loja (presets), tema versionado v2 e prévia ao vivo. Estado detalhado em [STATUS.md](docs/design/STATUS.md). A aprovação visual humana desta rodada continua pendente.
 
 Este documento orienta toda mudança de interface em `apps/web`. Ele **complementa** `docs/especificacao.md` (v1.1) e não altera regras de pagamento, estoque, pedidos, permissões, isolamento entre lojas, privacidade ou obrigações ao consumidor. Quando houver conflito, a especificação vence e este documento deve ser corrigido.
 
@@ -61,6 +61,25 @@ Princípio: a interface transmite **organização, confiança e cuidado com o ca
 - **Lojas:** a direção **não** se aplica às vitrines. Cada modelo (Editorial, Essencial, Ateliê) mantém neutros, fontes e composição próprios (§11), e as personalizações existentes continuam valendo. Os tokens `store-*` da “Casa Ipê” do material anexado ficam registrados só como **direção de demonstração** (D-35): não viraram tokens nem fixture, e nenhuma loja existente (Barro & Trama, Atelier Norte, Essencial Casa Digital) foi renomeada.
 
 **Proibido:** transformar toda informação em card; métricas/gráficos decorativos; blocos promocionais em telas operacionais; WebGL; animação ao rolar; bibliotecas novas apenas para ornamentar.
+
+### 2.2 Redesign do espaço de trabalho (05/10/2026)
+
+A solicitação de novo redesign substitui a lateral mineral da direção anterior por uma lateral grafite no desktop. Mantém o plano de trabalho claro, Manrope/IBM Plex Sans, os tokens existentes e as vitrines independentes. Esta rodada abrange o acesso, a casca compartilhada do painel, o catálogo e a página Hoje.
+
+- Lateral: `context-global` com `on-context-global` e `on-context-global-muted`; foco `focus-on-dark`. Item selecionado e hover claro usam `focus`, com marcador lateral na seleção. Identificação provisória “Plataforma”, contexto da loja e conta da equipe separados.
+- Acesso deslogado: introdução à esquerda e formulário à direita a partir de 1024 px; abaixo disso, formulário em uma coluna. Aviso local depois do formulário, códigos e erros preservados.
+- Catálogo: busca e filtros em faixa de trabalho, tabela com cabeçalho discreto; linhas compactas no celular. Limite de 100 e filtros na URL preservados.
+- Hoje: quatro links com contadores de pendências retornados por `/operations/status`; nenhum faturamento ou gráfico inventado. Alertas e vendas lado a lado no desktop, empilhados no celular. Zero significa ausência daquela pendência, não ausência de pedidos para enviar.
+- Evidência desta rodada: [redesign-workspace](docs/design/evidencias/redesign-workspace/README.md). A API nos testes foi sintética; os resultados anteriores de integração não certificam este commit.
+
+### 2.3 Vitrine e compra (06/10/2026)
+
+Continuação do redesign: Editorial com abertura ampla e coleções em três colunas, Ateliê com foto vertical e narrativa lateral, Essencial com categorias diretas e preços mais destacados. Fontes, cores, botões, dados e configurações continuam derivados do tema de cada loja.
+
+- Produto: miniaturas em trilho vertical no desktop; categoria, título, preço, variações, quantidade e ação agrupados. A proporção das fotos de produto continua configurável.
+- Navegação: abertura de busca recebe foco; Escape retorna ao botão. Menu móvel comunica estado expandido e devolve o foco ao fechar.
+- Checkout: identidade da loja e “Continuar comprando” no cabeçalho; título antes das etapas, quatro rótulos visíveis no celular, divisórias e revisão com espaço interno. Carrinho vazio omite etapas. Cálculo, validação, idempotência e avisos de pagamento mantidos.
+- Evidência: [redesign-vitrine](docs/design/evidencias/redesign-vitrine/README.md). Fluxo de interface com HTTP sintético; não certifica gateway, RLS ou autorização real.
 
 ## 3. Fundamentos
 
@@ -420,3 +439,5 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 | D-34 | Essencial com busca no cabeçalho, categorias em blocos de mesma altura, grade sem cartões e foto inteira no palco; Editorial com texto fora do produto (à direita no desktop, abaixo no celular) e nova foto CC0 de abertura; Ateliê com foto do processo coerente com o texto | Problemas apontados na revisão: busca e categorias pouco comerciais, foto da abertura sem o produto e imagem sem relação com o texto |
 | D-35 | Tokens `store-*` “Casa Ipê” do material da direção ficam só registrados como exemplo de demonstração, sem fixture nem token | Uma fonte única de tokens; não renomear lojas de exemplo existentes nem impor identidade às vitrines |
 | D-36 | Mídia do produto sem reordenar/remover na interface | Limite real da API (sem coluna de posição, sem `DELETE` para o papel da aplicação, só rota de vincular); exige decisão de produto e migração |
+| D-37 | Novo espaço de trabalho: lateral grafite, acesso dividido, faixa de catálogo e resumo de pendências em Hoje | Solicitação de novo redesign; reutiliza tokens e fontes, mantém contratos e temas de vitrine |
+| D-38 | Continuação: composição dos três modelos, galeria com trilho no desktop e checkout com etapas legíveis | Produto e custo total com mais hierarquia; personalizações e contratos de compra preservados |

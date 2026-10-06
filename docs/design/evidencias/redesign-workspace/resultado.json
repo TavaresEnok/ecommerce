@@ -1,0 +1,84 @@
+{
+  "scope": "UI com API sintética; sem integração de backend",
+  "captures": [
+    {
+      "label": "acesso",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "catalogo",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "hoje",
+      "width": 320,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "acesso",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "catalogo",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "hoje",
+      "width": 390,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "acesso",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "catalogo",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "hoje",
+      "width": 768,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "acesso",
+      "width": 1440,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "catalogo",
+      "width": 1440,
+      "overflow": 0,
+      "errors": []
+    },
+    {
+      "label": "hoje",
+      "width": 1440,
+      "overflow": 0,
+      "errors": []
+    }
+  ],
+  "interactions": [
+    "registro/login inválido e preservação de e-mail",
+    "busca e filtro na URL",
+    "contadores retornados pela API",
+    "menu modal, Escape e retorno de foco",
+    "ocultação de ações do Dono para Funcionário"
+  ]
+}

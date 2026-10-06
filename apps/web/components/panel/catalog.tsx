@@ -59,6 +59,7 @@ export function ProductList({ catalogue }: { catalogue: Catalogue }) {
       <Link className="btn btn-primary" href={`${base}?novo=1`}><Icon name="plus" />Novo produto</Link>
     </div>
     {total === 0 ? <EmptyState icon="box" title="Cadastre o primeiro produto" action={<Link className="btn btn-primary" href={`${base}?novo=1`}>Cadastrar produto</Link>}>Comece pelo item que você mais vende. Ele aparece na loja quando estiver ativo e a aparência estiver publicada.</EmptyState> : <>
+      <div className="catalog-workspace">
       <div className="list-toolbar" role="search" aria-label="Buscar e filtrar produtos">
         <div className="search-field">
           <label htmlFor="q-prod">{atLimit ? `Buscar nos primeiros ${LIST_LIMIT} produtos (A–Z)` : `Buscar em ${total} ${total === 1 ? 'produto' : 'produtos'}`}</label>
@@ -99,6 +100,7 @@ export function ProductList({ catalogue }: { catalogue: Catalogue }) {
         </table>
         <p className="list-foot" role="status">{shown.length === total ? `${total} ${total === 1 ? 'produto' : 'produtos'}` : `${shown.length} de ${total} produtos`}</p>
       </>}
+      </div>
     </>}
   </>;
 }

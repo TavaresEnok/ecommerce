@@ -130,3 +130,34 @@ Critérios do pedido de evolução (lotes A–C). Evidências no projeto de dese
 | CK-RESUMO | Checkout no celular: resumo com total no topo; itens e entrega junto da confirmação (substitui A-R12-07) | `ux-checks.mjs` (CK-RESUMO) | aprovado | Ver FN01; capturas [revisão](evidencias/evolucao-ux/checkout-revisao-390.jpg) e [resumo aberto](evidencias/evolucao-ux/checkout-resumo-aberto-390.jpg). |
 
 Cobertura por rota nova: R15 `/painel/[tenantId]/aparencia` → TH01–TH04, UI02, A-R02-12; R16 `/painel/[tenantId]/configuracoes/[secao]` → UX03, UX05, A-R05-03 a A-R05-06; R17 `/lojas/[slug]/produtos` → UX01, UI03.
+
+## 4. Novo redesign — D-37 (05/10/2026)
+
+Esta seção é a evidência atual para as superfícies alteradas; resultados históricos acima se referem aos commits lá indicados. A API foi interceptada pelo Playwright com dados sintéticos. Nenhuma comprovação nova de pagamento, RLS ou autorização do servidor.
+
+| Critério | Resultado | Evidência |
+|---|---|---|
+| R01: registro acessível e retorno ao login; credenciais inválidas preservam e-mail | Aprovado na UI | `scripts/redesign-check.mjs`, 320/390/768/1440 |
+| R02: busca, filtro de situação e contagem atualizados | Aprovado na UI | Mesmo script, quatro larguras |
+| R05: contadores coincidem com resposta da API | Aprovado na UI | Valores sintéticos 2/1/0/0, quatro larguras |
+| Casca: menu modal, foco inicial, Escape, retorno ao botão | Aprovado na UI | 320/390/768 |
+| Casca: Funcionário sem Aparência ou controle de pausa | Aprovado na UI | Resposta sintética de papel EMPLOYEE em 1440 |
+| Reflow: nenhuma rolagem horizontal nas três telas | Aprovado | 12 registros em `evidencias/redesign-workspace/resultado.json` |
+| Tipos, build, tokens e contraste dos pares existentes | Aprovado | Comandos no README da evidência |
+| Suítes completas de API/checkout/RLS e zoom real | Não executado nesta rodada | Sem Docker; teste de UI sintética não substitui integração |
+
+## 5. Continuação — D-38 (06/10/2026)
+
+Verificação nova com componentes reais em build de produção e API HTTP sintética. Resultados históricos não certificam este commit.
+
+| Critério | Resultado | Evidência |
+|---|---|---|
+| Três presets mantêm identidade e h1 único | Aprovado na UI | `scripts/vitrine-redesign-check.mjs`, quatro larguras |
+| Busca recebe foco; Escape retorna ao botão; menu comunica estado e restaura foco | Aprovado na UI | Mesmo script |
+| Galeria troca fotos, seleciona miniatura e bloqueia opção esgotada | Aprovado na UI | Mesmo script |
+| Adicionar, cotar, preencher comprador e revisar com foco nas etapas | Aprovado na UI | Mesmo script, 320/390/768/1440 |
+| Confirmação incerta 503 mantém intenção/chave após recarga; comprovante aguarda pagamento | Aprovado na UI sintética | Duas requisições comparadas integralmente em cada largura |
+| Troca de loja mostra identidade correta; vazio omite etapas | Aprovado na UI | Não representa teste de isolamento RLS |
+| Reflow nas três vitrines, produto, carrinho, revisão e comprovante | Aprovado | 28 medidas sem overflow em `redesign-vitrine/resultado.json` |
+| Tipos, build, tokens; regressão de acesso/painel | Aprovado | README das evidências |
+| Integração real de API/RLS/gateway, zoom real, leitor de tela | Não executado | Docker ausente; teste sintético não substitui integração |

@@ -107,8 +107,8 @@ export function CartFlow({ slug, thumbs = {} }: { slug: string; thumbs?: Record<
   const lines = <ul className="line-items">{cart.items.map((i) => <li key={i.variant_id}><span className="line-thumb">{thumbs[i.variant_id] ? <img src={thumbs[i.variant_id]} alt="" width={56} height={56} loading="lazy" /> : null}</span><span>{i.name}<br /><span className="muted">{i.quantity} × {money(i.price_cents)}</span></span><span className="money">{money((BigInt(i.price_cents) * BigInt(i.quantity)).toString())}</span></li>)}</ul>;
   const totals = <dl className="totals"><div><dt>Subtotal</dt><dd>{money(cart.subtotal_cents)}</dd></div><div><dt>Frete{quote ? ` · ${quote.method}` : ''}</dt><dd>{quote ? money(quote.price_cents) : 'calcule na entrega'}</dd></div>{quote && <div className="grand"><dt>Total</dt><dd>{money(quote.total_cents)}</dd></div>}</dl>;
   return <>
-    <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{done && !current ? <Icon name="check" size={16} /> : i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>
-    <h1 style={{ padding: 'var(--space-16) 0 0' }}>Seu carrinho</h1>
+    <div className="checkout-heading"><h1 className="display">Seu carrinho</h1><p className="small muted">{cart.items.length ? `${units} ${units === 1 ? 'unidade' : 'unidades'} · confira os itens e escolha como receber.` : 'Escolha seus produtos para começar.'}</p></div>
+    {cart.items.length > 0 && <ol className="steps" aria-label="Etapas da compra">{steps.map(([l, done, current], i) => <li key={l} className={done && !current ? 'done' : undefined} aria-current={current ? 'step' : undefined}><span className="n">{done && !current ? <Icon name="check" size={16} /> : i + 1}</span><span className="l">{l}</span>{done && !current && <span className="sr-only"> (concluída)</span>}</li>)}</ol>}
     {unknown && (unknown.restored || step !== 'review') && <div style={{ paddingTop: 'var(--space-16)' }}>{pendingPanel}</div>}
     {recovered && <div style={{ paddingTop: 'var(--space-16)' }}><Alert tone="danger" role="alert" title="A confirmação anterior foi recusada pela loja">{recovered} Nenhum pedido foi criado por ela. Revise e confirme de novo.</Alert></div>}
     {cart.items.length === 0 ? <div style={{ padding: 'var(--space-24) 0 var(--space-48)' }}><EmptyState icon="cart" title="Seu carrinho está vazio" action={<a className="btn btn-primary" href={`/lojas/${slug}`}>Ver produtos</a>}>Adicionar itens não reserva estoque; a reserva acontece só ao confirmar a compra.</EmptyState></div> :
@@ -118,7 +118,7 @@ export function CartFlow({ slug, thumbs = {} }: { slug: string; thumbs?: Record<
         <div className="ms-body">{lines}{totals}</div>
       </details>
       <div className="checkout-main">
-        <section className="step-block" aria-labelledby="t-items">
+        <section className={`step-block${step === 'delivery' || editItems ? ' is-open' : ''}`} aria-labelledby="t-items">
           <header><h2 id="t-items">Itens</h2>{step === 'delivery' || editItems ? <span className="small muted">Preços recalculados pela loja; adicionar itens não reserva estoque.</span> : <button type="button" className="btn btn-secondary btn-sm" aria-expanded={false} disabled={!!unknown} onClick={() => setEditItems(true)}>Alterar itens</button>}</header>
           {step !== 'delivery' && !editItems ? <p className="small">{cart.items.reduce((n, i) => n + i.quantity, 0)} {cart.items.reduce((n, i) => n + i.quantity, 0) === 1 ? 'unidade' : 'unidades'} · {money(cart.subtotal_cents)}. Mudar itens exige calcular a entrega de novo.</p> : <>
           {errors.cart && <Alert tone="danger" role="alert" title="Não foi possível atualizar o carrinho">{errors.cart}</Alert>}
@@ -136,7 +136,7 @@ export function CartFlow({ slug, thumbs = {} }: { slug: string; thumbs?: Record<
             </div></div></li>; })}</ul></>}
         </section>
         {info && <Alert tone="warning" role="status" title="Recalcule a entrega">{info}</Alert>}
-        <section className="step-block" aria-labelledby="t-delivery">
+        <section className={`step-block${step === 'delivery' ? ' is-open' : ''}`} aria-labelledby="t-delivery">
           <header><h2 id="t-delivery" tabIndex={-1}>Entrega</h2>{step !== 'delivery' && quote && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => { setStep('delivery'); setQuote(null); }}>Alterar entrega</button>}</header>
           {step !== 'delivery' && quote && address ? <dl className="summary"><dt>Método</dt><dd>{quote.method}: {money(quote.price_cents)} · prazo {quote.days} {quote.days === 1 ? 'dia' : 'dias'}</dd><dt>Endereço</dt><dd>{address.street}, {address.number}{address.complement ? `, ${address.complement}` : ''} — {address.city}/{address.state} · CEP {address.cep}</dd></dl> :
           <form className="form" aria-label="Calcular frete" onSubmit={(e) => void quoteDelivery(e)}>
@@ -161,7 +161,7 @@ export function CartFlow({ slug, thumbs = {} }: { slug: string; thumbs?: Record<
             <div><button className="btn btn-primary" disabled={busy || !cart.valid || invalid.length > 0 || !!unknown}>{busy ? 'Calculando…' : 'Calcular frete'}</button></div>
           </form>}
         </section>
-        {quote && step !== 'delivery' && <section className="step-block" aria-labelledby="t-buyer">
+        {quote && step !== 'delivery' && <section className={`step-block${step === 'buyer' ? ' is-open' : ''}`} aria-labelledby="t-buyer">
           <header><h2 id="t-buyer" tabIndex={-1}>Seus dados</h2>{step === 'review' && <button type="button" className="btn btn-secondary btn-sm" disabled={busy || !!unknown} onClick={() => setStep('buyer')}>Corrigir dados</button>}</header>
           {methods === undefined ? <p role="status" className="small">Consultando meios de pagamento…</p> : !methods?.simulation ? <Alert tone="warning" title="Pagamento indisponível">{methods?.reason || 'A loja ainda não tem meio de pagamento habilitado.'} Nenhum pedido será criado.</Alert> :
           step === 'buyer' ? <form className="form" aria-label="Dados do comprador" onSubmit={(e) => { const b = fields(e); setBuyer({ name: b.name!, email: b.email!, method: b.method! }); setStep('review'); }}>
