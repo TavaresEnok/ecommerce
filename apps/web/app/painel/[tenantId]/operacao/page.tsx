@@ -38,10 +38,18 @@ export default function Operation() {
   ] : [];
   const open = counters.filter((c) => c.n > 0);
   return <>
-    <PageHeader title="Hoje" meta="O que pede atenção agora. Pedidos e protocolos ficam nas próprias áreas." />
+    <PageHeader title="Hoje" meta="Sua rotina, organizada. Veja o que precisa de você." actions={<Link className="btn btn-primary" href={`${base}/pedidos`}><Icon name="receipt" />Ver pedidos</Link>} />
     <Feedback error={error} notice={notice} />
     {loadError && <Alert tone="danger" role="alert" title="Não foi possível carregar a situação da loja">{loadError}</Alert>}
     {!status ? !loadError && <Loading label="Carregando situação da loja…" /> : <>
+      <nav className="operation-overview" aria-label="Resumo de pendências">
+        {counters.map((c) => <Link key={c.href + c.label} href={c.href} className="operation-metric">
+          <span className="metric-label">{c.label}</span>
+          <strong className={`metric-value num${c.n > 0 ? ` tone-${c.tone}` : ''}`}>{c.n}</strong>
+          <span className="metric-action">{c.n > 0 ? 'Revisar pendências' : 'Consultar registros'}<Icon name="chevron" size={16} /></span>
+        </Link>)}
+      </nav>
+      <div className="operation-workspace">
       <section className="surface section stack-sm" id="alertas" aria-labelledby="t-alerts">
         <h2 id="t-alerts">Alertas</h2>
         {status.alerts.length === 0 && open.length === 0 ? <p className="ok-line"><span className="badge badge-success">Sem alertas</span><span className="small muted">Pagamentos, protocolos e e-mails sem pendências.</span></p> : <>
@@ -51,7 +59,7 @@ export default function Operation() {
         </>}
         <p className="small"><Link href={`${base}/pedidos?payment_status=PAID&fulfillment_status=UNFULFILLED`}>Ver pedidos pagos a enviar</Link><span className="muted"> · os alertas não incluem a fila de envio</span></p>
       </section>
-      <section className="surface section stack-sm" id="vendas" aria-labelledby="t-sales">
+      <section className="surface section stack-sm operation-sales" id="vendas" aria-labelledby="t-sales">
         <div className="section-head"><h2 id="t-sales">Vendas</h2>{status.suspended ? <Badge tone="danger">Suspensa pela plataforma</Badge> : status.sales_paused ? <Badge tone="warning">Novas vendas pausadas</Badge> : <Badge tone="success">Recebendo pedidos</Badge>}</div>
         {status.suspended ? <Alert tone="danger" title="Loja suspensa pela plataforma">Novas vendas estão bloqueadas pela administração. Pedidos e obrigações anteriores continuam acessíveis.</Alert> :
           !p.owner ? <p className="small muted">Somente o Dono pausa ou retoma as vendas.</p> :
@@ -60,6 +68,7 @@ export default function Operation() {
             <form className="cluster fold-body" style={{ alignItems: 'end' }} aria-label="Pausar vendas" onSubmit={(e: FormEvent<HTMLFormElement>) => { e.preventDefault(); const f = e.currentTarget, b = fields(f); void run(async () => { await api('sales/pause', 'POST', b); f.reset(); await load(); await p.refresh(); }, 'Novas vendas pausadas.'); }}>
               <Field label="Motivo da pausa" hint="Fica registrado; o comprador não vê.">{(a) => <input className="input" name="reason" required maxLength={500} {...a} />}</Field><button className="btn btn-secondary" disabled={busy}>Pausar novas vendas</button></form></details>}
       </section>
+      </div>
       <section className="surface section stack-sm" aria-labelledby="t-shortcuts"><h2 id="t-shortcuts">Atalhos</h2>
         <ul className="shortcut-list">
           <li><Link href={`${base}?novo=1`}><Icon name="plus" size={16} />Cadastrar produto</Link></li>

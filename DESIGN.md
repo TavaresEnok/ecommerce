@@ -62,6 +62,16 @@ Princípio: a interface transmite **organização, confiança e cuidado com o ca
 
 **Proibido:** transformar toda informação em card; métricas/gráficos decorativos; blocos promocionais em telas operacionais; WebGL; animação ao rolar; bibliotecas novas apenas para ornamentar.
 
+### 2.2 Redesign do espaço de trabalho (05/10/2026)
+
+A solicitação de novo redesign substitui a lateral mineral da direção anterior por uma lateral grafite no desktop. Mantém o plano de trabalho claro, Manrope/IBM Plex Sans, os tokens existentes e as vitrines independentes. Esta rodada abrange o acesso, a casca compartilhada do painel, o catálogo e a página Hoje.
+
+- Lateral: `context-global` com `on-context-global` e `on-context-global-muted`; foco `focus-on-dark`. Item selecionado e hover claro usam `focus`, com marcador lateral na seleção. Identificação provisória “Plataforma”, contexto da loja e conta da equipe separados.
+- Acesso deslogado: introdução à esquerda e formulário à direita a partir de 1024 px; abaixo disso, formulário em uma coluna. Aviso local depois do formulário, códigos e erros preservados.
+- Catálogo: busca e filtros em faixa de trabalho, tabela com cabeçalho discreto; linhas compactas no celular. Limite de 100 e filtros na URL preservados.
+- Hoje: quatro links com contadores de pendências retornados por `/operations/status`; nenhum faturamento ou gráfico inventado. Alertas e vendas lado a lado no desktop, empilhados no celular. Zero significa ausência daquela pendência, não ausência de pedidos para enviar.
+- Evidência desta rodada: [redesign-workspace](docs/design/evidencias/redesign-workspace/README.md). A API nos testes foi sintética; os resultados anteriores de integração não certificam este commit.
+
 ## 3. Fundamentos
 
 Os valores abaixo são os de [tokens.json](docs/design/tokens.json). O verificador calcula o contraste de cada combinação usada.
@@ -420,3 +430,5 @@ Alvo de trabalho: critérios pertinentes de WCAG 2.2 nível AA. **Nenhum teste a
 | D-34 | Essencial com busca no cabeçalho, categorias em blocos de mesma altura, grade sem cartões e foto inteira no palco; Editorial com texto fora do produto (à direita no desktop, abaixo no celular) e nova foto CC0 de abertura; Ateliê com foto do processo coerente com o texto | Problemas apontados na revisão: busca e categorias pouco comerciais, foto da abertura sem o produto e imagem sem relação com o texto |
 | D-35 | Tokens `store-*` “Casa Ipê” do material da direção ficam só registrados como exemplo de demonstração, sem fixture nem token | Uma fonte única de tokens; não renomear lojas de exemplo existentes nem impor identidade às vitrines |
 | D-36 | Mídia do produto sem reordenar/remover na interface | Limite real da API (sem coluna de posição, sem `DELETE` para o papel da aplicação, só rota de vincular); exige decisão de produto e migração |
+
+| D-37 | Novo espaço de trabalho: lateral grafite, acesso dividido, faixa de catálogo e resumo de pendências em Hoje | Solicitação de novo redesign; reutiliza tokens e fontes, mantém contratos e temas de vitrine |

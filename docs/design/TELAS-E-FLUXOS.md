@@ -57,12 +57,12 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 - **Usuário:** qualquer pessoa da equipe (deslogada ou logada). Ambiente local usa códigos LOCAL em vez de e-mail.
 - **Tarefa:** entrar; criar acesso e verificar e-mail; recuperar senha; escolher loja; criar loja em rascunho; ajustar nome/fuso; convidar/revogar funcionário (Dono); aceitar convite.
-- **Hierarquia (deslogado):** coluna central de até 28rem com “Plataforma” (texto) → título “Entrar” → formulário → links para “Criar acesso” e “Recuperar acesso” (seções abaixo, cada uma com seu título). Aviso de ambiente local em `alert-info`. Código LOCAL em caixa com título “Código LOCAL — não é entrega de e-mail”.
+- **Hierarquia (deslogado, D-37):** desktop com introdução em coluna grafite e formulário de até 30rem; celular com formulário em uma coluna com “Plataforma” (texto) → título “Entrar” → formulário → links para “Criar acesso” e “Recuperar acesso” (seções abaixo, cada uma com seu título). Aviso de ambiente local em `alert-info`. Código LOCAL em caixa com título “Código LOCAL — não é entrega de e-mail”.
 - **Hierarquia (logado):** casca simples (sem lateral de loja) → “Suas lojas” como lista com nome, papel e “Abrir painel” → configuração da loja selecionada → equipe (Dono) → “Criar loja” e “Aceitar convite” como seções secundárias. Barra superior com e-mail, “Sair” e “Revogar todas as sessões” (este último em diálogo de confirmação).
 - **Ação principal:** deslogado “Entrar”; logado “Abrir painel” da loja escolhida.
 - **Dados/API:** `GET auth/session`, `POST auth/login|register|verify-email|recover|reset|logout|revoke-all`, `GET/POST tenants`, `GET/PATCH tenants/:id/settings`, `GET tenants/:id/members`, `PATCH …/members/:id/revoke`, `POST tenants/:id/invitations`, `POST invitations/accept`, `POST tenants/:id/configuration-check`.
 - **Estados:** carregando sessão; API indisponível (“Não foi possível conectar à API”); credenciais inválidas; nenhuma loja vinculada (vazio com “Criar loja” e “Aceitar convite”); Funcionário vê configuração somente leitura; código local visível/oculto.
-- **Desktop/celular:** coluna única nos dois; no desktop logado, lista de lojas e configuração lado a lado (2/3 + 1/3).
+- **Desktop/celular (D-37):** deslogado em duas colunas a partir de 1024 px, uma abaixo disso; no desktop logado, lista de lojas e configuração lado a lado (2/3 + 1/3).
 - **Preservar para testes:** formulário “Entrar”, rótulos “E-mail”, “Senha”, “Nome de exibição”; botões “Entrar”, “Sair”, “Salvar configuração” e o nome acessível do botão de loja no formato “Nome — Dono/Funcionário”.
 - **Critérios:** A-R01-*.
 
