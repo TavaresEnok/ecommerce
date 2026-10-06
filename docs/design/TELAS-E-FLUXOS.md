@@ -138,7 +138,7 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 - **Usuário:** comprador.
 - **Tarefa:** navegar pelo catálogo, buscar por nome/SKU, filtrar por categoria.
-- **Hierarquia:** cabeçalho da loja → mensagem principal do tema (texto, sem banner genérico; imagem do tema só se o lojista enviou) → busca → categorias como navegação → grade de StoreProductCard (2 colunas celular, 3–4 desktop) → rodapé com fornecedor.
+- **Hierarquia:** cabeçalho da loja → mensagem principal do tema (texto, sem banner genérico; imagem do tema só se o lojista enviou) → busca → categorias como navegação → grade de StoreProductCard (2 colunas celular; Editorial e Ateliê com 3 colunas desktop; Essencial segue densidade do tema) → rodapé com fornecedor.
 - **Ação principal:** abrir produto.
 - **Dados/API:** `GET public/stores/:slug?q=&category=` (até 100 produtos ativos), mídia `public/stores/:slug/media/:id/small|large`.
 - **Estados:** nenhum produto publicado; busca sem resultado (“Nenhum produto encontrado para ‘termo’” + limpar busca); produto sem foto; esgotado; loja sintética; loja suspensa (404 da vitrine, pedidos continuam em R13).
@@ -173,7 +173,7 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 - **Usuário:** comprador.
 - **Tarefa:** avaliar produto, escolher variação e quantidade, adicionar ao carrinho.
-- **Hierarquia:** trilha → galeria (4:5) → nome (h1, fonte de título da loja), preço, nota de frete → VariantPicker → disponibilidade + SKU → quantidade + “Adicionar ao carrinho” → descrição, cuidados/riscos (`supplier.risks`), entrega e trocas → relacionados (opcional, só se houver dados; hoje a API não fornece relacionados — usar categoria apenas se for implementado sem nova API, senão omitir).
+- **Hierarquia:** trilha → galeria (proporção do tema, miniaturas à esquerda no desktop) → bloco de compra com categoria, nome (h1, fonte de título da loja), preço → VariantPicker → disponibilidade + SKU → quantidade + “Adicionar ao carrinho” → nota de frete → descrição, cuidados/riscos (`supplier.risks`), entrega e trocas → relacionados (opcional, só se houver dados; hoje a API não fornece relacionados — usar categoria apenas se for implementado sem nova API, senão omitir).
 - **Ação principal:** “Adicionar ao carrinho” (cor da loja).
 - **Dados/API:** `GET public/stores/:slug/products/:product`, `POST public/stores/:slug/cart/items`.
 - **Estados:** variação esgotada; todas esgotadas (botão desabilitado + “Produto esgotado”); quantidade acima do saldo (erro do servidor junto ao campo); adicionado (“Variação adicionada ao carrinho. Ver carrinho”); sem foto; slug antigo (redirecionamento 301).
@@ -189,7 +189,7 @@ Formato de cada tela: usuário · tarefa · hierarquia · ação principal · da
 
 - **Usuário:** comprador.
 - **Tarefa:** revisar itens, mudar quantidades, cotar entrega, informar dados, revisar e confirmar compra.
-- **Hierarquia:** etapas (Carrinho → Entrega → Seus dados → Revisão) → coluna principal com a etapa atual e as concluídas resumidas → Resumo do pedido (itens, subtotal, frete, total, validade da cotação). Etapa Entrega: método (tabela de CEP, retirada, transportadora quando configurada) + endereço. Seus dados: nome completo, e-mail para comprovante, forma de pagamento. Revisão: resumos com “Alterar”, aviso de reserva de 40 minutos e políticas, botão “Confirmar compra de R$ X”.
+- **Hierarquia:** cabeçalho com identidade e “Continuar comprando” → “Seu carrinho” e quantidade → etapas (Carrinho → Entrega → Seus dados → Revisão; todas nomeadas no celular, omitidas se vazio) → coluna principal com a etapa atual e as concluídas resumidas → Resumo do pedido (itens, subtotal, frete, total, validade da cotação). Etapa Entrega: método (tabela de CEP, retirada, transportadora quando configurada) + endereço. Seus dados: nome completo, e-mail para comprovante, forma de pagamento. Revisão: resumos com “Alterar”, aviso de reserva de 40 minutos e políticas, botão “Confirmar compra de R$ X”.
 - **Ação principal:** por etapa: “Calcular frete” → “Revisar pedido” → “Confirmar compra de R$ X”.
 - **Dados/API:** `GET/POST public/stores/:slug/cart`, `…/cart/items`, `…/cart/quotes`, `…/cart/quotes/validate`, `GET …/payment-methods`, `POST …/cart/checkout` (chave de idempotência em `sessionStorage`).
 - **Estados:** carrinho vazio (“Seu carrinho está vazio” + voltar ao catálogo); item indisponível/acima do saldo; CEP sem atendimento; cotação vencida/mudou (novo total exige confirmação); pagamento indisponível (“Nenhum pedido será criado”); erro ao confirmar com repetição segura; ambiente SIMULADO.

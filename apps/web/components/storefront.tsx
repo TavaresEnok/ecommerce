@@ -115,7 +115,7 @@ function SectionView({ s, ctx, first }: { s: Section; ctx: Ctx; first: boolean }
     const more = s.source === 'category' && s.category ? `/categorias/${s.category}` : '/produtos';
     if (!list.length) return null;
     return <section data-section={s.id} className="sec products" aria-labelledby={`t-${s.id}`} id={s.id}>
-      <div className="sec-head">{s.heading ? <h2 id={`t-${s.id}`} className="display">{s.heading}</h2> : <h2 id={`t-${s.id}`} className="sr-only">Produtos</h2>}{(s.source !== 'manual' && all.length > list.length) && ctx.link(more, 'Ver todos', { className: 'sec-more' })}</div>
+      <div className="sec-head">{s.heading ? <h2 id={`t-${s.id}`} className="display">{s.heading}</h2> : <h2 id={`t-${s.id}`} className="sr-only">Produtos</h2>}{(s.source !== 'manual' && all.length > list.length) && ctx.link(more, <>Ver todos<Icon name="chevron" size={16} /></>, { className: 'sec-more' })}</div>
       <ul className={`cards${list.length === 1 ? ' is-single' : list.length === 2 ? ' is-pair' : ''}`}>{list.map((p, i) => <ProductCard key={p.id} p={p} href={ctx.href(`/produtos/${p.slug}`)} url={ctx.url} category={ctx.categoryName(p.category_id)} eager={first && i < 4} feature={list.length === 1} />)}</ul>
     </section>;
   }
@@ -125,7 +125,7 @@ function SectionView({ s, ctx, first }: { s: Section; ctx: Ctx; first: boolean }
     const count = (c: Category) => ctx.data.products.filter((p) => c.id && p.category_id === c.id).length;
     return <section data-section={s.id} className="sec categories" aria-labelledby={`t-${s.id}`}>
       <div className="sec-head">{s.heading ? <h2 id={`t-${s.id}`} className="display">{s.heading}</h2> : <h2 id={`t-${s.id}`} className="sr-only">Categorias</h2>}</div>
-      <ul className="category-list">{cats.map((c) => <li key={c.slug}>{ctx.link(`/categorias/${c.slug}`, <><span className="cat-name">{c.name}</span>{count(c) > 0 && <span className="cat-count">{count(c)} {count(c) === 1 ? 'produto' : 'produtos'}</span>}</>)}</li>)}</ul>
+      <ul className="category-list">{cats.map((c) => <li key={c.slug}>{ctx.link(`/categorias/${c.slug}`, <><span className="category-copy"><span className="cat-name">{c.name}</span>{count(c) > 0 && <span className="cat-count">{count(c)} {count(c) === 1 ? 'produto' : 'produtos'}</span>}</span><Icon name="chevron" size={16} /></>)}</li>)}</ul>
     </section>;
   }
   if (s.type === 'image_text') {
@@ -153,7 +153,9 @@ export default function Storefront({ data, path = [], preview = false, previewTe
   const category = path[0] === 'categorias' ? data.categories.find((c) => c.slug === path[1]) : null;
   const catalog = path.length === 1 && path[0] === 'produtos';
   const home = path.length === 0, here = `/${path.join('/')}`;
-  const menuRef = useRef<HTMLDialogElement>(null), [searchOpen, setSearchOpen] = useState(false);
+  const menuRef = useRef<HTMLDialogElement>(null), menuButton = useRef<HTMLButtonElement>(null), searchButton = useRef<HTMLButtonElement>(null), searchInput = useRef<HTMLInputElement>(null), [searchOpen, setSearchOpen] = useState(false), [menuOpen, setMenuOpen] = useState(false);
+  const checkout = !preview && path[0] === 'carrinho';
+  useEffect(() => { if (searchOpen) searchInput.current?.focus(); }, [searchOpen]);
   const unavailable = <div className="store-page"><EmptyState icon="eye" title="Indisponível na prévia" action={<a className="btn btn-secondary" href={base}>Voltar ao início da prévia</a>}>Busca, carrinho, atendimento e pedidos só funcionam na loja publicada. A prévia mostra o início, o catálogo, as páginas e os produtos do rascunho.</EmptyState></div>;
   const grid = (list: Product[], label: string) => list.length ? <ul className="cards" aria-label={label}>{list.map((p, i) => <ProductCard key={p.id} p={p} href={href(`/produtos/${p.slug}`)} url={url} category={categoryName(p.category_id)} eager={i < 4} />)}</ul> : null;
   const categoryNav = (currentSlug?: string) => data.categories.length > 0 && <nav className="category-strip" aria-label="Categorias"><ul><li>{link('/produtos', 'Todos', { current: catalog && !currentSlug })}</li>{data.categories.map((c) => <li key={c.slug}>{link(`/categorias/${c.slug}`, c.name, { current: currentSlug === c.slug })}</li>)}</ul></nav>;
@@ -168,10 +170,13 @@ export default function Storefront({ data, path = [], preview = false, previewTe
     <div className="pdp">
       <Gallery product={product} url={url} category={cat} />
       <div className="buy">
+        <div className="product-purchase">
+        {cat && <p className="product-category">{cat}</p>}
         <h1 className="display buy-title">{product.name}</h1>
         {priceLabel(product) && <p className="price">{priceLabel(product)}</p>}
         {preview ? <p className="hint">A compra fica desativada na prévia.</p> : <AddToCart slug={route.slug} product={product} cartHref={`${base}/carrinho`} contactHref={`${base}/atendimento`} />}
         <p className="small muted ship-note"><Icon name="truck" size={16} />O frete é calculado no carrinho, pelo CEP.</p>
+        </div>
         <div className="info-list">
           {product.description && <section aria-labelledby="t-desc"><h2 id="t-desc">Descrição</h2><p className="prose">{product.description}</p></section>}
           {supplier?.risks && <details><summary>Cuidados</summary><p className="prose">{supplier.risks}</p></details>}
@@ -205,30 +210,32 @@ export default function Storefront({ data, path = [], preview = false, previewTe
   const brandMark = theme.brand.logo ? <img className="store-logo" src={url(theme.brand.logo, 'small')} alt={theme.title} height={40} /> : <span className="store-title display">{theme.title}</span>;
   const search = !preview && <form className="store-search" action={base} role="search">
     <label className="sr-only" htmlFor="store-q">Buscar produtos</label>
-    <input className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produtos…" enterKeyHint="search" />
+    <input ref={searchInput} className="input" id="store-q" type="search" name="q" maxLength={100} defaultValue={q} placeholder="Buscar produtos…" enterKeyHint="search" />
     <button className="btn btn-secondary" aria-label="Buscar"><Icon name="search" size={20} /></button>
   </form>;
   return <div className="surface-store" data-store={route.slug} data-preset={theme.preset} data-density={theme.layout.density} style={themeStyle(theme) as CSSProperties}>
     <a className="skip-link" href="#conteudo">Ir para o conteúdo</a>
     {preview && !live && <div className="notice-bar store-notice"><div className="store-wrap cluster-tight"><Icon name="eye" size={16} /><strong>Prévia privada do rascunho, não publicada.</strong><span>Produtos e preços vêm do catálogo atual.</span>{previewTenant && <a href={`/painel/${previewTenant}/aparencia`}>Voltar ao editor</a>}</div></div>}
     {!preview && supplier?.synthetic && <div className="notice-bar store-notice"><div className="store-wrap">Loja de teste: produtos, contatos e políticas fictícios; nenhuma venda real é feita.</div></div>}
-    <header className="store-header"><div className="store-wrap head-row">
-      <button type="button" className="store-menu-toggle" onClick={() => menuRef.current?.showModal()} aria-haspopup="dialog" aria-controls="menu-loja"><Icon name="menu" /><span className="sr-only">Menu da loja</span></button>
-      <div className="store-brand">{home && !q ? link('/', brandMark) : link('/', brandMark)}</div>
-      <nav className="store-nav" aria-label="Navegação da loja"><ul>{navItems}</ul></nav>
+    <header className={`store-header${checkout ? ' is-checkout' : ''}`}><div className="store-wrap head-row">
+      {!checkout && <button ref={menuButton} type="button" className="store-menu-toggle" onClick={() => { menuRef.current?.showModal(); setMenuOpen(true); }} aria-haspopup="dialog" aria-expanded={menuOpen} aria-controls="menu-loja"><Icon name="menu" /><span className="sr-only">Menu da loja</span></button>}
+      <div className="store-brand">{link('/', brandMark)}</div>
+      {!checkout && <nav className="store-nav" aria-label="Navegação da loja"><ul>{navItems}</ul></nav>}
       {/* Essencial: a busca é parte do cabeçalho (sempre visível); os outros modelos a abrem pela lupa. */}
-      {search && theme.preset === 'essencial' && <div className="head-search" id="busca-loja">{search}</div>}
+      {!checkout && search && theme.preset === 'essencial' && <div className="head-search" id="busca-loja">{search}</div>}
       <div className="head-actions">
-        {!preview && theme.preset !== 'essencial' && <button type="button" className="icon-link search-toggle" aria-expanded={searchOpen} aria-controls="busca-loja" onClick={() => setSearchOpen(!searchOpen)}><Icon name="search" /><span className="sr-only">{searchOpen ? 'Esconder busca' : 'Mostrar busca'}</span></button>}
-        {!preview && <a className="icon-link store-cart" href={`${base}/carrinho`} aria-current={here === '/carrinho' ? 'page' : undefined}><Icon name="cart" /><span className="cart-label">Carrinho</span></a>}
+        {checkout ? <a className="checkout-back" href={base}><Icon name="back" size={16} />Continuar comprando</a> : <>
+          {!preview && theme.preset !== 'essencial' && <button ref={searchButton} type="button" className="icon-link search-toggle" aria-expanded={searchOpen} aria-controls="busca-loja" onClick={() => setSearchOpen(!searchOpen)}><Icon name="search" /><span className="sr-only">{searchOpen ? 'Esconder busca' : 'Mostrar busca'}</span></button>}
+          {!preview && <a className="icon-link store-cart" href={`${base}/carrinho`}><Icon name="cart" /><span className="cart-label">Carrinho</span></a>}
+        </>}
       </div>
     </div>
-      {search && theme.preset !== 'essencial' && <div id="busca-loja" className={`store-wrap search-row${searchOpen || q ? '' : ' is-collapsed'}`}>{search}</div>}
+      {!checkout && search && theme.preset !== 'essencial' && <div id="busca-loja" className={`store-wrap search-row${searchOpen || q ? '' : ' is-collapsed'}`} onKeyDown={(e) => { if (e.key === 'Escape' && searchOpen) { setSearchOpen(false); searchButton.current?.focus(); } }}>{search}</div>}
     </header>
-    <dialog ref={menuRef} id="menu-loja" className="drawer store-drawer" aria-label="Menu da loja" onClick={(e) => { if (e.target === menuRef.current) menuRef.current?.close(); }}>
+    {!checkout && <dialog ref={menuRef} id="menu-loja" className="drawer store-drawer" aria-label="Menu da loja" onClose={() => { setMenuOpen(false); menuButton.current?.focus(); }} onClick={(e) => { if (e.target === menuRef.current) menuRef.current?.close(); }}>
       <div className="drawer-inner"><div className="drawer-head"><span className="store-title display">{theme.title}</span><button type="button" className="icon-button" onClick={() => menuRef.current?.close()} aria-label="Fechar menu"><Icon name="x" /></button></div>
         <nav aria-label="Navegação da loja (menu)"><ul className="drawer-links">{navItems}{data.categories.map((c) => <li key={c.slug}>{link(`/categorias/${c.slug}`, c.name)}</li>)}</ul></nav></div>
-    </dialog>
+    </dialog>}
     <main id="conteudo" className="store-main" tabIndex={-1}><div className="store-wrap">{content}</div></main>
     {path[0] === 'carrinho' && supplier ? <footer className="store-footer is-checkout"><div className="store-wrap checkout-foot">
       <section aria-labelledby="t-supplier"><h2 id="t-supplier" className="foot-title">Fornecedor e atendimento</h2><p className="small"><strong>{supplier.name}</strong>{supplier.document && <>, CPF/CNPJ {supplier.document}</>}. {supplier.address}</p><p className="small"><a href={`mailto:${supplier.email}`}>{supplier.email}</a>, {supplier.phone}. {link('/atendimento', 'Fale com a loja')}</p></section>
