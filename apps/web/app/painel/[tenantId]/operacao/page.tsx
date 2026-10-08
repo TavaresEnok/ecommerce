@@ -37,13 +37,22 @@ export default function Operation() {
     { n: status.notifications_failed, label: status.notifications_failed === 1 ? 'e-mail não entregue' : 'e-mails não entregues', href: `${base}/pedidos`, tone: 'warning' },
   ] : [];
   const open = counters.filter((c) => c.n > 0);
+  const summary = counters.map((c) => ({ ...c, hint: c.n > 0 ? 'Precisa de atenção' : 'Tudo certo nesta fila' }));
   return <>
     <PageHeader title="Hoje" meta="O que pede atenção agora. Pedidos e protocolos ficam nas próprias áreas." />
     <Feedback error={error} notice={notice} />
     {loadError && <Alert tone="danger" role="alert" title="Não foi possível carregar a situação da loja">{loadError}</Alert>}
     {!status ? !loadError && <Loading label="Carregando situação da loja…" /> : <>
+      <section className="today-summary" aria-label="Resumo operacional">
+        {summary.map((c) => <Link className={`status-tile tone-${c.tone}${c.n === 0 ? ' is-clear' : ''}`} href={c.href} key={c.label}>
+          <span className="status-number">{c.n}</span>
+          <span className="status-label">{c.label}</span>
+          <span className="status-hint">{c.hint}</span>
+          <Icon name="chevron" size={16} />
+        </Link>)}
+      </section>
       <section className="surface section stack-sm" id="alertas" aria-labelledby="t-alerts">
-        <h2 id="t-alerts">Alertas</h2>
+        <div className="section-head"><h2 id="t-alerts">Alertas e pendências</h2><p>Priorize o que impede venda, envio ou atendimento.</p></div>
         {status.alerts.length === 0 && open.length === 0 ? <p className="ok-line"><span className="badge badge-success">Sem alertas</span><span className="small muted">Pagamentos, protocolos e e-mails sem pendências.</span></p> : <>
           {open.length > 0 && <ul className="attention-list">{open.map((c) => <li key={c.label}><Link href={c.href}><span className={`attention-n tone-${c.tone}`}>{c.n}</span><span>{c.label}</span><Icon name="chevron" size={16} /></Link></li>)}</ul>}
           {status.alerts.length > 0 && <ul className="stack-sm" style={{ listStyle: 'none' }}>{status.alerts.map((a) => { const h = HELP[a.code] ?? { title: 'Alerta operacional', text: 'Verifique o processamento da loja.' }, link = h.link?.(base); return <li key={a.code}>
