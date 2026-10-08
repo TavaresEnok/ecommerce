@@ -121,10 +121,15 @@ function NavList({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () =
   </div>)}</nav>;
 }
 function StoreBlock() {
-  const p = usePanel();
+  const p = usePanel(), initial = p.store.name.trim().charAt(0).toLocaleUpperCase('pt-BR') || 'L';
   return <div className="store-block">
-    <p className="store-block-name">{p.store.name}</p>
-    <p className="store-block-meta">{p.owner ? 'Dono' : 'Funcionário'}<span className="sep" aria-hidden>/</span><span className="slug">{p.store.slug}</span></p>
+    <div className="store-identity">
+      <span className="store-avatar" aria-hidden>{initial}</span>
+      <div>
+        <p className="store-block-name">{p.store.name}</p>
+        <p className="store-block-meta">{p.owner ? 'Dono' : 'Funcionário'}<span className="sep" aria-hidden>/</span><span className="slug">{p.store.slug}</span></p>
+      </div>
+    </div>
     {/* Situação da loja num só lugar (lateral ou gaveta); a barra do celular mostra só “Simulado”. */}
     <div className="store-status"><SalesState /><PaymentTag /></div>
   </div>;
@@ -162,6 +167,17 @@ function Frame({ children }: { children: ReactNode }) {
       </div>
     </dialog>
     <div className="main">
+      <header className="topbar" aria-label="Contexto da área atual">
+        <div className="topbar-leading">
+          <span className="topbar-area">{current?.label ?? 'Painel'}</span>
+          <span className="topbar-store">{p.store.name}</span>
+        </div>
+        <div className="topbar-actions">
+          <SalesState />
+          <PaymentTag compact />
+          <a className="topbar-link" href={`/lojas/${p.store.slug}`}><Icon name="eye" size={16} />Ver loja</a>
+        </div>
+      </header>
       <main className="content" id="conteudo" tabIndex={-1}>{children}</main>
     </div>
   </div>;
